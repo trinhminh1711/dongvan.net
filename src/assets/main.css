@@ -1,12 +1,4 @@
 @import './base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-}
-
 a,
 .green {
   text-decoration: none;
@@ -14,22 +6,57 @@ a,
   transition: 0.4s;
   padding: 3px;
 }
-
+.text-color_primary
+{
+  color: #344054;
+}
+.text-color__tertiary
+{
+  color: rgba(174, 174, 174, 1);
+}
+.color-alert
+{
+  color: #BF2C24;
+}
+.color-layout
+{
+  background: #F7F6F2;
+}
+.color-gray
+{
+  color: #C6C4C4;
+}
+.color-yellow
+{
+  color: #FC6C28;
+}
+.color-blue
+{
+  color: #0060BF;
+}
+.color-light-blue
+{
+  color: #1F84D7;
+}
+.text-md
+{
+  font-size: 14px;
+}
+.text-sm
+{
+  font-size: 12px;
+}
+.btn-alert__rounded
+{
+border: none;
+    background-color: #FC6C28;
+    color: white;
+    border-radius: 50px;
+    padding: 5px 20px;
+    font-weight: 700;
+}
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
   }
 }

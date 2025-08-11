@@ -1,0 +1,166 @@
+<template>
+    <div class="container pb-3 text-center">
+        <div class="row align-items-start align-items-center justify-content-between">
+            <div class="col d-flex justify-content-start">
+                <img class="header-logo" src="../../assets/logo.png" />
+            </div>
+            <div class="col">
+                <el-autocomplete class="search-bar" v-model="state" :fetch-suggestions="querySearch"
+                    popper-class="my-autocomplete" placeholder="Tìm kiếm tên truyện" @select="handleSelect">
+                    <template #suffix>
+                        <el-icon style="color: black;" class="el-input__icon" @click="handleIconClick">
+                            <Search />
+                        </el-icon>
+                    </template>
+                    <template #default="{ item }">
+                        <div class="value">{{ item.value }}</div>
+                        <span class="link">{{ item.link }}</span>
+                    </template>
+                </el-autocomplete>
+            </div>
+            <div class="col">
+                <div @click="dialogVisible = true" class="d-flex justify-content-end"> <button type="button"
+                        class="btn btn-danger">Tài khoản</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="menu-bar">
+        <div class="container text-center">
+            <div class="row align-items-start align-items-center justify-content-between">
+                <div class="col-3 d-flex align-items-center">
+                    <div class="d-flex align-items-center">
+                        <el-icon style="color: aliceblue;">
+                            <Fold />
+                        </el-icon>
+                    </div>
+                    <div class="text-white">
+                        Thể loại
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="menu-item">
+                        <el-menu class="el-menu-top" mode="horizontal" background-color="#545c64" text-color="#fff"
+                            active-text-color="#ffd04b" @select="handleSelect">
+                            <el-menu-item index="1">Diễn đàn</el-menu-item>
+                            <el-menu-item index="1">Bảng xếp hạng</el-menu-item>
+                            <el-menu-item index="1">Hỗ trợ</el-menu-item>
+                        </el-menu>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="d-flex justify-content-end">
+                        <span class="text-white px-4">
+                            Hướng dẫn
+                        </span>
+                        <span class="text-white">
+                            Đăng truyện
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <el-dialog v-model="dialogVisible" width="300">
+        <LoginPage />
+    </el-dialog>
+</template>
+
+<script lang="ts" setup>
+import { onMounted, ref } from 'vue'
+import { ElMessageBox } from 'element-plus'
+import LoginPage from '@/pages/LoginPage.vue'
+
+const dialogVisible = ref(false)
+
+const handleClose = (done: () => void) => {
+    ElMessageBox.confirm('Are you sure to close this dialog?')
+        .then(() => {
+            done()
+        })
+        .catch(() => {
+            // catch error
+        })
+}
+interface LinkItem {
+    value: string
+    link: string
+}
+
+const state = ref('')
+const links = ref<LinkItem[]>([])
+
+const querySearch = (queryString: string, cb) => {
+    const results = queryString
+        ? links.value.filter(createFilter(queryString))
+        : links.value
+    // call callback function to return suggestion objects
+    cb(results)
+}
+const createFilter = (queryString: string) => {
+    return (restaurant: LinkItem) => {
+        return (
+            restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+        )
+    }
+}
+const loadAll = () => {
+    return [
+        { value: 'vue', link: 'https://github.com/vuejs/vue' },
+        { value: 'element', link: 'https://github.com/ElemeFE/element' },
+        { value: 'cooking', link: 'https://github.com/ElemeFE/cooking' },
+        { value: 'mint-ui', link: 'https://github.com/ElemeFE/mint-ui' },
+        { value: 'vuex', link: 'https://github.com/vuejs/vuex' },
+        { value: 'vue-router', link: 'https://github.com/vuejs/vue-router' },
+        { value: 'babel', link: 'https://github.com/babel/babel' },
+    ]
+}
+const handleSelect = (item: Record<string, any>) => {
+    console.log(item)
+}
+
+const handleIconClick = (ev: Event) => {
+    console.log(ev)
+}
+
+onMounted(() => {
+    links.value = loadAll()
+})
+</script>
+
+<style>
+.menu-bar {
+    background-color: rgb(42, 41, 41);
+}
+
+.search-bar .el-input__inner {
+    height: 40px;
+}
+
+.search-bar .el-input__wrapper {
+    border-radius: 50px;
+}
+
+.demo-tabs>.el-tabs__content {
+    color: #6b778c;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.header-logo {
+    width: 150px;
+    height: auto;
+}
+
+.el-menu-top {
+    max-height: 40px;
+}
+
+.btn-danger {
+    padding: 5px 20px;
+    border-radius: 40px;
+    border: solid 1px;
+    color: #fff;
+    background: red;
+}
+</style>

@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "bootstrap": "^5.3.7",
     "element-plus": "^2.10.6",
+    "swiper": "^11.2.10",
     "vue": "^3.5.18"
   },
   "devDependencies": {
