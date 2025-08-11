@@ -54,9 +54,9 @@
       <div class="row col-3 px-0 d-flex align-items-center">
         <RankingList>
           <template #header>
-            <img class="vote-icon__yellow" src="/src/assets/icon/vote-title-icon.svg" alt="">
+            <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
             <h3 class="topvote-title color-light-blue">Người đọc đề cử</h3>
-            <img class="vote-icon__yellow" src="/src/assets/icon/vote-title-icon2.svg" alt="">
+            <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon2.svg" alt="">
           </template>
         </RankingList>
 
@@ -64,9 +64,9 @@
       <div class="row col-3 px-0 d-flex align-items-center">
         <RankingList>
           <template #header>
-            <img class="vote-icon__yellow" src="/src/assets/icon/vote-title-icon.svg" alt="">
+            <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
             <h3 class="topvote-title color-light-blue">Đọc nhiều trong tuần</h3>
-            <img class="vote-icon__yellow" src="/src/assets/icon/vote-title-icon2.svg" alt="">
+            <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon2.svg" alt="">
           </template>
         </RankingList>
 
@@ -74,9 +74,9 @@
       <div class="row col-3 px-0 d-flex align-items-center">
         <RankingList>
           <template #header>
-            <img class="vote-icon__yellow" src="/src/assets/icon/vote-title-icon.svg" alt="">
+            <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
             <h3 class="topvote-title color-light-blue">Đọc nhiều trong tháng </h3>
-            <img class="vote-icon__yellow" src="/src/assets/icon/vote-title-icon2.svg" alt="">
+            <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon2.svg" alt="">
           </template>
         </RankingList>
 
@@ -84,9 +84,9 @@
       <div class="row col-3 px-0 d-flex align-items-center">
         <RankingList>
           <template #header>
-            <img class="vote-icon__yellow" src="/src/assets/icon/vote-title-icon.svg" alt="">
+            <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
             <h3 class="topvote-title color-light-blue">Top tác giả của tuần</h3>
-            <img class="vote-icon__yellow" src="/src/assets/icon/vote-title-icon2.svg" alt="">
+            <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon2.svg" alt="">
           </template>
         </RankingList>
 

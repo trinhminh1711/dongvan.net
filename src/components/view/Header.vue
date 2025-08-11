@@ -2,7 +2,7 @@
     <div class="container pb-3 text-center">
         <div class="row align-items-start align-items-center justify-content-between">
             <div class="col d-flex justify-content-start">
-                <img class="header-logo" src="../../assets/logo.png" />
+                <img class="header-logo" src="@/assets/logo.png" />
             </div>
             <div class="col">
                 <el-autocomplete class="search-bar" v-model="state" :fetch-suggestions="querySearch"

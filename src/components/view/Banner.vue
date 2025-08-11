@@ -14,7 +14,8 @@
                 </div>
             </div>
             <div class="col-6 el-menu-story">
-                <img style="width: 100%; height: 200px;" src="https://www.quehuong.org.vn/wp-content/uploads/2018/07/dung-noi-chuyen-voi-co-ay.jpg" alt=""
+                <img style="width: 100%; height: 200px;"
+                    src="https://www.quehuong.org.vn/wp-content/uploads/2018/07/dung-noi-chuyen-voi-co-ay.jpg" alt=""
                     srcset="">
                 <div class="banner-tabs">
                     <el-tabs v-model="activeTabs" class="tabs-category">
@@ -52,24 +53,38 @@
 import { onMounted, ref } from 'vue'
 import { Edit } from '@element-plus/icons-vue'
 import { spaceProps } from 'element-plus'
+import storyIcon from '@/assets/Icon/StoryIcon.png'
+import vectorIcon2 from '@/assets/icon/Vector (2).svg'
+import vectorIcon3 from '@/assets/icon/Vector (3).svg'
+import vectorIcon4 from '@/assets/icon/Vector (4).svg'
+import vectorIcon5 from '@/assets/icon/Vector (5).svg'
+import vectorIcon6 from '@/assets/icon/open-book-2 1.svg'
+import vectorIcon7 from '@/assets/icon/Vector (6).svg'
+import vectorIcon8 from '@/assets/icon/Vector (7).svg'
+import vectorIcon9 from '@/assets/icon/helmet 1.svg'
+import vectorIcon10 from '@/assets/icon/building 1.svg'
+import vectorIcon11 from '@/assets/icon/poem 1.svg'
+import vectorIcon12 from '@/assets/icon/Vector (8).svg'
+
 const activeTabs = ref('first')
 interface LinkItem {
     value: string
     link: string
 }
+
 const items = [
-    { image: '/src/assets/icon/StoryIcon.png', text: 'Linh dị', number: '236460' },
-    { image: '/src/assets/icon/Vector (2).svg', text: 'Trinh thám', number: '43492' },
-    { image: '/src/assets/icon/Vector (3).svg', text: 'Lịch sử', number: '77225' },
-    { image: '/src/assets/icon/Vector (4).svg', text: 'Ngôn tình', number: '45378' },
-    { image: '/src/assets/icon/Vector (5).svg', text: 'Truyện ngắn', number: '236460' },
-    { image: '/src/assets/icon/open-book-2 1.svg', text: 'Thơ', number: '43492' },
-    { image: '/src/assets/icon/Vector (6).svg', text: 'Huyền ảo', number: '77225' },
-    { image: '/src/assets/icon/Vector (7).svg', text: 'Viễn tưởng', number: '45378' },
-    { image: '/src/assets/icon/helmet 1.svg', text: 'Cổ đại', number: '45378' },
-    { image: '/src/assets/icon/building 1.svg', text: 'Hiện thực', number: '77225' },
-    { image: '/src/assets/icon/poem 1.svg', text: 'Tản văn', number: '77225' },
-    { image: '/src/assets/icon/Vector (8).svg', text: 'Tất cả', number: '77225' },
+    { image: storyIcon, text: 'Linh dị', number: '236460' },
+    { image: vectorIcon2, text: 'Trinh thám', number: '43492' },
+    { image: vectorIcon3, text: 'Lịch sử', number: '77225' },
+    { image: vectorIcon4, text: 'Ngôn tình', number: '45378' },
+    { image: vectorIcon5, text: 'Truyện ngắn', number: '236460' },
+    { image: vectorIcon6, text: 'Thơ', number: '43492' },
+    { image: vectorIcon7, text: 'Huyền ảo', number: '77225' },
+    { image: vectorIcon8, text: 'Viễn tưởng', number: '45378' },
+    { image: vectorIcon9, text: 'Cổ đại', number: '45378' },
+    { image: vectorIcon10, text: 'Hiện thực', number: '77225' },
+    { image: vectorIcon11, text: 'Tản văn', number: '77225' },
+    { image: vectorIcon12, text: 'Tất cả', number: '77225' },
 ]
 const newFeeds = [
     { topic: 'Luận truyện', text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s,' },

@@ -31,22 +31,26 @@ import { EffectCoverflow, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
-
+import slideImg1 from '@/assets/image/slide-img1.jpg'
+import slideImg2 from '@/assets/image/slide-img2.jpg'
+import slideImg3 from '@/assets/image/slide-img3.jpg'
+import slideImg4 from '@/assets/image/slide-img4.jpg'
+import slideImg5 from '@/assets/image/slide-img5.jpg'
 export default {
   components: { Swiper, SwiperSlide },
   data() {
     return {
       items: [
-        "/src/assets/image/slide-img1.jpg",
-        "/src/assets/image/slide-img2.jpg",
-        "/src/assets/image/slide-img3.jpg",
-        "/src/assets/image/slide-img4.jpg",
-        "/src/assets/image/slide-img5.jpg",
-        "/src/assets/image/slide-img1.jpg",
-        "/src/assets/image/slide-img2.jpg",
-        "/src/assets/image/slide-img3.jpg",
-        "/src/assets/image/slide-img4.jpg",
-        "/src/assets/image/slide-img5.jpg",
+        slideImg1,
+        slideImg2,
+        slideImg3,
+        slideImg4,
+        slideImg5,
+        slideImg1,
+        slideImg2,
+        slideImg3,
+        slideImg4,
+        slideImg5,
       ],
       descriptions: [
         "Đường nhỏ du du diêu diêu, trời xanh phiêu phiêu miểu miểu. Một ngày chuyển...",
@@ -113,11 +117,12 @@ export default {
 .slide-content {
   line-height: 2;
 }
-.slide-content__desc
-{
+
+.slide-content__desc {
   line-height: 1.5;
-   display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;    /* Giới hạn 2 dòng */
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  /* Giới hạn 2 dòng */
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
