@@ -92,6 +92,56 @@
 
       </div>
     </div>
+    <div class="row align-items-start mt-5 justify-content-between">
+      <div class="col-3 px-3">
+        <TopListUser>
+          <template #author-top3>
+            <div class="d-flex justify-content-between author-card__img">
+              <div class="d-flex flex-column">
+                <span class="bg-red text-white fw-bold p-1 text-sm align-self-start">NO.1</span>
+                <p class="my-2">Lãnh Hàn Phong</p>
+                <p class="text-start color-alert text-md mt-1">
+                  <span class="color-red fw-bold">567</span> <span class="fst-italic color-red ">Chương</span>
+                </p>
+              </div>
+              <div>
+                <img src="" alt="">
+              </div>
+            </div>
+          </template>
+        </TopListUser>
+      </div>
+      <div class="col-6 px-3">
+        <TopListUpdate :content="'Mới cập nhật'" />
+      </div>
+      <div class="col-3 px-3">
+        <TopListUser :content="'Top đại gia'">
+          <template #author-top3>
+            <div class="d-flex justify-content-between author-card__img">
+              <div class="d-flex flex-column">
+                <span class="bg-red text-white fw-bold p-1 text-sm align-self-start">NO.1</span>
+                <p class="my-2">Lãnh Hàn Phong</p>
+                <p class="text-start color-alert text-md mt-1">
+                  <span class="color-red fw-bold">567</span> <span class="fst-italic color-red ">Chương</span>
+                </p>
+              </div>
+              <div>
+                <img src="" alt="">
+              </div>
+            </div>
+          </template>
+        </TopListUser>
+      </div>
+    </div>
+    <div class="row align-items-start mt-5">
+      <TopAuthorWeek />
+    </div>
+  </div>
+  <div class="container-fluid my-5">
+    <img style="max-width: 100%;" src="@/assets/image/img-bottom.jpg" alt="">
+  </div>
+  <div class="container">
+    <StoryCompleted />
   </div>
 </template>
 
@@ -103,12 +153,16 @@ import type { TabsPaneContext } from 'element-plus'
 import ListStory from '@/components/homepage/ListStory.vue'
 import SliderCenter from '@/components/homepage/SliderCenter.vue'
 import RankingList from '@/components/homepage/RankingList.vue'
-
+import TopListUser from '@/components/homepage/TopListUser.vue'
+import TopListUpdate from '@/components/homepage/TopListUpdate.vue'
+import TopAuthorWeek from '@/components/homepage/TopAuthorWeek.vue'
+import StoryCompleted from '@/components/homepage/StoryCompleted.vue'
 const activeName = ref('first')
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
   console.log(tab, event)
 }
+
 const reviewTitle = "Review Tác phẩm";
 const dataReview = [
   { title: "Sống Sót Trong Trò", text: "Nhật Ánh" },

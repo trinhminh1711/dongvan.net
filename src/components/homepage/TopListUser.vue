@@ -1,29 +1,53 @@
 <template>
-    <h3 class="list-title text-color_primary">{{ content }}</h3>
+    <h3 class="list-title text-color_primary mb-4">{{ content }}</h3>
     <div class="list-container">
+        <slot name="author-top3">
+        </slot>
         <div v-for="(item, index) in items" :key="index" class="list-item">
-            <span>{{ item.title }}</span>
-            <span class="text-color__tertiary">{{ item.text }}</span>
+            <p>
+                <span  :class="{ 'active-top': index < 2 }" :style="{ backgroundImage: index == 0 ? `url(${top2Icon})` : index == 1 ? `url(${top3Icon})` : 'none'}" class="text-color_primary fw-bold">{{ index + 2 }}</span>
+                <span class="ps-3">{{ item.nameAuthor }}</span>
+            </p>
+            <span class="text-color__tertiary">{{ item.numberView }}</span>
         </div>
     </div>
 </template>
 
 <script>
+import top2Icon from '@/assets/icon/icon-top2-author.png'
+import top3Icon from '@/assets/icon/icon-top3-author.png'
 export default {
+    data() {
+        return {
+            top2Icon, top3Icon
+        }
+    },
     props: {
         items: {
             type: Array,
             default: () => [
-                { title: "Trận Vấn Trường", text: "Chương 1" },
-                { title: "Cẩu Tại Sơ Thánh", text: "Chương 1" },
-                { title: "Ngã Tại Tu Tiên gia", text: "Chương 1" },
-                { title: "Huyền Trần Đạo Đồ", text: "Chương 1" },
-                { title: "Cửu Vực Phàm Tiên", text: "Chương 1" }
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+            ]
+        },
+        itemsTop3: {
+            type: Array,
+            default: () => [
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
+                { nameAuthor: "why03you", numberView: "1098" },
             ]
         },
         content: {
             type: String,
-            default: "Chương mới cập nhật"
+            default: "Top độc giả"
         },
     }
 }
@@ -35,11 +59,23 @@ export default {
     text-align: left;
 }
 
+.author-card__img img {
+    max-width: 50px;
+}
+
 .list-item {
     text-align: left;
     display: flex;
     padding: 10px 0;
     justify-content: space-between;
     border-bottom: solid 1px #E4E7EC;
+}
+.active-top
+{
+    background-image: url(/src/assets/Icon/icon-top2-author.png);
+    background-size: contain;
+    padding: 0 7px 7px 5px;
+    color: #fff;
+    background-repeat: no-repeat;
 }
 </style>
