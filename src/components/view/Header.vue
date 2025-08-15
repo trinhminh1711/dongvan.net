@@ -2,7 +2,7 @@
     <div class="container pb-3 text-center">
         <div class="row align-items-start align-items-center justify-content-between">
             <div class="col d-flex justify-content-start">
-                <img class="header-logo" src="@/assets/logo.png" />
+                <router-link to="/"><img class="header-logo" src="@/assets/logo.png" /></router-link>
             </div>
             <div class="col">
                 <el-autocomplete class="search-bar" v-model="state" :fetch-suggestions="querySearch"
@@ -50,12 +50,12 @@
                 </div>
                 <div class="col">
                     <div class="d-flex justify-content-end">
-                        <span class="text-white px-4">
-                            Hướng dẫn
-                        </span>
-                        <span class="text-white">
-                            Đăng truyện
-                        </span>
+                        <router-link to="/library-page"><span class="text-white px-4">
+                                Tủ truyện
+                            </span></router-link>
+                        <router-link to="/article-page"><span class="text-white">
+                                Danh mục</span>
+                        </router-link>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@ const loadAll = () => {
     return [
         { value: 'Truyện mới' },
         { value: 'Hướng dẫn đăng truyện' },
-        { value: 'Nạp tam điệp'} ,
+        { value: 'Nạp tam điệp' },
         { value: 'Sống Sót Trong Trò' },
         { value: 'Đọc nhiều trong tuần' },
 

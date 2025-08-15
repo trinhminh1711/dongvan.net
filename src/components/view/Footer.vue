@@ -19,7 +19,5 @@
 </script>
 
 <style scoped>
-.bottom-layout{
-  background-color: #E7E7E7
-}
+
 </style>

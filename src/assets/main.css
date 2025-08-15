@@ -1,4 +1,4 @@
-@import './base.css';
+@import "./base.css";
 a,
 .green {
   text-decoration: none;
@@ -6,80 +6,86 @@ a,
   transition: 0.4s;
   padding: 3px;
 }
-.text-color_primary
-{
+.text-color_primary {
   color: #344054;
 }
-.text-color__tertiary
-{
+.text-color__tertiary {
   color: rgba(174, 174, 174, 1);
 }
-.color-alert
-{
-  color: #BF2C24;
+.color-alert {
+  color: #bf2c24;
 }
-.color-layout
-{
-  background: #F7F6F2;
+.color-layout {
+  background: #f7f6f2;
 }
-.color-gray
-{
-  color: #C6C4C4;
+.color-gray {
+  color: #c6c4c4;
 }
-.color-light-gray
-{
+.color-light-gray {
   color: #667085;
 }
-.color-yellow
-{
-  color: #FC6C28;
+.color-yellow {
+  color: #fc6c28;
 }
-.color-blue
-{
-  color: #0060BF;
+.color-blue {
+  color: #0060bf;
 }
-.color-light-blue
-{
-  color: #1F84D7;
+.color-light-blue {
+  color: #1f84d7;
 }
-.text-md
-{
+.text-md {
   font-size: 14px;
 }
-.text-sm
-{
+.text-sm {
   font-size: 12px;
 }
-.color-red
-{
-  color: #BF2C24;
+.color-red {
+  color: #bf2c24;
 }
-.bg-red
-{
-  background: #BF2C24;
+.bg-red {
+  background: #bf2c24;
 }
-.btn-alert__rounded
-{
-border: none;
-    background-color: #E60000;
-    color: white;
-    border-radius: 50px;
-    padding: 5px 20px;
-    font-weight: 700;
+.btn-alert__rounded {
+  border: none;
+  background-color: #e60000;
+  color: white;
+  border-radius: 50px;
+  padding: 5px 20px;
+  font-weight: 700;
 }
-.btn-outline
-{
-  border: solid 1px #3F5A93;
-    border-radius: 20px;
-    padding: 8px 20px;
-    background: none;
-    color: #3F5A93;;
+.btn-outline {
+  border: solid 1px #3f5a93;
+  border-radius: 20px;
+  padding: 8px 20px;
+  background: none;
+  color: #3f5a93;
 }
-.btn-outline:hover
-{
-  background-color: #3F5A93;
+.btn-outline:hover {
+  background-color: #3f5a93;
   cursor: pointer;
   color: #fff;
+}
+.btn-alert {
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  background: #ff6114;
+  color: #fff;
+}
+.btn-success {
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  background: #28dd9d;
+  color: #fff;
+}
+.btn-success:hover {
+  cursor: pointer;
+  background: #0ca977;
+}
+.btn-alert:hover {
+  cursor: pointer;
+  background: #e60000;
 }
 @media (hover: hover) {
   a:hover {
