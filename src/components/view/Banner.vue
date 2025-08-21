@@ -53,7 +53,7 @@
 import { onMounted, ref } from 'vue'
 import { Edit } from '@element-plus/icons-vue'
 import { spaceProps } from 'element-plus'
-import storyIcon from '@/assets/Icon/StoryIcon.png'
+import storyIcon from '@/assets/icon/StoryIcon.png'
 import vectorIcon2 from '@/assets/icon/Vector (2).svg'
 import vectorIcon3 from '@/assets/icon/Vector (3).svg'
 import vectorIcon4 from '@/assets/icon/Vector (4).svg'

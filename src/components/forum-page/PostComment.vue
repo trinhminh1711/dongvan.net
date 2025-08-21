@@ -1,0 +1,69 @@
+<template>
+    <div class="box-shadow px-3 pb-2 pt-3 mt-3">
+        <div class="post-main__info d-flex align-items-center justify-content-between gap-1">
+            <div class="d-flex align-items-center">
+                <img style="max-width: 40px;" src="@/assets/image/avatar-author-post4.png" alt="">
+                <p class="ms-3 fw-bold">{{ user }}</p>
+            </div>
+            <div class="date-comment">
+                <p class="text-sm pe-3">{{ date }}</p>
+            </div>
+        </div>
+        <div class="post-main__content text-sm ps-5 pe-3">
+            {{ comment }}
+            <div class="post-comment">
+                <p class="like-share d-flex gap-4 py-2">
+                    <span class="d-flex align-items-center gap-2 text-md">
+                        <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M9.99431 3.27985C8.32819 1.332 5.54981 0.808035 3.46227 2.59168C1.37472 4.37532 1.08083 7.35748 2.72019 9.467C4.0832 11.2209 8.20816 14.9201 9.5601 16.1174C9.71136 16.2513 9.78698 16.3183 9.8752 16.3446C9.95219 16.3676 10.0364 16.3676 10.1134 16.3446C10.2016 16.3183 10.2773 16.2513 10.4285 16.1174C11.7805 14.9201 15.9054 11.2209 17.2684 9.467C18.9078 7.35748 18.6498 4.35656 16.5264 2.59168C14.4029 0.826798 11.6604 1.332 9.99431 3.27985Z"
+                                stroke="#667085" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        2
+                    </span>
+                    <span class="d-flex align-items-center gap-2 text-md">
+                        <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M2.20864 10.6074C1.96452 10.3981 1.84246 10.2935 1.79774 10.169C1.75848 10.0598 1.75848 9.94022 1.79774 9.83095C1.84246 9.70645 1.96452 9.60183 2.20864 9.39258L10.6794 2.13196C11.0996 1.77176 11.3097 1.59166 11.4876 1.58725C11.6422 1.58342 11.7899 1.65134 11.8876 1.77122C12 1.90915 12 2.18589 12 2.73936V7.03462C14.1347 7.40807 16.0884 8.48974 17.5403 10.1139C19.1232 11.8845 19.9988 14.1759 20 16.551V17.1629C18.9507 15.8989 17.6405 14.8765 16.1592 14.1659C14.8533 13.5394 13.4416 13.1683 12 13.0705V17.2606C12 17.8141 12 18.0908 11.8876 18.2288C11.7899 18.3486 11.6422 18.4166 11.4876 18.4127C11.3097 18.4083 11.0996 18.2282 10.6794 17.868L2.20864 10.6074Z"
+                                stroke="#667085" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+
+                        Trả lời
+                    </span>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script lang="ts" setup>
+const props = defineProps({
+    user: {
+        type: String,
+    },
+    comment: {
+        type: String,
+    },
+    date: {
+        type: String,
+    },
+    isActive: {
+        type: Boolean,
+        default: false
+    }
+})
+</script>
+
+<style scoped>
+.box-shadow {
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border: solid 1px #e7e7e7;
+}
+
+.post-main__content {
+    line-height: 1.5rem;
+
+}
+</style>

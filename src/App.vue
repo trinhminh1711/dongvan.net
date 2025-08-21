@@ -7,6 +7,13 @@ import Footer from './components/view/Footer.vue';
 import ArticleCategoryList from './components/article-category/ArticleCategoryList.vue';
 import LibraryPage from './components/library-page/LibraryPage.vue';
 import HomePage from './pages/HomePage.vue';
+import PaymentPage from './pages/PaymentPage.vue';
+import InstructPage from './pages/InstructPage.vue';
+import SupportPage from './pages/SupportPage.vue';
+import CreateStory from './pages/CreateStory.vue';
+import ForumPage from './pages/ForumPage.vue';
+import StoryDetail from './pages/StoryDetail.vue';
+import ReadStory from './pages/ReadStory.vue';
 
 const dialogVisible = ref(false)
 </script>
@@ -16,7 +23,7 @@ const dialogVisible = ref(false)
   </header>
   <main class="pb-8">
     <transition name="fade" mode="out-in">
-      <router-view />
+      <RouterView/>
     </transition>
   </main>
   <footer class="bg-footer border-top">

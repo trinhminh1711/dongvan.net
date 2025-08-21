@@ -39,6 +39,12 @@ a,
 .text-sm {
   font-size: 12px;
 }
+.text-lg {
+  font-size: 20px;
+}
+.text-xlg {
+  font-size: 24px;
+}
 .color-red {
   color: #bf2c24;
 }
@@ -65,6 +71,13 @@ a,
   cursor: pointer;
   color: #fff;
 }
+.btn-outline__alert {
+  border: solid 1px #ff6114;
+  border-radius: 20px;
+  padding: 8px 20px;
+  background: none;
+  color: #ff6114;
+}
 .btn-alert {
   border: none;
   border-radius: 20px;
@@ -82,6 +95,11 @@ a,
 .btn-success:hover {
   cursor: pointer;
   background: #0ca977;
+}
+.btn-outline__alert:hover {
+  background: #ff6114;
+  color: #fff;
+  cursor: pointer;
 }
 .btn-alert:hover {
   cursor: pointer;
