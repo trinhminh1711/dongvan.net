@@ -1,35 +1,20 @@
-
 <template>
-    <div>
+    <div v-if="postData">
         <div>
             <div>
                 <h2 class="text-color_primary fw-bold"><el-icon>
                         <Back />
-                    </el-icon> "Gió mùa Ấm áp" Thanh xuân Trọng sinh</h2>
+                    </el-icon> {{ postData[0].title }}</h2>
             </div>
         </div>
         <div class="post-main p-3 mt-3">
             <div class="post-main__info d-flex align-items-center gap-1">
-                <img style="max-width: 50px;" src="@/assets/image/avatar-author-post4.png" alt="">
-                <p class="ms-3"> <span class="fw-bold">Đông văn</span> <span class="text-sm ms-2">2 giờ trước</span></p>
+                <img style="max-width: 50px;" :src="postData[0].post_link_thumbnail" alt="">
+                <p class="ms-3"> <span class="fw-bold">{{ postData[0].post_username }}</span> <span class="text-sm ms-2">{{
+                    timeAgo(postData[0].created_at) }}</span></p>
             </div>
-            <div class="post-main__content text-sm ps-5 pe-3 mt-3">
-                Đây cũng không hẳn là review, nhưng em muốn chia sẻ sự có duyên của mình với bộ truyện này vừa với t.ư
-                cách là dịch giả vừa với t.ư cách độc giả. Bộ truyện hay, ko cuốn theo kiểu hừng hực bằng các tình tiết
-                hút hồn ( như 1 bộ trọng sinh về chủ đề forex như em đã từng dịch để đọc ), với tình tiết nhẹ nhàng
-                nhưng đủ để người đọc đọc từ chương này đến chương khác. Nó mang lại cảm giác như hồi đọc Đại niết bàn (
-                Trùng Nhiên thì không thế ). Truyện không dài không ngắn với 1.5 triệu chữ ( Trung ) nên đảm bảo anh em
-                sẽ có truyện đọc trong tầm 3 tháng ( cái này phụ thuộc vào tốc độ edit, nếu em có nhiều thời gian để đọc
-                thì chắc chỉ 1 tháng ). Còn sau đây là tâm sự của ông dịch giả là em và ông tác giả ở tận bên Tàu Đang
-                biên tập thì em tình cờ thấy mấy dòng tự sự của tác giả lẫn vào, nên tiện tay biên luôn để anh em đọc.
-                Bộ này, em cảm thấy thực sự rất có duyên. Đây là một bộ truyện em dịch hoàn toàn ngẫu hứng, cũng là bộ
-                thứ ba em dịch, mà em cũng là tay ngang. Biết tiếng Trung hơn chục năm nhưng cũng từng ấy năm “mù chữ,”
-                nên việc dịch toàn bộ đều nhờ vào khả năng code và quá trình training AI.Cũng như tác giả, đây cũng là
-                bộ đầu tiên em dịch hoàn chỉnh, rất phù hợp để em dùng đào tạo AI. Bộ truyện các anh em đang đọc có lẽ
-                là bản dịch thứ 15, 16 của con AI mà em đã huấn luyện. Việc dịch này không phải vì kiếm tiền, mà chỉ đơn
-                giản là em muốn tạo ra một công cụ dịch những dòng truyện đô thị thật hay, để em và mọi người có thêm
-                truyện để đọc.Thật sự rất có duyên. Em cũng mong sẽ "vá víu" được chút vía của tác giả để nhận được sự
-                ủng hộ của anh em độc giả. Rất cảm ơn mọi người đã quan tâm và ghé qua.
+            <div  class="post-main__content text-sm ps-5 pe-3 mt-3">
+                <div v-html="postData[0].content"></div>
                 <div class="post-comment">
                     <p class="like-share d-flex gap-4 py-4">
                         <span class="d-flex align-items-center gap-2 text-md">
@@ -39,7 +24,7 @@
                                     d="M9.99431 3.27985C8.32819 1.332 5.54981 0.808035 3.46227 2.59168C1.37472 4.37532 1.08083 7.35748 2.72019 9.467C4.0832 11.2209 8.20816 14.9201 9.5601 16.1174C9.71136 16.2513 9.78698 16.3183 9.8752 16.3446C9.95219 16.3676 10.0364 16.3676 10.1134 16.3446C10.2016 16.3183 10.2773 16.2513 10.4285 16.1174C11.7805 14.9201 15.9054 11.2209 17.2684 9.467C18.9078 7.35748 18.6498 4.35656 16.5264 2.59168C14.4029 0.826798 11.6604 1.332 9.99431 3.27985Z"
                                     stroke="#667085" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
-                            2
+                            {{ postData[0].total_likes }}
                         </span>
                         <span class="d-flex align-items-center gap-2 text-md">
                             <svg width="21" height="20" viewBox="0 0 21 20" fill="none"
@@ -57,40 +42,68 @@
 
         </div>
         <div class="post__comment mt-5">
-            <h4 class=" mb-3 fw-bold">Bình luận (3)</h4>
+            <h4 v-if=" showComment" class=" mb-3 fw-bold">Bình luận ({{ listComment.length }})</h4>
         </div>
     </div>
-    <PostComment v-for="value in listComment" :user="value.user" :comment="value.comment" :date="value.date" />
+    <PostComment v-if="showComment" v-for="value in listComment" :comment_id = "value.comment_id" :like ="value.comment_total_likes" 
+    :user="value.comment_username" :user_thumbnail="value.comment_link_thumbnail" :comment="value.comment_content" :date="value.comment_created_at" />
     <div class="post__comment mt-5">
-        <h4 class=" mb-3 fw-bold">Tham gia thảo luận</h4>
+        <h4 class=" mb-3 fw-bold">{{ showComment }}</h4>
         <div class="user-comment">
-            <InputComment />
+            <InputCommentPost :postId="Number(route.params.id)"/>
         </div>
     </div>
 </template>
 <script setup lang="ts">
-import InputComment from './InputComment.vue';
 import PostComment from './PostComment.vue';
-const listComment = [
-    {
-        user: "An Nhiên",
-        comment: "Đến chương cuối mà vẫn không dám tin chuyện đã hết. Tình tiết nhẹ nhàng, ấm áp nhưng sâu lắng. Một trong những truyện chữa lành hay nhất mình từng đọc.",
-        date: "2 tháng trước",
-        isActive: true
-    },
-    {
-        user: "Quang Vũ Đức",
-        comment: "Tác giả xây dựng nhân vật quá đỉnh, đặc biệt là nữ chính — vừa thông minh lại không bánh bèo. Càng đọc càng cuốn, mong có thêm ngoại truyện! Lúc đầu thấy motip cũ, định bỏ giữa chừng, ai ngờ về sau plot twist liên tục, đọc liền 50 chương không dứt ra được!",
-        date: "2 tháng trước",
-        isActive: true
-    },
-    {
-        user: "An Nhiên",
-        comment: "Chấm điểm 8/10. Diễn biến logic, lời thoại tự nhiên, nhưng đoạn cao trào hơi nhanh. Nếu tác giả khai thác tâm lý nhân vật nhiều hơn nữa thì sẽ hoàn hảo!",
-        date: "3 tháng trước",
-        isActive: true
-    },
-]
+import { useRoute } from "vue-router";
+import { getPostDetail } from '@/api/forum';
+import { onMounted, ref } from 'vue';
+import InputCommentPost from './inputCommentPost.vue';
+const route = useRoute();
+const showComment = ref()
+const postData = ref();
+const listComment = ref([])
+onMounted(async () => {
+    const postId = route.params.id;
+    const res = await getPostDetail(postId);
+    postData.value = res.data;
+    showComment.value = res.data[0].comment_id;
+    listComment.value = postData.value.map(item => ({
+        comment_id: item.comment_id,
+        comment_user_id: item.comment_user_id,
+        comment_username: item.comment_username,
+        comment_link_thumbnail: item.comment_link_thumbnail,
+        comment_content: item.comment_content,
+        comment_created_at: item.comment_created_at,
+        comment_total_likes: item.comment_total_likes
+    }))
+    
+})
+function timeAgo(isoString) {
+    const now = new Date();
+    const past = new Date(isoString);
+    const diffMs = now.getTime() - past.getTime(); // chênh lệch mili giây
+
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    const diffMonths = Math.floor(diffDays / 30);
+
+    if (diffMinutes < 60) {
+        return `${diffMinutes} phút trước`;
+    } else if (diffHours < 24) {
+        return `${diffHours} giờ trước`;
+    } else if (diffDays < 30) {
+        return `${diffDays} ngày trước`;
+    } else {
+        return `${diffMonths} tháng trước`;
+    }
+}
+
+// ví dụ test
+
 </script>
 <style>
 .post-main {

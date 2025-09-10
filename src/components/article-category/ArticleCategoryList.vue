@@ -1,111 +1,53 @@
 <template>
-    <div class="container">
-        <h2 class="text-color_primary fw-bold">{{ "Truyện Ngôn Tình" }}</h2>
+    <div v-if="categoryList" class="container">
+        <h2 class="text-color_primary fw-bold">Truyện {{ categoryList[0]?.genre_name }}</h2>
         <p style="background-color: rgba(24, 119, 242, 0.1); border-radius: 5px;" class="color-blue  px-3 py-2 mt-2">
-            <span class="fw-bold">Mô tả thể loại:</span> Truyện tập trung vào các mối quan hệ tình cảm lãng mạn, với
-            những diễn biến tâm lý, tình tiết
-            ngọt ngào hoặc trắc trở của các nhân vật chính.
+            <span class="fw-bold">Mô tả thể loại:</span> {{ categoryList[0]?.genre_description }}
         </p>
         <div class="row mt-4">
-            <div v-for="stories in categoryList" :key="stories.id" class="box-left__content col-4">
-                <img src="@/assets/image/sieucapcungchieu.png" alt="">
-                <div class="left-content">
-                    <h4 class="text-color_primary fw-bold">{{ stories.title }}</h4>
+            <div v-for="stories in categoryList" :key="stories.id" class="box-left__content col-6 mt-3">
+                <img style="max-width: 150px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* bóng mờ nhẹ */ border-radius: 8px;" :src="stories.urlImg" alt="">
+                <div class="left-content px-4">
+                    <h4 class="text-color_primary fw-bold hover_link">{{ stories.title }}</h4>
                     <p class="left-content__author text-color__tertiary">{{ stories.author }}</p>
-                    <p class="color-red fst-italic"><span class="fw-bold">{{ stories.chapterCount }}</span><span>
-                            chương</span></p>
                     <p><img src="@/assets/icon/quote.png" alt="">
                         <desc class="left-content__desc text-sm">
                             {{ stories.description }}
                         </desc>
                     </p>
+                    <button @click="goToStory(stories.story_id)" class="btn-alert mt-3">Đọc tiếp</button>
                 </div>
             </div>
-        </div>
-        <div class="d-flex justify-content-center mt-4"> 
-            <el-pagination @current-change="handlePageChange"  v-model:current-page="currentPage" background layout="prev, pager, next" :total="1000" />
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute();
 const currentPage = 1
-const categoryList = [
-    {
-        id: 1, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 2, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 3, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 4, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 5, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 6, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 7, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 8, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 9, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-];
+const categoryList = ref(null);
+import { getStoryByCategory } from '@/api/stories'
+onMounted(async () => {
+    const getData = await getStoryByCategory(route.params.id)
+    console.log(getData);
+
+    categoryList.value = getData.data
+
+});
+
 function handlePageChange(page) {
-  console.log('Trang mới:', page) // In ra số trang
+    console.log('Trang mới:', page) // In ra số trang
+}
+function goToStory(post_id) {
+    router.push({
+    name: 'story',   // Tên route bạn đã định nghĩa trong router/index.js
+    params: { id:post_id }       // Truyền param id
+  })
 }
 </script>
 

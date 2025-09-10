@@ -19,8 +19,13 @@
                 </el-autocomplete>
             </div>
             <div class="col">
-                <div @click="dialogVisible = true" class="d-flex justify-content-end"> <button type="button"
-                        class="btn btn-danger">Tài khoản</button>
+                <div v-if="!auth.isAuthenticated" @click="dialogVisible = true" class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-danger">Tài khoản</button>
+                </div>
+                <div v-if="auth.isAuthenticated" class="user-login_icon">
+                     <router-link to="/profile"><img src="@/assets/icon/bell-02.svg" alt=""></router-link>
+                    <router-link to="/create-story"><img src="@/assets/icon/books-stack-of-three 1.svg" alt=""></router-link> 
+                    <router-link to="/profile"><img src="@/assets/icon/user-icon.svg" alt=""></router-link>
                 </div>
             </div>
         </div>
@@ -42,9 +47,9 @@
                     <div class="menu-item">
                         <el-menu class="el-menu-top" mode="horizontal" background-color="#545c64" text-color="#fff"
                             active-text-color="#ffd04b" @select="handleSelect">
-                            <el-menu-item index="1">Diễn đàn</el-menu-item>
-                            <el-menu-item index="1">Bảng xếp hạng</el-menu-item>
-                            <el-menu-item index="1">Hỗ trợ</el-menu-item>
+                           <router-link :to="{ name: 'forum' }"><el-menu-item index="1">Diễn đàn</el-menu-item></router-link>
+                             <router-link :to="{ name: 'forum' }"><el-menu-item index="2">Bảng xếp hạng</el-menu-item></router-link>
+                            <router-link :to="{ name: 'support' }"><el-menu-item index="3">Hỗ trợ</el-menu-item></router-link>
                         </el-menu>
                     </div>
                 </div>
@@ -53,7 +58,7 @@
                         <router-link to="/library-page"><span class="text-white px-4">
                                 Tủ truyện
                             </span></router-link>
-                        <router-link to="/article-page"><span class="text-white">
+                        <router-link to="/article-page/1"><span class="text-white">
                                 Danh mục</span>
                         </router-link>
                     </div>
@@ -70,7 +75,8 @@
 import { onMounted, ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import LoginPage from '@/pages/LoginPage.vue'
-
+import { useAuthStore } from "@/stores/auth";
+const auth = useAuthStore();
 const dialogVisible = ref(false)
 
 const handleClose = (done: () => void) => {
@@ -131,7 +137,10 @@ onMounted(() => {
 .menu-bar {
     background-color: rgb(42, 41, 41);
 }
-
+.menu-item .el-menu-item
+{
+    max-height: 100%;
+}
 .search-bar .el-input__inner {
     height: 40px;
 }
@@ -145,7 +154,16 @@ onMounted(() => {
     font-size: 32px;
     font-weight: 600;
 }
-
+.el-menu--horizontal
+{
+    border: none !important;
+    display: flex;
+    width: 100%;
+}
+.el-menu-item
+{
+ 
+}
 .header-logo {
     width: 150px;
     height: auto;
@@ -161,5 +179,16 @@ onMounted(() => {
     border: solid 1px;
     color: #fff;
     background: red;
+}
+
+.user-login_icon {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: end
+}
+
+.user-login_icon img {
+    max-width: 24px;
 }
 </style>

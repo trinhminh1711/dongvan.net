@@ -1,93 +1,103 @@
-<template>
-    <el-form class="form-createstory mt-5" ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="auto">
-        <el-form-item prop="storyName">
-            <template #label>
-                <span class="form-createstory__label">
-                    Tên truyện
-                </span>
-            </template>
-            <el-input placeholder="Viết hoa chữ đầu mỗi từ" size="large" v-model="ruleForm.storyName" />
-        </el-form-item>
-        <el-form-item prop="storyAuthor">
-            <template #label>
-                <span class="form-createstory__label">
-                    Tác giả
-                </span>
-            </template>
-            <el-input placeholder="Nhập tên tác giả" size="large" v-model="ruleForm.storyAuthor" />
-        </el-form-item>
-        <el-form-item prop="storyGenre">
-            <template #label>
-                <span class="form-createstory__label">
-                    Thể loại
-                </span>
-            </template>
-            <el-select-v2 size="large" v-model="ruleForm.storyGenre" placeholder="Chọn thể loại" :options="options" />
-        </el-form-item>
-        <el-form-item class="custom-textarea" prop="storyDesc">
-            <template #label>
-                <span class="form-createstory__label">
-                    Giới thiệu
-                </span>
-            </template>
-            <el-mention placeholder="Giới thiệu ngắn" v-model="ruleForm.storyDesc" type="textarea" />
-        </el-form-item>
-        <el-form-item class="list-imageupload">
-            <template #label>
-                <span class="form-createstory__label">
-                    Ảnh bìa
-                </span>
-            </template>
-            <div>
-                <div class="d-flex">
-                    <el-upload :on-change="handleFileChange" class="upload-demo" action="#" :limit="1"
-                        :auto-upload="false" list-type="picture-card" accept=".jpg,.png" v-model:file-list="fileList">
-                        <template #trigger>
-                            <button v-if="fileList.length === 0" class="btn-selectfile" type="button">Chọn tệp</button>
-                        </template>
-                    </el-upload>
-                    <p v-if="fileList.length === 0" class="ps-2">Chưa có tệp nào được chọn</p>
-                    <img :src="dialogImageUrl" class="el-upload-list__item-thumbnail" alt="" />
-                </div>
+    <template>
+        <el-form class="form-createstory mt-5" ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="auto">
+            <el-form-item prop="storyName">
+                <template #label>
+                    <span class="form-createstory__label">
+                        Tên truyện
+                    </span>
+                </template>
+                <el-input placeholder="Viết hoa chữ đầu mỗi từ" size="large" v-model="ruleForm.storyName" />
+            </el-form-item>
+            <el-form-item prop="storyAuthor">
+                <template #label>
+                    <span class="form-createstory__label">
+                        Tác giả
+                    </span>
+                </template>
+                <el-input size="large" :value="auth.user.username" disabled />
+            </el-form-item>
+            <el-form-item prop="storyGenre">
+                <template #label>
+                    <span class="form-createstory__label">
+                        Thể loại
+                    </span>
+                </template>
+                <el-select-v2 size="large" v-model="ruleForm.storyGenre" placeholder="Chọn thể loại"
+                    :options="options" />
+            </el-form-item>
+            <el-form-item class="custom-textarea" prop="storyDesc">
+                <template #label>
+                    <span class="form-createstory__label">
+                        Giới thiệu
+                    </span>
+                </template>
+                <el-mention placeholder="Giới thiệu ngắn" v-model="ruleForm.storyDesc" type="textarea" />
+            </el-form-item>
+            <el-form-item class="list-imageupload">
+                <template #label>
+                    <span class="form-createstory__label">
+                        Ảnh bìa
+                    </span>
+                </template>
                 <div>
-                    <p class="mb-3">Hoặc chọn một poster dưới đây</p>
-                    <div class="preset-images">
-                        <el-carousel :autoplay="false" arrow="always">
-                            <el-carousel-item v-for="(carosel, index) in presetImages" :key="index">
-                                <img v-for="imgUrl in carosel" :src="imgUrl" class="preset-img mx-2"
-                                    :class="{ active: selectedImage === imgUrl }" @click="selectPreset(imgUrl)" />
-                            </el-carousel-item>
-                        </el-carousel>
+                    <div class="d-flex">
+                        <el-upload :on-change="handleFileChange" class="upload-demo" action="#" :limit="1"
+                            :auto-upload="false" list-type="picture-card" accept=".jpg,.png"
+                            v-model:file-list="fileList">
+                            <template #trigger>
+                                <button v-if="fileList.length === 0" class="btn-selectfile" type="button">Chọn
+                                    tệp</button>
+                            </template>
+                        </el-upload>
+                        <p v-if="fileList.length === 0" class="ps-2">Chưa có tệp nào được chọn</p>
+                        <img :src="dialogImageUrl" class="el-upload-list__item-thumbnail" alt="" />
+                    </div>
+                    <div>
+                        <p class="mb-3">Hoặc chọn một poster dưới đây</p>
+                        <div class="preset-images">
+                            <el-carousel :autoplay="false" arrow="always">
+                                <el-carousel-item v-for="(carosel, index) in presetImages" :key="index">
+                                    <img v-for="imgUrl in carosel" :src="imgUrl" class="preset-img mx-2"
+                                        :class="{ active: selectedImage === imgUrl }" @click="selectPreset(imgUrl)" />
+                                </el-carousel-item>
+                            </el-carousel>
 
+                        </div>
                     </div>
                 </div>
-            </div>
-        </el-form-item>
-        <el-form-item prop="storyLinkForum">
-            <template #label>
-                <span class="form-createstory__label">
-                    Link Forum
-                </span>
-            </template>
-            <el-input size="large" placeholder="Link thảo luận forum (nếu có)" v-model="ruleForm.storyLinkForum" />
-        </el-form-item>
-    </el-form>
-      <button style="display: block; margin-left: auto;" class="btn-alert my-4 fw-semibold">Đăng truyện</button>
-</template>
+            </el-form-item>
+            <el-form-item prop="storyLinkForum">
+                <template #label>
+                    <span class="form-createstory__label">
+                        Link Forum
+                    </span>
+                </template>
+                <el-input size="large" placeholder="Link thảo luận forum (nếu có)" v-model="ruleForm.storyLinkForum" />
+            </el-form-item>
+        </el-form>
+        <button type="button" @click="submitForm()" style="display: block; margin-left: auto;"
+            class="btn-alert my-4 fw-semibold">Đăng truyện</button>
+    </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { genFileId } from 'element-plus'
-import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
-
+import type { UploadInstance, UploadProps, UploadRawFile, UploadFile } from 'element-plus'
+import { createStory } from "@/api/stories"
 import type { FormInstance, FormRules } from 'element-plus'
-
+import { useAuthStore } from "@/stores/auth";
+import { toast } from "vue3-toastify";
+import { useRouter } from "vue-router";
+const emit = defineEmits(["created-success"])
+const router = useRouter();
+const auth = useAuthStore();
 interface RuleForm {
     storyName: string,
     storyGenre: string,
     storyAuthor: string,
     storyDesc: string,
-    storyLinkForum: string
+    storyLinkForum: string,
+    cover: UploadRawFile | null
 }
 const fileList = ref([])
 const dialogImageUrl = ref("")
@@ -125,11 +135,13 @@ const options = [
 
 ]
 const ruleFormRef = ref<FormInstance>()
+const userId = auth.userId || null
 const ruleForm = reactive<RuleForm>({
     storyName: '',
     storyGenre: '',
-    storyAuthor: '',
+    storyAuthor: userId,
     storyDesc: '',
+    cover: null,
     storyLinkForum: ''
 
 })
@@ -142,16 +154,26 @@ const rules = reactive<FormRules<RuleForm>>({
         { required: true, message: 'Thông tin là bắt buộc', trigger: 'blur' },
     ],
 })
-const handleFileChange = (file, fileList) => {
-    // In ra đường dẫn file tạm
-    console.log("Đã chọn file:", file)
-
+const handleFileChange = (file: UploadFile) => {
+    if (file.raw) {
+        ruleForm.cover = file.raw as UploadRawFile
+    }
 }
-const submitForm = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return
-    await formEl.validate((valid, fields) => {
+
+const submitForm = async () => {
+    if (!ruleFormRef.value) return
+    await ruleFormRef.value.validate(async (valid, fields) => {
+        const toastAddStories = toast.loading("Đang xử lý...");
         if (valid) {
-            console.log('submit!')
+            const res = await createStory(ruleForm)
+            if (res.success) {
+                toast.remove(toastAddStories);
+                toast.success("Thêm truyện thành công");
+                emit("created-success", "second")
+            } else {
+                console.log(res.message);
+            }
+
         } else {
             console.log('error submit!', fields)
         }

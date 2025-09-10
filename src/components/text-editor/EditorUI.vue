@@ -5,8 +5,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-const content = ref("");
+import { ref , watch } from "vue";
+const content = defineModel('content');
 const previewContent = ref("");
 import { QuillEditor } from '@vueup/vue-quill'
 import Quill from "quill";
@@ -35,16 +35,9 @@ const editorOptions = {
         ],
     },
 };
-
 </script>
 
 <style>
-.editor-wrapper {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    width: 100%;
-    overflow: hidden;
-}
 
 .editor {
     min-height: 200px;

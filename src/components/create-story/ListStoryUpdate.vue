@@ -9,38 +9,62 @@
                     </el-icon>
                 </template>
             </el-input>
-            <el-select v-model="filterStoryData" placeholder="Chọn một mục" style="width: 240px">
+            <el-select v-model="filterStoryData" @change="handleSelectStoryStatus" placeholder="Chọn một mục"
+                style="width: 240px">
                 <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
         </div>
         <el-table class="story-table" :data="filterTableData" style="width: 100%" :fit="true">
-            <el-table-column prop="name">
+            <el-table-column type="index" label="STT" width="80" />
+            <el-table-column prop="title" width="300">
                 <template #header>
                     <span class="table-header">Tên truyện</span>
                 </template>
                 <template #default="scope">
                     <div class="d-flex align-items-center gap-2">
-                        <img class="story-thumnail" :src="scope.row.thumnailImg" alt="">
-                        {{ scope.row.name }}
+                        <img class="story-thumnail" :src="scope.row.urlImg" alt="">
+                        {{ scope.row.title }}
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column prop="chapNumber">
+            <el-table-column v-if="filterStoryData == 1" prop="last_chapter_id">
                 <template #header>
                     <span class="table-header">Số chương</span>
                 </template>
                 <template #default="scope">
-                    {{ scope.row.chapNumber }} Chương
+                    {{ scope.row.last_chap_number?? 1 }} Chương
                 </template>
             </el-table-column>
-            <el-table-column label="Date" prop="createAt">
+
+            <el-table-column label="Date" prop="create_at">
                 <template #header>
                     <span class="table-header">Ngày tháng đăng</span>
                 </template>
-            </el-table-column>
-            <el-table-column align="center">
                 <template #default="scope">
-                    <el-button @click="handleAdd(scope.$index, scope.row)">
+                    {{ formatDateVN(scope.row.create_at) }}
+                </template>
+            </el-table-column>
+            <el-table-column v-if="filterStoryData == 3" prop="last_chapter_id">
+                <template #header>
+                    <span class="table-header">Số từ</span>
+                </template>
+                <template #default="scope">
+                    {{ scope.row.total_word_count }}
+                </template>
+            </el-table-column>
+            <el-table-column v-if="filterStoryData == 3" prop="last_chapter_id">
+                <template #header>
+                    <span class="table-header">Lượt đọc</span>
+                </template>
+                <template #default="scope">
+                    {{ scope.row.total_view_count > 0
+                        ? scope.row.total_view_count + ' lượt'
+                        : 'Chưa có lượt đọc' }}
+                </template>
+            </el-table-column>
+            <el-table-column align="center" width="250" v-if="filterStoryData != 3">
+                <template #default="scope">
+                    <el-button @click="handleAdd(scope.row.story_id)">
                         <el-icon>
                             <Plus />
                         </el-icon>
@@ -66,9 +90,7 @@
             <p class="text-sm mt-2">Trước khi gửi câu hỏi, vui lòng đọc hết mục Hướng dẫn, nếu bạn vẫn không tìm thấy
                 câu trả
                 lời,
-                hãy gửi
-                câu hỏi
-                cho chúng tôi.</p>
+                hãy gửi câu hỏi cho chúng tôi.</p>
             <el-form label-position="top" class="mt-3">
                 <!-- Input 1: Text -->
                 <el-form-item label="Liên quan đến truyện">
@@ -117,17 +139,24 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from "vue-router"
 import { genFileId } from 'element-plus'
-
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
-
+import { getStory } from "@/api/stories"
+import { useAuthStore } from "@/stores/auth";
+const auth = useAuthStore();
+const router = useRouter()
+const tableData = ref<Story[]>([])
 const upload = ref<UploadInstance>()
 interface Story {
-    thumnailImg: String
-    createAt: string
-    name: string
-    chapNumber: Number
+    urlImg: String
+    create_at: string
+    title: string
+    last_chapter_id: Number
+    total_word_count: Number
+    total_view_count: Number
+
 }
 const form = ref({
     name: '',
@@ -135,28 +164,15 @@ const form = ref({
     description: '',
 })
 const options = [
-    { value: '1', label: 'Tất cả' },
-    { value: '2', label: 'Đang chờ duyệt' },
-    { value: '3', label: 'Đã xuất bản' },
+    { value: 1, label: 'Tất cả' },
+    { value: 2, label: 'Đang chờ duyệt' },
+    { value: 3, label: 'Đã xuất bản' },
 ]
 const dialogVisible = ref(false)
 const filterStoryData = ref(options[0].value)
 const search = ref('')
 const currentPage = ref(1)
 const pageSize = ref(5)
-
-const tableData: Story[] = [
-    { thumnailImg: new URL("@/assets/image/story-update1.png", import.meta.url).href, name: 'Hoà Lạc Thiên Không', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update2.png", import.meta.url).href, name: 'Thiên Hạ Vô Song', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update3.png", import.meta.url).href, name: 'Yêu Em Từ Cái Nhìn Đầu Tiên', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update4.png", import.meta.url).href, name: 'Hậu Cung Như Ý Truyện', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update5.png", import.meta.url).href, name: 'Phá Quân Tinh Ký', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update4.png", import.meta.url).href, name: 'Đấu La Đại Lục', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update3.png", import.meta.url).href, name: 'Sổ Tay Nuôi Dưỡng Hắc Liên Hoa', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update5.png", import.meta.url).href, name: 'Hoà Lạc Thiên Không', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update2.png", import.meta.url).href, name: 'Yêu Em Từ Cái Nhìn Đầu Tiê', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-    { thumnailImg: new URL("@/assets/image/story-update1.png", import.meta.url).href, name: 'Yêu Em Từ Cái Nhìn Đầu Tiê', chapNumber: 22, createAt: '22/03/2025 11:52:46' },
-]
 
 
 const handleExceed: UploadProps['onExceed'] = (files) => {
@@ -169,17 +185,30 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 const submitUpload = () => {
     upload.value!.submit()
 }
+onMounted(async () => {
+    const res = await getStory(auth.userId)
+    tableData.value = res
+    console.log(tableData.value);
+    
 
+
+})
 const filterTableData = computed(() =>
-    tableData.filter(
+    tableData.value.filter(
         (data) =>
             !search.value ||
-            data.name.toLowerCase().includes(search.value.toLowerCase())
+            data.title.toLowerCase().includes(search.value.toLowerCase())
     )
 )
 
-function handleAdd(index: number, row: Story) {
-    console.log('Thêm:', index, row)
+function handleSelectStoryStatus(val) {
+    if (val == 1) {
+
+    }
+}
+function handleAdd(value) {
+    router.push(`/create-story/new-chap/${value}`)
+
 }
 
 function handleEdit(index: number, row: Story) {
@@ -192,10 +221,31 @@ function handleDelete(index: number, row: Story) {
 
 function handleSupport(index: number, row: Story) {
     dialogVisible.value = true;
-    console.log(row.name);
-    form.value.name = row.name
+    form.value.name = row.title
 
 }
+function formatDateVN(isoString) {
+    const date = new Date(isoString)
+    const vnTime = new Date(date.getTime() + 7 * 60 * 60 * 1000)
+    const day = String(vnTime.getDate()).padStart(2, "0")
+    const month = String(vnTime.getMonth() + 1).padStart(2, "0")
+    const year = vnTime.getFullYear()
+    const hours = String(vnTime.getHours()).padStart(2, "0")
+    const minutes = String(vnTime.getMinutes()).padStart(2, "0")
+    const seconds = String(vnTime.getSeconds()).padStart(2, "0")
+    const formatted = new Intl.DateTimeFormat("vi-VN", {
+        timeZone: "Asia/Ho_Chi_Minh",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+    }).format(date)
+    return formatted
+}
+
 </script>
 <style>
 .story-table .table-header {
@@ -211,5 +261,18 @@ function handleSupport(index: number, row: Story) {
     border: solid 1px #cfd0d0;
     border-radius: 10px;
     padding-top: 10px;
+}
+.story-table .el-button, .el-button.is-round
+{
+    padding: 0;
+    border: none;
+}
+.story-table .el-button span, .story-table .el-button.is-round span
+{
+    font-weight: bold;
+    color: #344054;
+    padding: 0 2px;
+    font-size: 18px;
+    
 }
 </style>

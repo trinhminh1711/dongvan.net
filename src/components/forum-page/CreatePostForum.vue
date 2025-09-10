@@ -5,30 +5,42 @@
 
         <div class="py-2">
             <p class="mb-1 fw-semibold text-md">Tiêu đề</p>
-            <el-input v-model="text" placeholder="Nhập nội dung..." />
+            <el-input v-model="postData.title" placeholder="Nhập nội dung..." />
         </div>
         <div class="py-2">
             <p class="mb-1 fw-semibold text-md">Chuyên mục</p>
-            <el-select v-model="selected" placeholder="Chọn loại chuyên mục bài đăng">
+            <el-select v-model="postData.topic_id" placeholder="Chọn loại chuyên mục bài đăng">
                 <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
         </div>
         <div class="mt-2">
             <p class="mb-1 fw-semibold text-md">Nội dung</p>
-            <QuillEditor v-model:content="content" contentType="html" :options="editorOptions" class="editor" />
+            <QuillEditor v-model:content="postData.content" contentType="html" :options="editorOptions"
+                class="editor" />
         </div>
-        <button style="width: 100%;" class="btn-alert mt-3"> Đăng bài </button>
+        <button @click="upPost()" style="width: 100%;" class="btn-alert mt-3"> Đăng bài </button>
     </div>
 </template>
 
 
 <script setup>
-import { ref } from "vue";
+import { ref, reactive } from "vue";
+import { toast } from "vue3-toastify";
 const content = ref("");
 const previewContent = ref("");
-import { QuillEditor } from '@vueup/vue-quill'
+import { useRouter } from "vue-router";
+const router = useRouter()
 import Quill from "quill";
+import { useAuthStore } from "@/stores/auth";
+import { createPost } from "@/api/forum";
 const Size = Quill.import('formats/size');
+const auth = useAuthStore();
+const postData = ref({
+    title: '',
+    topic_id: '',
+    user_id: '',
+    content: ''
+});
 Size.whitelist = [
     '8px', '10px', '12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '36px'
 ];
@@ -52,18 +64,41 @@ const editorOptions = {
         ],
     },
 };
+
 const text = ref("")
 const selected = ref("")
 const options = [
-    { value: "1", label: "Lựa chọn 1" },
-    { value: "2", label: "Lựa chọn 2" },
-    { value: "3", label: "Lựa chọn 3" }
+    { value: "1", label: "Trinh thám" },
+    { value: "2", label: "Ngôn tình" },
+    { value: "3", label: "Linh dị" },
+    { value: "4", label: "Lịch sử" },
+    { value: "5", label: "Thể loại khác" },
+    { value: "6", label: "Đề cử và Review truyện" },
+    { value: "7", label: "Nhập môn sáng tác" },
+    { value: "8", label: "Tìm bạn đồng sáng tác" },
+    { value: "9", label: "Tin tức và sự kiện" },
+    { value: "10", label: "Hỏi đáp cùng tác giả" }
 ]
+async function upPost() {
+    const toastAddChapter = toast.loading("Đang xử lý...");
+    const userId = auth.userId
+    postData.value.user_id = userId
+    const res = await createPost(postData.value)
+    if (res.success) {
+        setTimeout(() => {
+            toast.remove(toastAddChapter);
+            toast.success("Đăng bài thành công");
+            router.push({
+                name: "list-post", // đúng route name của Component A
+            });
+        }, 2000);
+    }
+
+}
 </script>
 
 <style>
 .editor-wrapper {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     width: 100%;
     overflow: hidden;

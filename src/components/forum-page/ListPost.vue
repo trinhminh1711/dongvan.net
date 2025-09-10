@@ -16,12 +16,14 @@
             <template #default="scope">
                 <div class="post-info py-3">
                     <div class="imgAuthor">
-                        <img :src="scope.row.avatarImg" alt="">
+                        <img style="width: 50px;" :src="scope.row.avatarImg" alt="">
                     </div>
                     <div class="info">
-                        <p> <span class="text-sm fw-semibold color-blue post-topic"><span class="dot"></span> Luận
-                                truyện</span> <span class="text-md fw-bold color-blue">{{ scope.row.name }}</span></p>
-                        <div class="d-flex gap-3 align-items-center">
+                        <p> <span class="text-sm fw-semibold color-blue post-topic"><span class="dot"></span>
+                                {{ scope.row.topicTitle }}
+                            </span> <span @click="goToPost(scope.row.postId)" class="text-md fw-bold color-blue hover_link">{{
+                                scope.row.name }}</span></p>
+                        <div class="d-flex gap-3 align-items-center mt-2">
                             <p class="d-flex gap-1 align-items-center">
                                 <el-icon>
                                     <User />
@@ -44,7 +46,7 @@
                 <p class="like-share d-flex gap-4 py-4">
                     <span><el-icon>
                             <View />
-                        </el-icon> {{ scope.row.view }}</span>
+                        </el-icon> {{ scope.row.like }}</span>
                     <span><el-icon>
                             <ChatRound />
                         </el-icon>{{ scope.row.comment }}</span>
@@ -60,7 +62,13 @@
                         <p class="text-md color-blue">{{ scope.row.closestInteraction.date }}</p>
                         <p class="text-sm">{{ scope.row.closestInteraction.name }}</p>
                     </div>
-                    <img style="max-width: 40px; height: 40px;" :src="scope.row.closestInteraction.avatarImg" alt="">
+                    <el-tooltip popper-class="custom-tooltip" placement="left-start">
+                        <template #content>
+                            <UserInfoCard :idUserComment="scope.row.closestInteraction.user_id" />
+                        </template>
+                        <img style="max-width: 40px; height: 40px;" :src="scope.row.closestInteraction.avatarImg"
+                            alt="">
+                    </el-tooltip>
                 </div>
             </template>
         </el-table-column>
@@ -71,14 +79,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import CreatePostForum from './CreatePostForum.vue';
+import { getPostForumByTopic } from '@/api/forum';
+import UserInfoCard from './UserInfoCard.vue';
+import { useRouter } from "vue-router";
+import { useRoute } from "vue-router";
+const router = useRouter();
+const route = useRoute();
 const dialogVisible = ref(false)
+const listPostTopic = ref([])
 interface Item {
+    topicTitle: string,
+    postId: number,
     name: string
     author: string,
     time: string,
-    view: number,
+    like: number,
     comment: number,
     avatarImg: string,
     closestInteraction: object,
@@ -86,55 +103,54 @@ interface Item {
 
 const tableData = ref<Item[]>([
     {
+        topicTitle: null,
+        postId: null,
         avatarImg: new URL('@/assets/image/avatar-author-post2.png', import.meta.url).href,
         name: 'Đại Đạo Triều Thiên - Lý Miêu Nị cùng Cửu Bảo Trân',
-        author: "Đông Văn", time: '21 giờ trước', view: 12540, comment: 67,
-        closestInteraction: { avatarImg: new URL('@/assets/image/avatar-author-post.png', import.meta.url).href, name: 'khanhbao3tt', date: '22/03/2025' }
-    },
-    {
-        avatarImg: new URL('@/assets/image/avatar-author-post3.png', import.meta.url).href,
-        name: 'Đại Đạo Triều Thiên - Miêu Nị',
-        author: "Đông Văn", time: '21 giờ trước', view: 12540, comment: 67,
-        closestInteraction: { avatarImg: new URL('@/assets/image/avatar-author-post2.png', import.meta.url).href, name: 'khanhbao3tt', date: '22/03/2025' }
-    },
-    {
-        avatarImg: new URL('@/assets/image/avatar-author-post4.png', import.meta.url).href,
-        name: 'Đại Đạo Triều Thiên - Miêu Nị',
-        author: "Đông Văn", time: '21 giờ trước', view: 12540, comment: 67,
-        closestInteraction: { avatarImg: new URL('@/assets/image/avatar-author-post5.png', import.meta.url).href, name: 'khanhbao3tt', date: '22/03/2025' }
-    },
-    {
-        avatarImg: new URL('@/assets/image/avatar-author-post5.png', import.meta.url).href,
-        name: 'Đại Đạo Triều Thiên - Miêu Nị',
-        author: "Đông Văn", time: '21 giờ trước', view: 12540, comment: 67,
-        closestInteraction: { avatarImg: new URL('@/assets/image/avatar-author-post3.png', import.meta.url).href, name: 'khanhbao3tt', date: '22/03/2025' }
-    },
-    {
-        avatarImg: new URL('@/assets/image/avatar-author-post6.png', import.meta.url).href,
-        name: 'Đại Đạo Triều Thiên - Miêu Nị',
-        author: "Đông Văn", time: '21 giờ trước', view: 12540, comment: 67,
-        closestInteraction: { avatarImg: new URL('@/assets/image/avatar-author-post6.png', import.meta.url).href, name: 'khanhbao3tt', date: '22/03/2025' }
-    },
-    {
-        avatarImg: new URL('@/assets/image/avatar-author-post2.png', import.meta.url).href,
-        name: 'Đại Đạo Triều Thiên - Miêu Nị',
-        author: "Đông Văn", time: '21 giờ trước', view: 12540, comment: 67,
-        closestInteraction: { avatarImg: new URL('@/assets/image/avatar-author-post.png', import.meta.url).href, name: 'khanhbao3tt', date: '22/03/2025' }
+        author: "Đông Văn",
+        time: '21 giờ trước',
+        like: null,
+        comment: 67,
+        closestInteraction:
+            { avatarImg: new URL('@/assets/image/avatar-author-post.png', import.meta.url).href, name: 'khanhbao3tt', date: '22/03/2025', user_id: null }
     },
 
 ])
-// Các hàm xử lý
-const handleAdd = (row: Item) => {
-    console.log('Thêm:', row)
+async function getAllPostByTopic() {
+    console.log("abc");
+    
+    const res = await getPostForumByTopic(route.params.id);
+    listPostTopic.value = res.data;
+    tableData.value = listPostTopic.value.map(post => ({
+        topicTitle: post.topic_title,
+        postId: post.post_id,
+        avatarImg: post.link_thumbnail, // tạm thời fix cứng, hoặc lấy từ user table
+        name: post.title,
+        author: post.username,  // chỗ này có thể thay bằng username nếu backend trả về
+        time: "21 giờ trước", // cần xử lý từ created_at nếu backend có
+        like: post.total_likes, // nếu backend có trường view thì gán trực tiếp
+        comment: post.total_comments, // hoặc số comment thực tế nếu có
+        closestInteraction: {
+            avatarImg: post.latest_comment ? convertJsonData(post.latest_comment).link_thumbnail : null,
+            name: post.latest_comment ? convertJsonData(post.latest_comment).username : "Chưa có tương tác",
+            date: post.latest_comment ? convertJsonData(post.latest_comment).created_at.split(" ")[0] : null,
+            user_id: post.latest_comment ? convertJsonData(post.latest_comment).user_id : null,
+        }
+    }));
 }
-const handleEdit = (row: Item) => {
-    console.log('Sửa:', row)
+onMounted(async () => {
+    await getAllPostByTopic();
+})
+function goToPost(postId) {
+    router.push({
+        name: "post-detail",  // name của route đã định nghĩa trong router/index.js
+        params: { id: postId }
+    });
+
+
 }
-const handleDelete = (row: Item) => {
-    console.log('Xóa:', row)
-}
-const handleSupport = (row: Item) => {
-    console.log('Hỗ trợ:', row)
+function convertJsonData(data) {
+    return JSON.parse(data)
 }
 </script>
 <style scoped>
@@ -169,5 +185,24 @@ const handleSupport = (row: Item) => {
     border: solid 1px #b0d5f4;
     border-radius: 10px;
     padding: 2px 10px;
+}
+</style>
+<style>
+.custom-tooltip {
+    font-size: 13px;
+    border-radius: 8px !important;
+    border: none !important;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.custom-tooltip .el-popper__arrow::before {
+    background: #f7f6f2 !important;
+    border: solid 1px #f7f6f2 !important;
+}
+.hover_link:hover
+{
+    cursor: pointer;
+    color: #ff6114;
 }
 </style>

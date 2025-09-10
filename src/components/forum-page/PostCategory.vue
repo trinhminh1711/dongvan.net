@@ -1,9 +1,10 @@
 <template>
     <div>
 
-        <PostCard v-for="(post, index) in postData" :key="index" :title="post.title" :comment="post.comment"
-            :content="post.content" :is-active="post.isActive" :like="post.like" :time="post.time" :view="post.view"
-            :topic="post.topic" />
+        <PostCard v-for="(post, index) in postData" :key="index" :title="post.title" :content="post.content"
+            :username="post.username" :created_at="timeAgo(post.created_at)" :hashtag="post.hashtag" :total_likes="post.total_likes"
+            :total_comments="post.total_comments" :is-active="true" :topic_title="post.topic_title" 
+            :topic_id="post.topic_id" :STT="index"/>
 
     </div>
     <el-dialog v-model="dialogVisible" width="500">
@@ -12,48 +13,38 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
+import { getPost } from "@/api/forum";
 import CreatePostForum from './CreatePostForum.vue';
 import PostCard from './PostCard.vue';
 const dialogVisible = ref(false)
-const postData = [
-    {
-        title: "Tu Tiên Nông Dân - Hành trình từ phàm nhân",
-        user: "Đông Văn",
-        time: "2 giờ trước",
-        like: 345,
-        view: 12540,
-        comment: 67,
-        topic: 'Linh dị',
-        content: "Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương. Tình yêu của Dĩ Thâm dành cho Mặc Sênh giống như ánh mặt trời – lặng lẽ nhưng không bao giờ tắt.",
-        hashtag: ['#tu tiên'],
-        isActive: true
-    },
-    {
-        title: "Tu Tiên Nông Dân - Hành trình từ phàm nhân",
-        user: "Đông Văn",
-        time: "2 giờ trước",
-        like: 345,
-        view: 12540,
-        comment: 67,
-        topic: 'Ngôn tình',
-        content: "Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương. Tình yêu của Dĩ Thâm dành cho Mặc Sênh giống như ánh mặt trời – lặng lẽ nhưng không bao giờ tắt.",
-        hashtag: ['#tu tiên'],
-        isActive: false
-    },
-    {
-        title: "Tu Tiên Nông Dân - Hành trình từ phàm nhân",
-        user: "Đông Văn",
-        time: "2 giờ trước",
-        like: 345,
-        view: 12540,
-        comment: 67,
-        topic: 'Lịch sử',
-        content: "Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương. Tình yêu của Dĩ Thâm dành cho Mặc Sênh giống như ánh mặt trời – lặng lẽ nhưng không bao giờ tắt.",
-        hashtag: ['#tu tiên'],
-        isActive: true
+const postData = ref([])
+onMounted(async () => {
+    const res = await getPost()
+    postData.value = res.data
+    console.log(postData.value);
+})
+function timeAgo(isoString) {
+    const now = new Date();
+    const past = new Date(isoString);
+    const diffMs = now.getTime() - past.getTime(); // chênh lệch mili giây
+
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    const diffMonths = Math.floor(diffDays / 30);
+
+    if (diffMinutes < 60) {
+        return `${diffMinutes} phút trước`;
+    } else if (diffHours < 24) {
+        return `${diffHours} giờ trước`;
+    } else if (diffDays < 30) {
+        return `${diffDays} ngày trước`;
+    } else {
+        return `${diffMonths} tháng trước`;
     }
-]
+}
 </script>
 
 <style></style>

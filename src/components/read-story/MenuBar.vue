@@ -1,9 +1,9 @@
 <template>
-  <el-tabs v-model="activeName" @tab-click="handleClick">
+  <el-tabs v-if="storyData"  v-model="activeName">
     <el-tab-pane label="Mục lục" name="first">
       <ul class="list-menu" style="list-style: none;">
-        <li class="my-3" v-for="value in bookIndex" :key="index">
-          <p class="fw-bold">{{ value.text }}</p>
+        <li @click="gotoChap(value.chap_number)" class="my-3" v-for="(value, index) in bookIndex" :key="index">
+          <p class="fw-bold hover_link">Chương {{ value.chap_number }} : {{ value.chapter_title }}</p>
           <p v-if="!value.isPayfee" class="text-sm">Miễn phí</p>
         </li>
       </ul>
@@ -21,6 +21,40 @@
 
 <script setup>
 import { ref } from 'vue'
+import { defineProps } from "vue";
+import { onMounted } from "vue";
+import { getStoryFullInfo } from '@/api/stories';
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const props = defineProps({
+  storyId: Number,
+  chapterId: Number,
+});
+const storyData = ref(null)
+async function fetchChapter() {
+  storyData.value = await getStoryFullInfo(props.storyId);
+    console.log(storyData.value);
+
+  bookIndex.value = (storyData.value.data).map(chap => ({
+    chap_number: chap.chap_number,
+    chapter_title: chap.chapter_title,
+  }));
+
+
+}
+function gotoChap(chap_number) {
+  router.push({
+    name: "chap-detail",
+    params: {
+      id: props.storyId,
+      chapId: chap_number
+    }
+  });
+}
+onMounted(async () => {
+  await fetchChapter();
+});
 const activeName = ref('first')
 const handleOpen = (key, keyPath) => {
   console.log("Open:", key, keyPath);
@@ -28,27 +62,8 @@ const handleOpen = (key, keyPath) => {
 const handleClose = (key, keyPath) => {
   console.log("Close:", key, keyPath);
 };
-const bookmark =
-  [{ text: "Mục lục chương 1: Cà Phê Đen Và Mắt Nâu", date: "20/07/2025" },
-  { text: "Mục lục chương 2: Tin Nhắn Lúc Nửa Đêm", date: "20/07/2025" },
-  { text: "Mục lục chương 3: Bất Ngờ Làm Bạn Cùng Nhóm", date: "20/07/2025" },
-  { text: "Mục lục chương 4: Anh Là Ai Trong Em?", date: "20/07/2025" }
-  ]
-const bookIndex = [
-  { text: "Chương 1: Cà Phê Đen Và Mắt Nâu", isPayfee: false },
-  { text: "Chương 2: Tin Nhắn Lúc Nửa Đêm", isPayfee: false },
-  { text: "Chương 3: Bất Ngờ Làm Bạn Cùng Nhóm", isPayfee: true },
-  { text: "Chương 4: Anh Là Ai Trong Em?", isPayfee: true },
-  { text: "Chương 5: Ghen – Cảm Giác Lần Đầu Biết Đến", isPayfee: true },
-  { text: "Chương 6: Khi Trái Tim Lạc Nhịp", isPayfee: true },
-  { text: "Chương 7: Lời Tỏ Tình Trên Sân Thượng", isPayfee: true},
-  { text: "Chương 8: Một Cuộc Gọi, Một Lần Xa Cách", isPayfee: true },
-  { text: "Chương 10: Trở Lại Bên Nhau, Trưởng Thành Hơn", isPayfee: true },
-  { text: "Chương 11: Khi Trái Tim Lạc Nhịp", isPayfee: true },
-  { text: "Chương 12: Gặp Anh – Điều Đẹp Đẽ Nhất", isPayfee: true},
-  { text: "Chương 13: Khi Trái Tim Lạc Nhịp", isPayfee: true},
-  { text: "Chương 14: Anh Là Ai Trong Em?", isPayfee: true},
-]
+const bookmark = ref([])
+const bookIndex = ref([])
 </script>
 <style scoped>
 .list-menu {

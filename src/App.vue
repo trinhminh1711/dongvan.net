@@ -14,11 +14,12 @@ import CreateStory from './pages/CreateStory.vue';
 import ForumPage from './pages/ForumPage.vue';
 import StoryDetail from './pages/StoryDetail.vue';
 import ReadStory from './pages/ReadStory.vue';
-
+import { useRoute } from "vue-router";
+const route = useRoute();
 const dialogVisible = ref(false)
 </script>
 <template>
-  <header class="py-3">
+  <header  v-if="route.name !== 'chap-detail'" class="py-3">
     <Header />
   </header>
   <main class="pb-8">
@@ -26,7 +27,7 @@ const dialogVisible = ref(false)
       <RouterView/>
     </transition>
   </main>
-  <footer class="bg-footer border-top">
+  <footer v-if="route.name !== 'chap-detail'" class="bg-footer border-top">
     <Footer />
   </footer>
 </template>

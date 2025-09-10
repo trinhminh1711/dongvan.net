@@ -11,11 +11,14 @@ import ForumPage from '@/pages/ForumPage.vue'
 import HomePage from '@/pages/HomePage.vue'
 import InstructPage from '@/pages/InstructPage.vue'
 import PaymentPage from '@/pages/PaymentPage.vue'
+import ProfilePage from '@/pages/ProfilePage.vue'
 import ReadStory from '@/pages/ReadStory.vue'
 import StoryDetail from '@/pages/StoryDetail.vue'
+import requireAuth from "@/middleware/auth";
 import SupportPage from '@/pages/SupportPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-
+import EditStory from '@/components/create-story/EditStory.vue'
+import NotFound from '@/pages/NotFound.vue'
 // Import các page
 
 
@@ -26,30 +29,37 @@ const routes = [
     {
         path: '/forum', name: 'forum', component: ForumPage, children: [
             {
-                path: "list-post",
+                path: "list-post/:id",
+                name:"list-post",
                 component: ListPost
             },
             {
-                path: "post/:id",
+                path: "post-detail/:id",
+                name:"post-detail",
                 component: PostDetail
             },
             {
                 path: "post-card",
+                name: "post-card",
                 component: PostCategory
             },
         ]
     },
+
     { path: '/instruct-page', name: 'instruct', component: InstructPage },
     { path: '/support', name: 'support', component: SupportPage },
     { path: '/story-detail/:id', name: 'story', component: StoryDetail },
-     { path: '/story-detail/:id/chap', name: 'story', component: ReadStory },
+    { path: '/story-detail/:id/chap/:chapId', name: 'chap-detail', component: ReadStory },
     { path: '/create-story', name: 'create-story', component: CreateStory },
-    { path: '/create-story/new-chap', name: 'create-newchap', component: CreateNewTrapForm },
+    { path: '/profile', name: 'profile', component: ProfilePage, beforeEnter: requireAuth },
+    { path: '/create-story/new-chap/:storyId', name: 'create-newchap', component: CreateNewTrapForm },
+    { path: '/edit-story/:id', name: 'edit-story', component: EditStory },
     {
-        path: '/article-page', name: 'article', component: ArticleCategoryList, children: [
+        path: '/article-page/:id', name: 'article', component: ArticleCategoryList, children: [
 
         ]
-    }
+    },
+    { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFound },
 ]
 
 const router = createRouter({

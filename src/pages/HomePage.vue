@@ -3,7 +3,7 @@
   <div class="container py-3 text-center">
     <div class="row align-items-start justify-content-between">
       <div class="row col-3 px-0 d-flex align-items-center">
-        <ListStory />
+        <ListStory v-model:items="items" />
       </div>
       <div class="col-6 el-menu-story">
         <h3 class="text-color_primary fw-bold text-start">Biên tập viên đề cử</h3>
@@ -47,7 +47,7 @@
         </div>
       </div>
       <div class="col-3 p-0">
-        <ListStory :content="reviewTitle" :items="dataReview" />
+       
       </div>
     </div>
     <div class="row align-items-start mt-5 justify-content-between">
@@ -158,7 +158,9 @@ import TopListUpdate from '@/components/homepage/TopListUpdate.vue'
 import TopAuthorWeek from '@/components/homepage/TopAuthorWeek.vue'
 import StoryCompleted from '@/components/homepage/StoryCompleted.vue'
 const activeName = ref('first')
-
+const items = ref([
+  { title: "mock", text: "mock text" }
+]);
 const handleClick = (tab: TabsPaneContext, event: Event) => {
   console.log(tab, event)
 }

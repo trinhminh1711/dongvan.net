@@ -2,7 +2,7 @@
     <div class="container py-3 text-center">
         <div class="row align-items-start  justify-content-between">
             <div class="row col-3 col d-flex align-items-center menu-category">
-                <div v-for="(item, index) in items" :key="index"
+                <div @click="goToCategory(item)" v-for="(item, index) in items" :key="index"
                     class="col-6 d-flex align-items-center menu-category__item">
                     <span>
                         <img :src="item.image" alt="Logo">
@@ -65,26 +65,33 @@ import vectorIcon9 from '@/assets/icon/helmet 1.svg'
 import vectorIcon10 from '@/assets/icon/building 1.svg'
 import vectorIcon11 from '@/assets/icon/poem 1.svg'
 import vectorIcon12 from '@/assets/icon/Vector (8).svg'
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const activeTabs = ref('first')
 interface LinkItem {
     value: string
     link: string
 }
-
+function goToCategory(item) {
+    router.push({
+        name: "article",
+        params: {id: item.id}
+    });
+}
 const items = [
-    { image: storyIcon, text: 'Linh dị', number: '236460' },
-    { image: vectorIcon2, text: 'Trinh thám', number: '43492' },
-    { image: vectorIcon3, text: 'Lịch sử', number: '77225' },
-    { image: vectorIcon4, text: 'Ngôn tình', number: '45378' },
-    { image: vectorIcon5, text: 'Truyện ngắn', number: '236460' },
-    { image: vectorIcon6, text: 'Thơ', number: '43492' },
-    { image: vectorIcon7, text: 'Huyền ảo', number: '77225' },
-    { image: vectorIcon8, text: 'Viễn tưởng', number: '45378' },
-    { image: vectorIcon9, text: 'Cổ đại', number: '45378' },
-    { image: vectorIcon10, text: 'Hiện thực', number: '77225' },
-    { image: vectorIcon11, text: 'Tản văn', number: '77225' },
-    { image: vectorIcon12, text: 'Tất cả', number: '77225' },
+    { image: storyIcon, text: 'Linh dị', number: '236460', id: 1 },
+    { image: vectorIcon2, text: 'Trinh thám', number: '43492', id: 2 },
+    { image: vectorIcon3, text: 'Lịch sử', number: '77225' , id: 3},
+    { image: vectorIcon4, text: 'Ngôn tình', number: '45378', id: 4 },
+    { image: vectorIcon5, text: 'Truyện ngắn', number: '236460', id: 5 },
+    { image: vectorIcon6, text: 'Thơ', number: '43492' , id:6},
+    { image: vectorIcon7, text: 'Huyền ảo', number: '77225' , id: 7},
+    { image: vectorIcon8, text: 'Viễn tưởng', number: '45378' , id: 8},
+    { image: vectorIcon9, text: 'Cổ đại', number: '45378' , id: 9},
+    { image: vectorIcon10, text: 'Hiện thực', number: '77225', id: 10 },
+    { image: vectorIcon11, text: 'Tản văn', number: '77225', id: 11 },
+    { image: vectorIcon12, text: 'Tất cả', number: '77225', id: 12 },
 ]
 const newFeeds = [
     { topic: 'Luận truyện', text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s,' },
@@ -128,7 +135,6 @@ const handleSelect = (item: Record<string, any>) => {
 const handleIconClick = (ev: Event) => {
     console.log(ev)
 }
-
 onMounted(() => {
     links.value = loadAll()
 })
@@ -226,5 +232,11 @@ onMounted(() => {
     max-width: 20px;
     height: auto;
     margin-right: 4px;
+}
+.menu-category > div:hover
+{
+    cursor: pointer;
+    background-color: #f7f6f2;
+    transition: all .2s ease-in;
 }
 </style>

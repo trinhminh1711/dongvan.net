@@ -1,34 +1,53 @@
 <template>
-    <h3 class="list-title text-color_primary">{{ content }}</h3>
+    <h3 class="list-title text-color_primary">Chương mới cập nhật</h3>
     <div class="list-container">
-        <div v-for="(item, index) in items" :key="index" class="list-item">
+        <div @click="gotoChapDetail(item.story_id, item.chap_number)" v-for="(item, index) in items" :key="index"
+            class="list-item">
             <span>{{ item.title }}</span>
             <span class="text-color__tertiary">{{ item.text }}</span>
         </div>
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        items: {
-            type: Array,
-            default: () => [
-                { title: "Trận Vấn Trường", text: "Chương 1" },
-                { title: "Cẩu Tại Sơ Thánh", text: "Chương 1" },
-                { title: "Ngã Tại Tu Tiên gia", text: "Chương 1" },
-                { title: "Huyền Trần Đạo Đồ", text: "Chương 1" },
-                { title: "Cửu Vực Phàm Tiên", text: "Chương 1" }
-            ]
-        },
-        content: {
-            type: String,
-            default: "Chương mới cập nhật"
-        },
-    }
+<script setup>
+import { ref, onMounted, watch } from "vue";
+import { getListChapterUpdate } from "@/api/chapter";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const emit = defineEmits(["update:items"]);
+const props = defineProps({
+    items: {
+        type: Array,
+        default: () => []
+    },
+});
+function gotoChapDetail(storyId, chapterId) {
+    router.push({
+        name: "chap-detail",
+        params: {
+            id: storyId,
+            chapId: chapterId
+        }
+    });
 }
-</script>
+onMounted(async () => {
+    try {
+        const res = await getListChapterUpdate()
+        const result = res.map((bItem) => ({
+            title: bItem.title,
+            text: "Chương " + bItem.chap_number,
+            chap_number: bItem.chap_number,
+            story_id: bItem.story_id
+        }));
+        console.log(res);
 
+        emit("update:items", result);
+
+    } catch (err) {
+        console.error("Lỗi khi fetch API:", err);
+    }
+});
+</script>
 <style scoped>
 .list-title {
     font-weight: bold;
@@ -41,5 +60,11 @@ export default {
     padding: 10px 0;
     justify-content: space-between;
     border-bottom: solid 1px #E4E7EC;
+}
+.list-container > div:hover
+{
+    cursor: pointer;
+    background-color: #f7f6f2;
+    transition: all .2s ease-in;
 }
 </style>
