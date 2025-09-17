@@ -28,7 +28,7 @@
                 <div class="el-descriptions-storyinfo">
                     <el-descriptions label-width="150px" :column="4" direction="vertical" size="small" class="mb-3">
                         <el-descriptions-item label="Tác giả"><span class="fw-bold">{{ storyData.author_name
-                                }}</span></el-descriptions-item>
+                        }}</span></el-descriptions-item>
                         <el-descriptions-item label="Thể loại"><span class="fw-bold">Ngôn
                                 tình</span></el-descriptions-item>
                         <el-descriptions-item label="Trạng thái"><span class="fw-bold">Hoàn
@@ -51,9 +51,15 @@
                     <div class="btn-option d-flex align-items-center gap-2">
                         <img src="@/assets/icon/coin2.png" alt="">Đề cử
                     </div>
-                    <div class="btn-option d-flex align-items-center gap-2">
-                        <img src="@/assets/icon/hearth.png" alt="">
-                        Yêu thích
+                    <div @click="likeStory(storyData.story_id)" class="">
+                        <div v-if="!isFavorite" class="d-flex align-items-center gap-2 btn-option ">
+                            <img src="@/assets/icon/hearth.png" alt="">
+                            <span class="fw-bold">Yêu thích</span>
+                        </div>
+                        <div v-if="isFavorite" class="d-flex align-items-center gap-2 btn-like btn-option ">
+                            <img src="@/assets/icon/hearth.png" alt="">
+                            <span class="fw-bold">Bỏ yêu thích</span>
+                        </div>
                     </div>
                     <div class="btn-option d-flex align-items-center gap-2"><img src="@/assets/icon/start.png"
                             alt="">Đánh giá</div>
@@ -90,7 +96,7 @@
                                 </template>
                             </el-table-column>
                             <el-table-column>
-                                <template  #default="scope">
+                                <template #default="scope">
                                     <button @click="goReadChap(scope.row.chap_number)" style="padding: 10px 15px;"
                                         class="btn-alert d-flex align-items-center fw-bold"> Đọc ngay</button>
                                 </template>
@@ -134,9 +140,13 @@
 <script setup>
 import Comment from "@/components/story-detail/Comment.vue"
 import ReviewStory from "@/components/story-detail/ReviewStory.vue"
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import { getStoryFullInfo } from "@/api/stories";
 import { useRoute, useRouter } from "vue-router";
+import { addFavorite } from "@/api/stories";
+import { useAuthStore } from "@/stores/auth";
+import { checkStoryLike } from "@/api/stories";
+const auth = useAuthStore();
 const loading = ref(true);
 const route = useRoute();
 const router = useRouter();
@@ -145,6 +155,7 @@ const fullStoryData = ref(null);
 const rating = ref(4.6)
 const sort = ref("desc")
 const activeName = "first"
+const isFavorite = ref();
 const chapters = ref([
     { title: "Tập 46 - Chương 24: Ngoại truyện", words: "839 chữ" },
     { title: "Tập 46 - Chương 23: Ngoại truyện", words: "819 chữ" },
@@ -175,9 +186,20 @@ async function getData() {
         console.error("Lỗi khi load dữ liệu:", err);
     }
 }
+async function likeStory(story_id) {
+    const res = await addFavorite(auth.userId, story_id)
+    isFavorite.value = res.isFavorite
+
+}
+async function checkLikeStory() {
+    const res = await checkStoryLike(auth.userId, route.params.id)
+    isFavorite.value = res.isFavorite
+}
 onMounted(async () => {
+    await checkLikeStory();
     await getData();
 });
+watch
 </script>
 <style>
 .el-descriptions-storyinfo .el-descriptions__table {
@@ -185,12 +207,21 @@ onMounted(async () => {
 }
 </style>
 <style scoped>
+.btn-like {
+    background-color: red;
+    color: #fff;
+}
+
 .btn-option {
     padding: 5px 10px;
     border-radius: 15px;
     font-weight: 700;
     font-size: 12px;
     border: solid 1px #e7e9eb;
+}
+
+.btn-option:hover {
+    cursor: pointer;
 }
 
 .btn-option img {

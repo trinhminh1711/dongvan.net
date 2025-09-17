@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="col-6 el-menu-story">
-                <img style="width: 100%; height: 200px;"
+                <img style="width: 100%; height: 250px;"
                     src="https://www.quehuong.org.vn/wp-content/uploads/2018/07/dung-noi-chuyen-voi-co-ay.jpg" alt=""
                     srcset="">
                 <div class="banner-tabs">
@@ -26,10 +26,30 @@
                                 <img src="@/assets/image/img-cateory3.png" />
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="Lâm Uyên Hành" name="second">Lâm Uyên Hành</el-tab-pane>
-                        <el-tab-pane label="Vạn Cổ Tối Cường" name="third">Vạn Cổ Tối Cường</el-tab-pane>
-                        <el-tab-pane label="Quỷ Bí Chi Chủ" name="fourth">Quỷ Bí Chi Chủ</el-tab-pane>
-                        <el-tab-pane label="Phàm Nhân Tu Tiên" name="five">Phàm Nhân Tu Tiên</el-tab-pane>
+                        <el-tab-pane label="Lâm Uyên Hành" name="second">
+                            <div class="d-flex">
+                                <img src="@/assets/image/img-cateory3.png" />
+                                <img src="@/assets/image/img-cateory1.png" />
+                                <img src="@/assets/image/img-cateory2.png" />
+
+                            </div>
+                        </el-tab-pane>
+                        <el-tab-pane label="Vạn Cổ Tối Cường" name="third">
+                            <div class="d-flex">
+                                <img src="@/assets/image/img-cateory3.png" />
+                                <img src="@/assets/image/img-cateory2.png" />
+                                <img src="@/assets/image/img-cateory1.png" />
+
+                            </div>
+                        </el-tab-pane>
+                        <el-tab-pane label="Quỷ Bí Chi Chủ" name="fourth">
+                            <div class="d-flex">
+                                <img src="@/assets/image/img-cateory2.png" />
+                                <img src="@/assets/image/img-cateory1.png" />
+                                <img src="@/assets/image/img-cateory3.png" />
+
+                            </div>
+                        </el-tab-pane>
                     </el-tabs>
                 </div>
             </div>
@@ -38,7 +58,8 @@
                     <img src="@/assets/icon/newfeed.png" alt=""> Tin tức mới
                 </h3>
                 <ul class="m-0 p-0">
-                    <li v-for="(item, index) in newFeeds" :key="index" class="d-flex align-items-center topic-item">
+                    <li @click="goToPost(item.link)" v-for="(item, index) in newFeeds" :key="index"
+                        class="d-flex align-items-center topic-item hover_link">
                         <span class="text-black">[{{ item.topic }}]</span>
                         <span class="text-color__tertiary">{{ item.text }}</span>
                     </li>
@@ -66,7 +87,7 @@ import vectorIcon10 from '@/assets/icon/building 1.svg'
 import vectorIcon11 from '@/assets/icon/poem 1.svg'
 import vectorIcon12 from '@/assets/icon/Vector (8).svg'
 import { useRouter } from "vue-router";
-
+import { getPost } from '@/api/forum'
 const router = useRouter();
 const activeTabs = ref('first')
 interface LinkItem {
@@ -76,30 +97,38 @@ interface LinkItem {
 function goToCategory(item) {
     router.push({
         name: "article",
-        params: {id: item.id}
+        params: { id: item.id }
     });
+}
+function goToPost(id) {
+    router.push({
+        name: "post-detail",
+        params: { id: id }
+    });
+}
+async function getNotification() {
+    const res = await getPost()
+    newFeeds.value = res.data.map(b => ({
+        topic: b.topic_title,
+        text: b.title,
+        link: b.post_id
+    }));
 }
 const items = [
     { image: storyIcon, text: 'Linh dị', number: '236460', id: 1 },
     { image: vectorIcon2, text: 'Trinh thám', number: '43492', id: 2 },
-    { image: vectorIcon3, text: 'Lịch sử', number: '77225' , id: 3},
+    { image: vectorIcon3, text: 'Lịch sử', number: '77225', id: 3 },
     { image: vectorIcon4, text: 'Ngôn tình', number: '45378', id: 4 },
     { image: vectorIcon5, text: 'Truyện ngắn', number: '236460', id: 5 },
-    { image: vectorIcon6, text: 'Thơ', number: '43492' , id:6},
-    { image: vectorIcon7, text: 'Huyền ảo', number: '77225' , id: 7},
-    { image: vectorIcon8, text: 'Viễn tưởng', number: '45378' , id: 8},
-    { image: vectorIcon9, text: 'Cổ đại', number: '45378' , id: 9},
+    { image: vectorIcon6, text: 'Thơ', number: '43492', id: 6 },
+    { image: vectorIcon7, text: 'Huyền ảo', number: '77225', id: 7 },
+    { image: vectorIcon8, text: 'Viễn tưởng', number: '45378', id: 8 },
+    { image: vectorIcon9, text: 'Cổ đại', number: '45378', id: 9 },
     { image: vectorIcon10, text: 'Hiện thực', number: '77225', id: 10 },
     { image: vectorIcon11, text: 'Tản văn', number: '77225', id: 11 },
     { image: vectorIcon12, text: 'Tất cả', number: '77225', id: 12 },
 ]
-const newFeeds = [
-    { topic: 'Luận truyện', text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s,' },
-    { topic: 'Review truyện', text: 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout', link: '#' },
-    { topic: 'Hỏi đáp', text: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making', link: '#' },
-    { topic: 'Sự kiện', text: 'There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour,', link: '#' },
-    { topic: 'Sự kiện', text: 'Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).', link: '#' },
-]
+const newFeeds = ref([])
 const state = ref('')
 const links = ref<LinkItem[]>([])
 
@@ -135,8 +164,10 @@ const handleSelect = (item: Record<string, any>) => {
 const handleIconClick = (ev: Event) => {
     console.log(ev)
 }
-onMounted(() => {
-    links.value = loadAll()
+onMounted(async () => {
+    links.value = loadAll();
+    await getNotification();
+
 })
 </script>
 <style>
@@ -161,6 +192,19 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     width: 100%;
+}
+
+.banner-tabs {
+    position: relative;
+    top: -46px;
+}
+
+.banner-tabs .el-tabs__header {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.banner-tabs .el-tabs__header .el-tabs__item {
+    color: #fff;
 }
 </style>
 <style scoped>
@@ -228,13 +272,18 @@ onMounted(() => {
     max-width: 100%;
 }
 
+.topic-item:hover span {
+    cursor: pointer;
+    color: #ff6114;
+}
+
 .new-feed_title img {
     max-width: 20px;
     height: auto;
     margin-right: 4px;
 }
-.menu-category > div:hover
-{
+
+.menu-category>div:hover {
     cursor: pointer;
     background-color: #f7f6f2;
     transition: all .2s ease-in;

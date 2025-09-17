@@ -8,14 +8,14 @@
             <div v-for="stories in categoryList" :key="stories.id" class="box-left__content col-6 mt-3">
                 <img style="max-width: 150px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* bóng mờ nhẹ */ border-radius: 8px;" :src="stories.urlImg" alt="">
                 <div class="left-content px-4">
-                    <h4 class="text-color_primary fw-bold hover_link">{{ stories.title }}</h4>
+                    <h4 @click="goToStory(stories.story_id)" class="text-color_primary fw-bold hover_link">{{ stories.title }}</h4>
                     <p class="left-content__author text-color__tertiary">{{ stories.author }}</p>
                     <p><img src="@/assets/icon/quote.png" alt="">
                         <desc class="left-content__desc text-sm">
                             {{ stories.description }}
                         </desc>
                     </p>
-                    <button @click="goToStory(stories.story_id)" class="btn-alert mt-3">Đọc tiếp</button>
+                    <button @click="goToStory(stories.story_id)" class="btn-alert mt-3">Đọc truyện</button>
                 </div>
             </div>
         </div>
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref ,  watch } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from 'vue-router'
 
@@ -32,14 +32,13 @@ const route = useRoute();
 const currentPage = 1
 const categoryList = ref(null);
 import { getStoryByCategory } from '@/api/stories'
-onMounted(async () => {
-    const getData = await getStoryByCategory(route.params.id)
-    console.log(getData);
-
-    categoryList.value = getData.data
-
-});
-
+async function fetchData() {
+  const getData = await getStoryByCategory(route.params.id)
+  categoryList.value = getData.data
+}
+onMounted(() => {
+  fetchData()
+})
 function handlePageChange(page) {
     console.log('Trang mới:', page) // In ra số trang
 }
@@ -49,6 +48,12 @@ function goToStory(post_id) {
     params: { id:post_id }       // Truyền param id
   })
 }
+watch(
+  () => route.params.id,
+  () => {
+    fetchData()
+  }
+)
 </script>
 
 <style scoped>

@@ -54,11 +54,7 @@ import CreatePostForum from '@/components/forum-page/CreatePostForum.vue'
 import PostCategory from '@/components/forum-page/PostCategory.vue'
 const loading = ref(false);
 const items = [
-    { image: storyIcon, text: 'Linh dị', number: '236460' },
-    { image: vectorIcon2, text: 'Trinh thám', number: '43492' },
-    { image: vectorIcon3, text: 'Lịch sử', number: '77225' },
-    { image: vectorIcon4, text: 'Ngôn tình', number: '45378' },
-    { image: vectorIcon5, text: 'Truyện ngắn', number: '236460' },
+    { image: storyIcon, text: 'Luận truyện', number: '236460' },
     { image: vectorIcon6, text: 'Đề cử và Review truyện', number: '43492' },
     { image: vectorIcon7, text: 'Nhập môn sáng tác', number: '77225' },
     { image: vectorIcon8, text: 'Tìm bạn đồng sáng tác', number: '45378' },
@@ -124,13 +120,16 @@ watch(
 .fade-leave-to {
     opacity: 0;
 }
-.menu-category__item:hover
-{
+
+.menu-category__item:hover {
     cursor: pointer;
 
 }
-.menu-category__item:hover p.text-color_primary{
-    font-weight: 900;
+
+.menu-category__item:hover p.text-color_primary {
+    color: #BF2C24;
+  font-weight: 900;
+  transform: scale(1.02); /* bù lại độ giãn */
     transition: all .2s ease-in;
 }
 </style>

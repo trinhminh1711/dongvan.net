@@ -2,7 +2,7 @@
     <div>
         <LoadingSpiner :show="loading" />
     </div>
-    <div :style="{backgroundColor: backgroundColor, color: textColor, transition: 'all 0.3s ease'}"  v-if="!loading">
+    <div :style="{ backgroundColor: backgroundColor, color: textColor, transition: 'all 0.3s ease' }" v-if="!loading">
         <div class="tab-bar">
             <button class="hover_link" @click="goBack"><el-icon style="color: white; font-size: 24px;">
                     <ArrowLeft />
@@ -21,7 +21,8 @@
         </div>
         <div class="container mt-3">
             <div class="story">
-                <div :style="{ fontFamily: fontFamily, fontSize: fontSize + 'px', marginTop: '20px' }" v-html="chapterData.content"></div>
+                <div :style="{ fontFamily: fontFamily, fontSize: fontSize + 'px', marginTop: '20px' }"
+                    v-html="chapterData.content"></div>
             </div>
 
         </div>
@@ -32,7 +33,8 @@
                 </div>
             </template>
             <MenuBar :storyId="Number(route.params.id)" :chapterId="Number(route.params.chapId)" v-if="showOption" />
-            <MenuEditUI  @change-font="handleFontChange" @changeTheme="handleTheme"  @changeFontSize="handleFontSize" v-if="!showOption" />
+            <MenuEditUI @change-font="handleFontChange" @changeTheme="handleTheme" @changeFontSize="handleFontSize"
+                v-if="!showOption" />
         </el-drawer>
     </div>
 </template>
@@ -44,6 +46,9 @@ import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from 'vue-router'
 import { getChapterWithId } from '@/api/chapter';
+import { updateUserReadingBook } from '@/api/stories';
+import { useAuthStore } from "@/stores/auth";
+const auth = useAuthStore();
 import LoadingSpiner from '@/components/loadding/LoadingSpiner.vue';
 const route = useRoute();
 const drawer = ref(false);
@@ -68,22 +73,29 @@ async function fetchChapter() {
         loading.value = false;
     }
 
-}function handleFontSize(action) {
-  if(action === "increase" && fontSize.value < 40) fontSize.value += 2;
-  if(action === "decrease" && fontSize.value > 6) fontSize.value -= 2;
+} function handleFontSize(action) {
+    if (action === "increase" && fontSize.value < 40) fontSize.value += 2;
+    if (action === "decrease" && fontSize.value > 6) fontSize.value -= 2;
 }
 function handleFontChange(font) {
-  fontFamily.value = font;
+    fontFamily.value = font;
 }
 function handleTheme(theme) {
-  backgroundColor.value = theme.background;
-  textColor.value = theme.text;
+    backgroundColor.value = theme.background;
+    textColor.value = theme.text;
 }
 const router = useRouter()
 
 function goBack() {
-  router.back()       // quay lại 1 bước trong history
-  // hoặc: router.go(-1)
+    router.back()       // quay lại 1 bước trong history
+    // hoặc: router.go(-1)
+}
+async function updateReadingUser() {
+    const storyId = route.params.id;
+    const chapterId = route.params.chapId;
+    const userId = auth.userId;
+    const res = await updateUserReadingBook(userId, storyId, chapterId);
+    console.log(res);
 }
 watch(
     () => route.params,
@@ -93,7 +105,8 @@ watch(
     { immediate: true }
 );
 onMounted(async () => {
-    fetchChapter();
+    await updateReadingUser()
+    await fetchChapter();
 });
 </script>
 

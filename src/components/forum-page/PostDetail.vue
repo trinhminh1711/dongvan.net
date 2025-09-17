@@ -48,7 +48,7 @@
     <PostComment v-if="showComment" v-for="value in listComment" :comment_id = "value.comment_id" :like ="value.comment_total_likes" 
     :user="value.comment_username" :user_thumbnail="value.comment_link_thumbnail" :comment="value.comment_content" :date="value.comment_created_at" />
     <div class="post__comment mt-5">
-        <h4 class=" mb-3 fw-bold">{{ showComment }}</h4>
+
         <div class="user-comment">
             <InputCommentPost :postId="Number(route.params.id)"/>
         </div>

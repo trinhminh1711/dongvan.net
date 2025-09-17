@@ -52,8 +52,7 @@
                 </el-icon> {{ created_at }}
             </p>
         </div>
-        <p class="lh-lg mt-3 text-sm">
-            {{ content }}
+        <p v-html="content" class="lh-lg mt-3 text-sm">
         </p>
         <p class="hashtag mt-3"><span class="pe-3 fw-semibold">{{ hashtag }}</span> </p>
 

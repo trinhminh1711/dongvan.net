@@ -1,15 +1,23 @@
 <template>
     <div class="container">
         <div class="row mt-4">
-            <div v-for="stories in categoryList" :key="stories.id" class="box-left__content col-6">
-                <img src="@/assets/image/sieucapcungchieu.png" alt="">
+            <div v-for="(stories, index) in categoryList" :key="index" class="box-left__content col-md-6">
+                <div class="book-card">
+                    <div v-if="!stories" class="ribbon">FULL</div>
+                    <div v-if="stories" class="ribbon-vip">VIP</div>
+                    <img style="max-width: 150px;" :src="stories.link_img" alt=""></img>
+                </div>
                 <div class="left-content">
-                    <h4 class="text-color_primary fw-bold">{{ stories.title }}</h4>
-                    <p class="left-content__author text-color__tertiary text-md">{{ stories.author }}</p>
-                    <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.chapterCount }}</span><span class="text-md">
-                            chương</span></p>
-                    <p class="text-sm"> Chương đang đọc: [Chương 1] Trùng Sinh Tỉnh Lại </p>
-                     <button class="btn-alert my-4">Đọc ngay</button>
+                    <p class="text-color_primary fw-bold text-lg">{{ stories.story_title }}</p>
+                    <p class="text-md fw-semibold">{{ stories.author_name }}</p>
+                    <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.total_chapters }}</span>
+                        <span class="text-md">
+                            chương</span>
+                    </p>
+                    <p class="text-md fw-semibold"> Chương đang đọc: [Chương {{ stories.chapter_number }}] {{
+                        stories.chapter_title }} </p>
+                    <button @click="readOnBook(stories.story_id, stories.chapter_number)" class="btn-alert my-3">Đọc
+                        tiếp</button>
                 </div>
             </div>
         </div>
@@ -18,87 +26,73 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, onMounted } from 'vue';
+import { useAuthStore } from '../../stores/auth';
+import { getListUserReading } from '@/api/stories';
+import { useRouter } from "vue-router";
+const router = useRouter();
 const currentPage = 1
-const categoryList = [
-    {
-        id: 1, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 2, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 3, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 4, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 5, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 6, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 7, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 8, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-    {
-        id: 9, // định danh duy nhất
-        title: 'Siêu Cấp Cưng Chiều',
-        author: 'Mạch Văn',
-        description: 'Bên Nhau Trọn Đời” là một câu chuyện tình yêu nhẹ nhàng nhưng sâu sắc giữa Hà Dĩ Thâm – chàng luật sư lạnh lùng, tài giỏi và Triệu Mặc Sênh – cô nhiếp ảnh gia mạnh mẽ, độc lập.Không có quá nhiều cao trào hay biến cố gay gắt, truyện cuốn hút người đọc bằng cách xây dựng tâm lý nhân vật tinh tế, lời thoại thâm thúy và tình cảm chân thành không phô trương.',
-        imageUrl: '@/assets/image/sieucapcungchieu.png',
-        chapterCount: 567
-    },
-];
+const categoryList = ref([]);
 function handlePageChange(page) {
-  console.log('Trang mới:', page) // In ra số trang
+    console.log('Trang mới:', page) // In ra số trang
 }
+async function getListReading() {
+    const auth = useAuthStore();
+    const res = await getListUserReading(auth.userId);
+    categoryList.value = res.data;
+
+}
+function readOnBook(storyId, chapId) {
+    router.push({
+        name: "chap-detail",
+        params: { id: storyId, chapId: chapId }
+    });
+}
+onMounted(async () => {
+    await getListReading()
+})
 </script>
 
 <style scoped>
+.book-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.ribbon {
+    position: absolute;
+    top: 12px;
+    left: -35px;
+    /* dịch ra để canh chéo */
+    width: 120px;
+    text-align: center;
+    background: #16a34a;
+    /* xanh lá */
+    color: #fff;
+    font-weight: bold;
+    transform: rotate(-45deg);
+    padding: 4px 0;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+.ribbon-vip
+{
+    position: absolute;
+    top: 12px;
+    left: -35px;
+    /* dịch ra để canh chéo */
+    width: 120px;
+    text-align: center;
+    background:red;
+    /* xanh lá */
+    color: #fff;
+    font-weight: bold;
+    transform: rotate(-45deg);
+    padding: 4px 0;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
 .box-left__content {
     display: flex;
     padding: 10px;
@@ -117,8 +111,12 @@ function handlePageChange(page) {
     /* hướng hộp */
     overflow: hidden;
 }
-.box-left__content h4
-{
+
+.box-left__content h4 {
     font-size: 22px;
+}
+
+.fw-semibold {
+    font-weight: 500 !important;
 }
 </style>

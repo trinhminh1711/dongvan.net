@@ -68,16 +68,13 @@ const editorOptions = {
 const text = ref("")
 const selected = ref("")
 const options = [
-    { value: "1", label: "Trinh thám" },
-    { value: "2", label: "Ngôn tình" },
-    { value: "3", label: "Linh dị" },
-    { value: "4", label: "Lịch sử" },
+    { value: "1", label: "Luận truyện" },
+    { value: "2", label: "Ngôn Đề cử và Review truyện" },
+    { value: "3", label: "Nhập môn sáng tác dị" },
+    { value: "4", label: "Tìm bạn đồng sáng tác" },
     { value: "5", label: "Thể loại khác" },
-    { value: "6", label: "Đề cử và Review truyện" },
-    { value: "7", label: "Nhập môn sáng tác" },
-    { value: "8", label: "Tìm bạn đồng sáng tác" },
-    { value: "9", label: "Tin tức và sự kiện" },
-    { value: "10", label: "Hỏi đáp cùng tác giả" }
+    { value: "6", label: "Hỏi đáp cùng tác giả" },
+
 ]
 async function upPost() {
     const toastAddChapter = toast.loading("Đang xử lý...");

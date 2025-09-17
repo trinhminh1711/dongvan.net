@@ -9,7 +9,7 @@ export const createPost = async (postData) => {
        return err
     }
 };
-export const getPost = async (TopicId) => {
+export const getPost = async () => {
     try {
         const res = await axiosClient.get(`${API_URL}/post-forum/get-post`);
         return res.data

@@ -19,7 +19,7 @@ const route = useRoute();
 const dialogVisible = ref(false)
 </script>
 <template>
-  <header  v-if="route.name !== 'chap-detail'" class="py-3">
+  <header  v-if="route.name !== 'chap-detail'" class="pt-3">
     <Header />
   </header>
   <main class="pb-8">

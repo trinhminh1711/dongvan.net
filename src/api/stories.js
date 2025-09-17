@@ -39,7 +39,7 @@ export const createStory = async (data) => {
         };
     };
 }
-export const updateStory = async (data , story_id) => {
+export const updateStory = async (data, story_id) => {
     console.log(data);
     try {
         const formData = new FormData();
@@ -79,7 +79,7 @@ export const getStory = async (authorId) => {
         const res = await axiosClient.get(`${API_URL}/${authorId}`);
         return res.data
     } catch (err) {
-       return err
+        return err
     }
 };
 
@@ -88,7 +88,7 @@ export const getStoryById = async (storyId) => {
         const res = await axiosClient.get(`${API_URL}/story/${storyId}`);
         return res.data
     } catch (err) {
-       return err
+        return err
     }
 };
 
@@ -97,7 +97,7 @@ export const getStoryByCategory = async (categoryId) => {
         const res = await axiosClient.get(`${API_URL}/category/${categoryId}`);
         return res.data
     } catch (err) {
-       return err
+        return err
     }
 };
 export const getStoryFullInfo = async (story_id) => {
@@ -105,7 +105,7 @@ export const getStoryFullInfo = async (story_id) => {
         const res = await axiosClient.get(`${API_URL}/story-allinfo/${story_id}`);
         return res.data
     } catch (err) {
-       return err
+        return err
     }
 };
 
@@ -114,6 +114,63 @@ export const getStoryComment = async (story_id) => {
         const res = await axiosClient.get(`${API_URL}/${story_id}/comments`);
         return res.data
     } catch (err) {
-       return err
+        return err
+    }
+};
+
+export const updateUserReadingBook = async (userId, storyId, chapterId) => {
+    try {
+        const res = await axiosClient.post(`${API_URL}/story/reading`, {
+            user_id: userId,
+            story_id: storyId,
+            chapter_id: chapterId
+        });
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
+
+export const getListUserReading = async (userId) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/user/reading/${userId}`);
+        return res.data
+    } catch (err) {
+        return err
+    }
+}
+
+export const getListPostLike = async (userId) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/favorite/${userId}`);
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
+
+export const checkStoryLike = async (userId, storyId) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/check/storylike`, {
+            params: {
+                user_id: userId,
+                story_id: storyId
+            }
+        });
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
+
+export const addFavorite = async (userId, storyId) => {
+    try {
+        const res = await axiosClient.post(`${API_URL}/user-story/favorite`, {
+            user_id: userId,
+            story_id: storyId,
+        });
+        return res.data
+    } catch (err) {
+        return err
     }
 };

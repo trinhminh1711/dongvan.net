@@ -1,4 +1,7 @@
 @import "./base.css";
+html, body {
+  font-family: 'Roboto', sans-serif;
+}
 a,
 .green {
   text-decoration: none;
