@@ -48,8 +48,11 @@
                 </div>
                 <!-- Nút hành động -->
                 <div class="my-4 d-flex gap-3">
-                    <div class="btn-option d-flex align-items-center gap-2">
-                        <img src="@/assets/icon/coin2.png" alt="">Đề cử
+                    <div :style="{ backgroundColor: coinVoted > 1 ? 'green' : 'white' }" @click="voteDialog = true"
+                        class="btn-option d-flex align-items-center gap-2">
+                        <img src="@/assets/icon/coin2.png" alt="">
+                        <span class="fw-bold" v-if="!coinVoted">Đề cử</span>
+                        <span style="color: white;" v-if="coinVoted">Đã vote {{ coinVoted }} phiếu</span>
                     </div>
                     <div @click="likeStory(storyData.story_id)" class="">
                         <div v-if="!isFavorite" class="d-flex align-items-center gap-2 btn-option ">
@@ -57,23 +60,25 @@
                             <span class="fw-bold">Yêu thích</span>
                         </div>
                         <div v-if="isFavorite" class="d-flex align-items-center gap-2 btn-like btn-option ">
-                            <img src="@/assets/icon/hearth.png" alt="">
                             <span class="fw-bold">Bỏ yêu thích</span>
                         </div>
                     </div>
-                    <div class="btn-option d-flex align-items-center gap-2"><img src="@/assets/icon/start.png"
-                            alt="">Đánh giá</div>
-                    <div class="btn-option d-flex align-items-center gap-2"><img src="@/assets/icon/present.png"
-                            alt="">Tặng quà</div>
+                    <div @click="rateDialog = true" class="btn-option d-flex align-items-center gap-2"><img
+                            src="@/assets/icon/start.png" alt="">Đánh giá</div>
+                    <div @click="giftDialog = true" class="btn-option d-flex align-items-center gap-2"><img
+                            src="@/assets/icon/present.png" alt="">Tặng quà</div>
                 </div>
                 <div>
                     <button @click="goReadChap(1)" class="btn-alert  d-flex align-items-center"> <img
                             src="@/assets/icon/book.png" alt=""><span class="fw-bold"> Đọc truyện ngay</span></button>
                 </div>
                 <!-- Mô tả -->
-                <p class="text-secondary mt-5">{{ storyData.description }}
-                    <el-link type="primary">Xem thêm</el-link>
+                <p :class="!isExpanded ? 'text-four-line' : ''" class="text-secondary mt-5 ">{{ storyData.description }}
+
                 </p>
+                <a class="text-link" v-if="storyData.description.length > 100" @click="toggleExpand" type="primary">
+                    {{ isExpanded ?
+                        'Thu gọn' : 'Xem thêm' }}</a>
                 <div class="mt-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h3 class="fw-bold">Danh sách chương ( {{ fullStoryData.data.length }})</h3>
@@ -86,8 +91,12 @@
                         <el-table :data="chapters" style="width: 100%">
                             <el-table-column min-width="200">
                                 <template #default="scope">
-                                    <p><span class="fw-semibold">Chương {{ scope.row.chap_number }}</span> : {{
-                                        scope.row.chapter_title }}</p>
+                                    <p><span v-if="scope.row.is_vip" class="me-2">
+                                            <img src="@/assets/icon/key.png" alt="">
+                                        </span>
+                                        <span class="fw-semibold">Chương {{ scope.row.chap_number }}</span> : {{
+                                            scope.row.chapter_title }}
+                                    </p>
                                 </template>
                             </el-table-column>
                             <el-table-column min-width="100">
@@ -112,7 +121,7 @@
 
     </div>
     <div class="container">
-        <h3 class="fw-bold">Độc giả nói gì về “Âm mưu tình yêu của tôi”</h3>
+        <h3 class="fw-bold">Độc giả nói gì về {{ storyData?.story_title }}</h3>
         <el-tabs class="mt-3" v-model="activeName">
             <el-tab-pane label="User" name="first">
                 <template #label>
@@ -130,21 +139,73 @@
                         Đánh giá & nhận xét
                     </span>
                 </template>
-                <ReviewStory />
+                <ReviewStory :story_id="route.params.id" />
             </el-tab-pane>
         </el-tabs>
-
+        <el-dialog v-model="voteDialog" title="Đề cử" width="500" :before-close="handleClose">
+            <span class="fw-bold text-color_primary text-md ">Số lượng Tang Diệp đề cử</span>
+            <el-input class="mt-1" v-model="inputCoinVote" placeholder="10" />
+            <ul class="list-note mt-3">
+                <li>5 Tang Diệp = 1 phiếu đề cử</li>
+                <li>Đề cử sẽ giúp truyện lên “Top Người đọc đề cử” trên Bảng Xếp Hạng</li>
+                <li>Top đại gia hàng tháng hoặc mỗi khi lên hạng người đọc sẽ được tặng phiếu đề cử</li>
+            </ul>
+            <button @click="onVote()" style="width: 100%; height: 40px;" class="btn-alert mt-3"><span class="py-2">Đề
+                    cử</span></button>
+        </el-dialog>
+        <el-dialog v-model="rateDialog" title="Đánh giá và nhận xét" width="500" :before-close="handleClose">
+            <div class="d-flex align-items-center gap-2">
+                <span class="fw-bold">Đánh giá</span>
+                <el-rate v-model="rateValue" :texts="['Chưa hay', 'Bình thường', 'Tạm được', 'Khá hay', 'Tuyệt vời']"
+                    show-text />
+            </div>
+            <div class="mt-2">
+                <span class="fw-bold">Nhật xét</span>
+                <el-input class="mt-2" v-model="rateComment" type="textarea" :rows="5"
+                    placeholder="Hãy cho chúng mình vài nhận xét và đóng góp ý kiến nhé!" />
+            </div>
+            <button @click="onRate()" style="width: 100%; height: 40px;" class="btn-alert mt-3"><span class="py-2">Gửi
+                    nhận
+                    xét</span></button>
+        </el-dialog>
+        <el-dialog v-model="giftDialog" title="Đánh giá và nhận xét" width="500" :before-close="handleClose">
+            <div class="gap-2">
+                <span>Số lượng Tang diệp ủng hộ</span>
+                <span>
+                    <el-tooltip class="box-item" effect="dark" :content="'Số tang diệp của bạn: ' + coinUser"
+                        placement="top">
+                        <el-icon>
+                            <InfoFilled />
+                        </el-icon>
+                    </el-tooltip>
+                </span>
+                <el-input v-model="giftValue" class="mt-2" type="input" />
+            </div>
+            <div class="mt-2">
+                <span>Lời nhắn (nếu có)</span>
+                <el-input v-model="giftMessenger" class="mt-2" type="textarea" :rows="5"
+                    placeholder="Gửi lời nhắn đến tác giả bạn yêu thích..." />
+            </div>
+            <button @click="onGift()" style="width: 100%; height: 40px;" class="btn-alert mt-3">
+                <span class="py-2">Gửi ủng hộ</span>
+            </button>
+        </el-dialog>
     </div>
 </template>
 
 <script setup>
 import Comment from "@/components/story-detail/Comment.vue"
 import ReviewStory from "@/components/story-detail/ReviewStory.vue"
+import { voteStory, rateStory, giveSupport } from "@/api/author";
+import { getVoteStory } from "@/api/author";
+import { toast } from "vue3-toastify"; // nếu dùng toast
+import "vue3-toastify/dist/index.css";
 import { ref, onMounted, watch } from "vue"
 import { getStoryFullInfo } from "@/api/stories";
 import { useRoute, useRouter } from "vue-router";
 import { addFavorite } from "@/api/stories";
 import { useAuthStore } from "@/stores/auth";
+
 import { checkStoryLike } from "@/api/stories";
 const auth = useAuthStore();
 const loading = ref(true);
@@ -156,6 +217,17 @@ const rating = ref(4.6)
 const sort = ref("desc")
 const activeName = "first"
 const isFavorite = ref();
+const voteDialog = ref(false);
+const rateDialog = ref(false);
+const coinUser = ref(0);
+const isExpanded = ref(false);
+const inputCoinVote = ref(10);
+const rateValue = ref();
+const rateComment = ref();
+const coinVoted = ref();
+const giftDialog = ref()
+const giftValue = ref(10)
+const giftMessenger = ref()
 const chapters = ref([
     { title: "Tập 46 - Chương 24: Ngoại truyện", words: "839 chữ" },
     { title: "Tập 46 - Chương 23: Ngoại truyện", words: "819 chữ" },
@@ -163,6 +235,9 @@ const chapters = ref([
     { title: "Tập 46 - Chương 21: Ngoại truyện", words: "740 chữ" },
     { title: "Tập 46 - Chương 20: Ngoại truyện", words: "833 chữ" }
 ])
+const toggleExpand = () => {
+    isExpanded.value = !isExpanded.value;
+};
 function goReadChap(chapNumber) {
     router.push({
         name: "chap-detail",
@@ -186,6 +261,45 @@ async function getData() {
         console.error("Lỗi khi load dữ liệu:", err);
     }
 }
+async function onVote() {
+    const res = await voteStory(auth.userId, route.params.id, inputCoinVote.value);
+    if (res.success) {
+        toast.success("Đề cử thành công!")
+        setTimeout(() => {
+            window.location.reload()
+        }, 1000);
+    }
+}
+async function onGift() {
+    if (!giftMessenger.value) {
+        giftMessenger.value = "Gửi tặng tác giả, truyện rất hay"
+    }
+    const res = await giveSupport(auth.userId, storyData.value.user_id, giftValue.value, giftMessenger.value)
+    console.log(res);
+    if (res.success) {
+        toast.success("Gửi thành công " + giftValue.value + " Tang diệp")
+        setTimeout(() => {
+            window.location.reload()
+        }, 1000);
+    }
+    else {
+        toast.error("Lỗi không xác định!")
+    }
+}
+async function onRate() {
+    const res = await rateStory(route.params.id, auth.userId, rateValue.value, rateComment.value);
+    if (res.status == 201) {
+        toast.success("Đã gửi đánh giá truyện")
+        setTimeout(() => {
+            window.location.reload()
+        }, 1000);
+    }
+}
+async function getAllVote() {
+    const res = await getVoteStory(route.params.id, auth.userId)
+    coinVoted.value = res.total_votes / 5
+
+}
 async function likeStory(story_id) {
     const res = await addFavorite(auth.userId, story_id)
     isFavorite.value = res.isFavorite
@@ -196,8 +310,10 @@ async function checkLikeStory() {
     isFavorite.value = res.isFavorite
 }
 onMounted(async () => {
+    coinUser.value = auth.user.coin_balance
     await checkLikeStory();
     await getData();
+    await getAllVote()
 });
 watch
 </script>
@@ -250,5 +366,23 @@ watch
     border: none;
     padding: 20px;
     color: #BF2C24;
+}
+
+.list-note {
+    padding: 0 20px;
+}
+
+.list-note li {
+    color: #1877F2;
+}
+
+.text-four-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    /* Giới hạn 4 dòng */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
 }
 </style>

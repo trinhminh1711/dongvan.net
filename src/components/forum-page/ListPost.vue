@@ -117,8 +117,6 @@ const tableData = ref<Item[]>([
 
 ])
 async function getAllPostByTopic() {
-    console.log("abc");
-    
     const res = await getPostForumByTopic(route.params.id);
     listPostTopic.value = res.data;
     tableData.value = listPostTopic.value.map(post => ({

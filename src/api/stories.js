@@ -40,7 +40,7 @@ export const createStory = async (data) => {
     };
 }
 export const updateStory = async (data, story_id) => {
-    console.log(data);
+
     try {
         const formData = new FormData();
         formData.append("title", data.storyName);
@@ -118,6 +118,34 @@ export const getStoryComment = async (story_id) => {
     }
 };
 
+
+export const getStoryRandom = async (limit) => {
+  try {
+    console.log("abc");
+    
+    const res = await axiosClient.get(`${API_URL}/random/story`, {
+      params: { limit }   // query param ?limit=10
+    });
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching stories:", err);
+  }
+};
+
+export const getStoryComplete = async (limit) => {
+  try {
+    console.log("abc");
+    
+    const res = await axiosClient.get(`${API_URL}/complete/story`, {
+      params: { limit }   // query param ?limit=10
+    });
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching stories:", err);
+  }
+};
+
+
 export const updateUserReadingBook = async (userId, storyId, chapterId) => {
     try {
         const res = await axiosClient.post(`${API_URL}/story/reading`, {
@@ -172,5 +200,108 @@ export const addFavorite = async (userId, storyId) => {
         return res.data
     } catch (err) {
         return err
+    }
+};
+
+export const getTopStoryReaded = async (limit) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/check/top-reader?limit=${limit}`,
+        );
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
+
+export const getTopStoryReadedMonth = async (limit) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/check/top-reader/month?limit=${limit}`,
+        );
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
+
+export const getTopAuthorWeek = async (limit) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/check/top-author/week?limit=${limit}`,
+        );
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
+
+export const getTopUserReaders = async (limit) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/check/top-user/reader?limit=${limit}`,
+        );
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
+
+export const getListStoryUpdatedNew = async (limit) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/check/just-updated?limit=${limit}`,
+        );
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
+
+export const getNumberChapterStory = async (storyId) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/${storyId}/chapters/count`);
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching chapter count:", error);
+        throw error;
+    }
+};
+
+export const getNumberChapterNotPurchaseStory = async (storyId, userId) => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/${storyId}/chapters/user/${userId}/notpurchase`);
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching chapter count:", error);
+        throw error;
+    }
+};
+
+export const getTopStoryRecomment = async () => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/story/recommendations`);
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching chapter count:", error);
+        throw error;
+    }
+};
+
+
+export const unlockChapters = async (storyId, userId, chapters) => {
+    try {
+        const res = await axiosClient.post(
+            `${API_URL}/unlock-chapter/user/${userId}/story/${storyId}`,
+            { chapters }
+        );
+        return { success: true, status: res.status, data: res.data };
+    } catch (error) {
+        if (error.response) {
+            return {
+                success: false,
+                status: error.response.status,
+                message: error.response.data.message || "API error",
+            };
+        } else if (error.request) {
+            return { success: false, message: "No response from server" };
+        } else {
+            return { success: false, message: error.message };
+        }
     }
 };

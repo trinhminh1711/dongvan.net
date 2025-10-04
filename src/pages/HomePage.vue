@@ -3,7 +3,7 @@
   <div class="container py-3 text-center">
     <div class="row align-items-start justify-content-between">
       <div class="row col-3 px-0 d-flex align-items-center">
-        <ListStory v-model:items="items" />
+        <ListStory />
       </div>
       <div class="col-6 el-menu-story">
         <h3 class="text-color_primary fw-bold text-start">Biên tập viên đề cử</h3>
@@ -47,12 +47,12 @@
         </div>
       </div>
       <div class="col-3 p-0">
-       
+        <ReviewStory />
       </div>
     </div>
     <div class="row align-items-start mt-5 justify-content-between">
       <div class="row col-3 px-0 d-flex align-items-center">
-        <RankingList>
+        <RankingList :items="topUserReadersRecoment">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
             <h3 class="topvote-title color-light-blue">Người đọc đề cử</h3>
@@ -62,7 +62,7 @@
 
       </div>
       <div class="row col-3 px-0 d-flex align-items-center">
-        <RankingList>
+        <RankingList :items="topStoryRead">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
             <h3 class="topvote-title color-light-blue">Đọc nhiều trong tuần</h3>
@@ -72,7 +72,7 @@
 
       </div>
       <div class="row col-3 px-0 d-flex align-items-center">
-        <RankingList>
+        <RankingList :items="topStoryMonthRead">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
             <h3 class="topvote-title color-light-blue">Đọc nhiều trong tháng </h3>
@@ -82,37 +82,38 @@
 
       </div>
       <div class="row col-3 px-0 d-flex align-items-center">
-        <RankingList>
+        <RankingListUser :items="topAuthorWeek">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
             <h3 class="topvote-title color-light-blue">Top tác giả của tuần</h3>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon2.svg" alt="">
           </template>
-        </RankingList>
+        </RankingListUser>
 
       </div>
     </div>
     <div class="row align-items-start mt-5 justify-content-between">
       <div class="col-3 px-3">
-        <TopListUser>
+        <TopListUser v-if="topUserReadersStory && topUserReadersStory.length > 0" :items="topUserReadersStory">
           <template #author-top3>
             <div class="d-flex justify-content-between author-card__img">
               <div class="d-flex flex-column">
                 <span class="bg-red text-white fw-bold p-1 text-sm align-self-start">NO.1</span>
-                <p class="my-2">Lãnh Hàn Phong</p>
+                <p class="my-2">{{ topUserReadersStory[0].username }}</p>
                 <p class="text-start color-alert text-md mt-1">
-                  <span class="color-red fw-bold">567</span> <span class="fst-italic color-red ">Chương</span>
+                  <span class="color-red fw-bold">{{ topUserReadersStory[0].total_reads }}</span> <span
+                    class="fst-italic color-red ">Chương</span>
                 </p>
               </div>
               <div>
-                <img src="" alt="">
+                <img style="max-width: 50px;" :src="topUserReadersStory[0].link_thumbnail" alt="">
               </div>
             </div>
           </template>
         </TopListUser>
       </div>
       <div class="col-6 px-3">
-        <TopListUpdate :content="'Mới cập nhật'" />
+        <TopListUpdate :items="topStoryUpdatedNew" :content="'Truyện mới cập nhật'" />
       </div>
       <div class="col-3 px-3">
         <TopListUser :content="'Top đại gia'">
@@ -147,24 +148,63 @@
 
 <script lang="ts" setup>
 
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Banner from '@/components/view/Banner.vue'
 import type { TabsPaneContext } from 'element-plus'
 import ListStory from '@/components/homepage/ListStory.vue'
 import SliderCenter from '@/components/homepage/SliderCenter.vue'
 import RankingList from '@/components/homepage/RankingList.vue'
 import TopListUser from '@/components/homepage/TopListUser.vue'
+import RankingListUser from '@/components/homepage/RankingListUser.vue'
 import TopListUpdate from '@/components/homepage/TopListUpdate.vue'
+import ReviewStory from '@/components/homepage/ReviewStory.vue'
 import TopAuthorWeek from '@/components/homepage/TopAuthorWeek.vue'
 import StoryCompleted from '@/components/homepage/StoryCompleted.vue'
+import { getTopUserRead } from '../api/chapter'
+import { getTopStoryReaded, getTopStoryReadedMonth, getTopAuthorWeek, getTopUserReaders, getListStoryUpdatedNew, getTopStoryRecomment } from '../api/stories'
 const activeName = ref('first')
+const topUserRead = ref()
+const topStoryRead = ref()
+const topAuthorWeek = ref()
+const topUserReadersStory = ref()
+const topUserReadersRecoment = ref()
+const topStoryMonthRead = ref()
+const storyNewUpdated = ref()
+const topStoryUpdatedNew = ref()
 const items = ref([
   { title: "mock", text: "mock text" }
 ]);
 const handleClick = (tab: TabsPaneContext, event: Event) => {
-  console.log(tab, event)
-}
 
+};
+async function getTopStoryMonth() {
+  topStoryMonthRead.value = await getTopStoryReadedMonth(10)
+}
+async function getTopStory() {
+  topStoryRead.value = await getTopStoryReaded(10);
+}
+async function getTopAuthor() {
+  topAuthorWeek.value = await getTopAuthorWeek(10);;
+
+
+}
+async function getTopUserReader() {
+  topUserReadersStory.value = await getTopUserReaders(10);
+}
+async function getTopStoryUpdate() {
+  topStoryUpdatedNew.value = await getListStoryUpdatedNew(24);
+}
+async function getTopRecomment() {
+  topUserReadersRecoment.value = await getTopStoryRecomment();
+}
+onMounted(async () => {
+  await getTopStory()
+  await getTopStoryMonth()
+  await getTopAuthor()
+  await getTopUserReader()
+  await getTopStoryUpdate()
+  await getTopRecomment()
+})
 const reviewTitle = "Review Tác phẩm";
 const dataReview = [
   { title: "Sống Sót Trong Trò", text: "Nhật Ánh" },

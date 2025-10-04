@@ -123,7 +123,6 @@ const handleRegister = async () => {
         });
 
         success.value = res.data.success; // ví dụ backend trả "Registered successfully"
-        console.log(success.value);
         toast.success("Đăng ký thành công 🎉")
         localStorage.setItem("token", res.data.token); // lưu JWT token
         setTimeout(() => {

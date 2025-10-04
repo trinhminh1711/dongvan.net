@@ -8,8 +8,7 @@
             <div class="d-flex infomation">
                 <div class="d-flex infomation_avatar">
                     <div>
-                        <img :src="user.link_thumbnail"
-                            alt="" srcset="">
+                        <img :src="user.link_thumbnail" alt="" srcset="">
                     </div>
                     <div>
                         <h2 class="fw-bold text-color_primary mt-2">{{ user.username }}</h2>
@@ -44,8 +43,7 @@
 
                                     <el-form-item label="Ảnh đại diện">
                                         <div class="d-flex edit-avatar">
-                                            <img :src="user.link_thumbnail"
-                                                alt="" srcset="">
+                                            <img :src="user.link_thumbnail" alt="" srcset="">
                                             <div class="ml-3">
                                                 <el-button type="text" @click="changeAvatar">Thay đổi</el-button>
                                                 <el-button type="text" @click="removeAvatar">Xóa</el-button>
@@ -69,7 +67,7 @@
                                 <el-descriptions-item>
                                     <template #label>
                                         <p class="d-flex align-items-center gap-1 fw-bold">
-                                            Cấp độ người đọc
+                                            Cấp độ
                                             <el-icon>
                                                 <InfoFilled />
                                             </el-icon>
@@ -94,14 +92,15 @@
                                             </el-icon>
                                         </p>
                                     </template><span>
-                                        88 <img src="@/assets/icon/tamdiep-icon.png">
+                                        {{ user.coin_balance }} <img src="@/assets/icon/tamdiep-icon.png">
                                     </span>
                                 </el-descriptions-item>
                             </el-descriptions>
                         </el-tab-pane>
 
                         <el-tab-pane label="Tài khoản & Bảo mật" name="account">
-                            <el-form :model="otherInfo" label-position="left" label-width="200px" class="form-infomation">
+                            <el-form :model="otherInfo" label-position="left" label-width="200px"
+                                class="form-infomation">
                                 <el-form-item label="Email">
                                     <el-input v-model="otherInfo.email" placeholder="Nhập email"></el-input>
                                 </el-form-item>
@@ -115,18 +114,22 @@
                                         placeholder="Nhập mật khẩu">
                                     </el-input>
                                 </el-form-item>
+                                <div v-if="changPasswordOpen">
+                                    <el-form-item label="Mật khẩu mới">
+                                        <el-input v-model="otherInfo.newPassword" type="password" show-password
+                                            placeholder="Nhập mật khẩu mới">
+                                        </el-input>
+                                    </el-form-item>
 
-                                <el-form-item label="Mật khẩu mới">
-                                    <el-input v-model="otherInfo.newPassword" type="password" show-password
-                                        placeholder="Nhập mật khẩu mới">
-                                    </el-input>
-                                </el-form-item>
-
-                                <el-form-item label="Xác nhận mật khẩu">
-                                    <el-input v-model="otherInfo.confirmPassword" type="password" show-password
-                                        placeholder="Xác nhận mật khẩu">
-                                    </el-input>
-                                </el-form-item>
+                                    <el-form-item label="Xác nhận mật khẩu">
+                                        <el-input v-model="otherInfo.confirmPassword" type="password" show-password
+                                            placeholder="Xác nhận mật khẩu">
+                                        </el-input>
+                                    </el-form-item>
+                                </div>
+                                <span @click="changPasswordOpen = !changPasswordOpen" class="text-link">
+                                    {{ changPasswordOpen ? "Hủy bỏ" : "Đổi mật khẩu" }}
+                                </span>
                             </el-form>
                         </el-tab-pane>
                     </el-tabs>
@@ -145,7 +148,7 @@ import Infomation from '@/components/profile/Infomation.vue';
 import { useAuthStore } from "@/stores/auth";
 const auth = useAuthStore();
 const activeTab = ref('personal');
-
+const changPasswordOpen = ref(false)
 const user = reactive({
     id: 727457,
     username: "Ngọc Bảo Phạm",
@@ -154,11 +157,11 @@ const user = reactive({
     user_description: ''
 });
 const otherInfo = reactive({
-  email: "admin@gmail.com",
-  phone: '0972183635',
-  password: '05111993',
-  newPassword: '',
-  confirmPassword: ''
+    email: "admin@gmail.com",
+    phone: '0972183635',
+    password: '05111993',
+    newPassword: '',
+    confirmPassword: ''
 })
 const changeAvatar = () => {
     alert('Chức năng thay đổi avatar');
@@ -168,19 +171,20 @@ const removeAvatar = () => {
     user.link_thumbnail = '';
 };
 watch(
-  () => auth.user,
-  (newUser) => {
-    if (newUser) {
-      user.id = newUser.user_id;
-      user.username = newUser.username;
-      user.gender = newUser.gender;
-      user.link_thumbnail = newUser.link_thumbnail;
-      user.user_description = newUser.user_description;
-      otherInfo.email = newUser.email,
-      otherInfo.phone = newUser.phone_number
-    }
-  },
-  { immediate: true } // chạy luôn lần đầu
+    () => auth.user,
+    (newUser) => {
+        if (newUser) {
+            user.id = newUser.user_id;
+            user.username = newUser.username;
+            user.gender = newUser.gender;
+            user.link_thumbnail = newUser.link_thumbnail;
+            user.user_description = newUser.user_description;
+            user.coin_balance = newUser.coin_balance;
+            otherInfo.email = newUser.email,
+                otherInfo.phone = newUser.phone_number
+        }
+    },
+    { immediate: true } // chạy luôn lần đầu
 );
 </script>
 <style>
@@ -197,21 +201,23 @@ watch(
 .user-description .el-textarea__inner {
     height: 150px;
 }
-.tab-diable__line .el-tabs__nav-wrap:after , .tab-diable__line .el-tabs__active-bar
-{
+
+.tab-diable__line .el-tabs__nav-wrap:after,
+.tab-diable__line .el-tabs__active-bar {
     display: none !important;
 }
-.tab-diable__line .el-tabs__item
-{
+
+.tab-diable__line .el-tabs__item {
     font-weight: 400;
     font-size: 16px;
 }
-.tab-diable__line .el-tabs__item.is-active
-{
+
+.tab-diable__line .el-tabs__item.is-active {
     color: #BF2C24;
 }
-.tab-diable__line .el-tabs__item.is-active, .el-tabs__item:hover
-{
+
+.tab-diable__line .el-tabs__item.is-active,
+.el-tabs__item:hover {
     color: #BF2C24;
 }
 </style>

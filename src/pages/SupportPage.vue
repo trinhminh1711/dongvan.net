@@ -9,7 +9,7 @@
                             <img style="width: 15px;" src="@/assets/icon/mail.png" alt=""></img>
                             <ul class="list-style">
                                 <li class="fw-bold">Email</li>
-                                <li>support@truyen.vn</li>
+                                <li>mvhdongminhtanvan@gmail.com </li>
                             </ul>
                         </div>
                         <div class="d-flex align-items-start mt-3">
@@ -24,16 +24,16 @@
                 <div class="infor-contact mt-5 ">
                     <div class="p-4">
                         <h4 class="fw-bold color-alert"> Câu hỏi thường gặp</h4>
-                        <a href="">
+                        <a @click="router.push({ name: 'instruct' })">
                             <p>Làm sao để Đề cử truyện hoặc Tặng quà cho tác giả?</p>
                             <p>- Cuối mỗi chương truyện, sẽ có nút “Đề cử” và “Tặng quà” cho tác giả của truyện bạn đang
                                 đọc.</p>
                         </a>
-                        <a href="">
+                        <a @click="router.push({ name: 'instruct' })">
                             <p>Cách để có Tang Diệp trong tài khoản?</p>
                             <p>- Bạn có thể có Tang Diệp thông qua nạp tiền bằng momo, chuyển khoản ngân hàng.</p>
                         </a>
-                        <a href="">
+                        <a @click="router.push({ name: 'instruct' })">
                             <p>Phiếu Đề cử là gì?</p>
                             <p>- Phiếu đề cử là phiếu dùng để đề cử cho các truyện bạn đang đọc, hoặc các truyện bạn yêu
                                 thích để cho truyện đó xuất hiện trong bảng xếp hạng trên Trang chủ của nền tảng (Truyện
@@ -46,7 +46,7 @@
             </div>
             <div class="col-8 contact-form">
                 <div class="pt-4 px-4">
-                   <SupportContacForm />
+                    <SupportContacForm />
                 </div>
             </div>
         </div>
@@ -54,12 +54,18 @@
 </template>
 
 <script lang="ts" setup>
+import { useRouter } from 'vue-router';
 import SupportContacForm from '@/components/contact-form/SupportContacForm.vue';
-
+const router = useRouter();
 
 </script>
 
 <style scoped>
+a:hover p {
+    color: #ff6114 !important;
+    cursor: pointer;
+}
+
 .list-style {
     list-style: none;
     margin: 0;
@@ -72,7 +78,8 @@ import SupportContacForm from '@/components/contact-form/SupportContacForm.vue';
     padding-bottom: .5rem;
 }
 
-.infor-contact , .contact-form{
+.infor-contact,
+.contact-form {
     border-radius: 10px;
     box-shadow:
         0 3px 6px rgba(0, 0, 0, 0.12),
@@ -84,22 +91,25 @@ import SupportContacForm from '@/components/contact-form/SupportContacForm.vue';
         -2px 0 4px rgba(0, 0, 0, 0.02);
     /* 👈 trái siêu nhạt */
 }
-.infor-contact a p:first-child{
-     color: #344054;
-     font-weight: 500;
-     font-size: 14px;
-}
-.infor-contact a p:last-child{
-      color: rgb(111, 109, 109);
 
-     font-size: 14px;
+.infor-contact a p:first-child {
+    color: #344054;
+    font-weight: 500;
+    font-size: 14px;
 }
-.infor-contact a p
-{
+
+.infor-contact a p:last-child {
+    color: rgb(111, 109, 109);
+
+    font-size: 14px;
+}
+
+.infor-contact a p {
     display: -webkit-box;
-  -webkit-line-clamp: 2;   /* Giới hạn 2 dòng */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    /* Giới hạn 2 dòng */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

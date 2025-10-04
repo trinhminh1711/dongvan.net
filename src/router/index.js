@@ -9,12 +9,16 @@ import LibraryPage from '@/components/library-page/LibraryPage.vue'
 import CreateStory from '@/pages/CreateStory.vue'
 import ForumPage from '@/pages/ForumPage.vue'
 import HomePage from '@/pages/HomePage.vue'
+import PaymentHistory from '@/admin/PaymentHistory.vue'
 import InstructPage from '@/pages/InstructPage.vue'
 import PaymentPage from '@/pages/PaymentPage.vue'
 import ProfilePage from '@/pages/ProfilePage.vue'
+import Forbidden from '@/pages/Forbiden.vue'
 import ReadStory from '@/pages/ReadStory.vue'
 import StoryDetail from '@/pages/StoryDetail.vue'
-import requireAuth from "@/middleware/auth";
+import {requireAuth} from "@/middleware/auth";
+import {checkAdminAuth} from "@/middleware/auth";
+import TransactionHistory from '@/pages/TransactionHistory.vue'
 import SupportPage from '@/pages/SupportPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import EditStory from '@/components/create-story/EditStory.vue'
@@ -45,7 +49,8 @@ const routes = [
             },
         ]
     },
-
+    { path: '/payment-approval', name: 'payment-approval', component: PaymentHistory , beforeEnter: checkAdminAuth },
+    { path: '/transaction-history', name: 'transaction-history', component: TransactionHistory },
     { path: '/instruct-page', name: 'instruct', component: InstructPage },
     { path: '/support', name: 'support', component: SupportPage },
     { path: '/story-detail/:id', name: 'story', component: StoryDetail },
@@ -54,6 +59,7 @@ const routes = [
     { path: '/profile', name: 'profile', component: ProfilePage, beforeEnter: requireAuth },
     { path: '/create-story/new-chap/:storyId', name: 'create-newchap', component: CreateNewTrapForm },
     { path: '/edit-story/:id', name: 'edit-story', component: EditStory },
+    { path: '/forbidden', name: 'forbidden', component: Forbidden},
     {
         path: '/article-page/:id', name: 'article', component: ArticleCategoryList, children: [
 

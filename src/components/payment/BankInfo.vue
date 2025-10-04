@@ -53,22 +53,36 @@
             ở trên cùng bên
             phải)</li>
         <li>Tang Diệp sẽ được cộng vào tài khoản sau 1-5 phút</li>
+
     </ul>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            form: {
-                name: "Vietcombank",
-                email: "123456789",
-                phone: "DOAN VAN DUC",
-                address: "NAPTIEN [ID_USER]"
-            }
-        }
-    }
-}
+<script setup>
+import { sendMail } from "@/api/mail";
+import { useAuthStore } from "@/stores/auth";
+import { reactive } from "vue";  
+const auth = useAuthStore();
+
+const form = reactive({
+  name: "Vietcombank",
+  email: "123456789",
+  phone: "DOAN VAN DUC",
+  address: `NAPTIEN [USER${auth.userId}]`
+});
+
+const handleSend = async () => {
+  try {
+    await sendMail({
+      to: "mvhdongminhtanvan@gmail.com",
+      subject: "Thông báo từ hệ thống",
+      text: "Email test",
+    });
+    alert("Gửi email thành công!");
+  } catch (err) {
+    console.error(err);
+    alert("Gửi email thất bại!");
+  }
+};
 </script>
 <style>
 .bank-info .el-input__inner {
@@ -96,5 +110,4 @@ export default {
     color: #1877F2;
     line-height: 2;
 }
-
 </style>

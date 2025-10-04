@@ -6,9 +6,9 @@
         <div v-for="(item, index) in items" :key="index" class="list-item">
             <p>
                 <span  :class="{ 'active-top': index < 2 }" :style="{ backgroundImage: index == 0 ? `url(${top2Icon})` : index == 1 ? `url(${top3Icon})` : 'none'}" class="text-color_primary fw-bold">{{ index + 2 }}</span>
-                <span class="ps-3">{{ item.nameAuthor }}</span>
+                <span class="ps-3">{{ item.username }}</span>
             </p>
-            <span class="text-color__tertiary">{{ item.numberView }}</span>
+            <span class="text-color__tertiary">{{ item.total_reads }} lượt đọc</span>
         </div>
     </div>
 </template>
@@ -25,25 +25,7 @@ export default {
     props: {
         items: {
             type: Array,
-            default: () => [
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-            ]
-        },
-        itemsTop3: {
-            type: Array,
-            default: () => [
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-                { nameAuthor: "why03you", numberView: "1098" },
-            ]
+            default: () => []
         },
         content: {
             type: String,

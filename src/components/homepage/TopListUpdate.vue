@@ -1,16 +1,10 @@
 <template>
     <h3 class="list-title text-color_primary mb-4">{{ content }}</h3>
     <div class="row">
-        <div class="list-container col-6">
-            <div v-for="(item, index) in items" :key="index" class="list-item">
-                <span class="ps-3">{{ item.nameStory }}</span>
-                <span class="text-color__tertiary">{{ item.update_at }}</span>
-            </div>
-        </div>
-        <div class="list-container col-6">
-            <div v-for="(item, index) in items" :key="index" class="list-item">
-                <span class="ps-3">{{ item.nameStory }}</span>
-                <span class="text-color__tertiary">{{ item.update_at }}</span>
+        <div v-for="(item, index) in items" class="list-container col-6">
+            <div  :key="index" class="list-item">
+                <span class="ps-3">{{ item.title }}</span>
+                <span class="text-color__tertiary">{{ formatDateTime(item.create_at) }}</span>
             </div>
         </div>
     </div>
@@ -28,25 +22,24 @@ export default {
     props: {
         items: {
             type: Array,
-            default: () => [
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-                { nameStory: "Hỏa Tinh Già Phê", update_at: "17:03 08/07" },
-            ]
+            default: () => []
         },
         content: {
             type: String,
             default: "Top độc giả"
         },
+    },
+    methods: {
+        formatDateTime(dateString) {
+            const date = new Date(dateString);
+
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const hours = String(date.getHours()).padStart(2, "0");
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+
+            return `${hours}:${minutes} ${day}/${month}`;
+        }
     }
 }
 </script>

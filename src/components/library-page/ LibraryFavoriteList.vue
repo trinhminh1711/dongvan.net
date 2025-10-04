@@ -9,11 +9,10 @@
                 </div>
                 <div class="left-content">
                     <p class="text-color_primary fw-bold text-lg">{{ stories.title }}</p>
-                    <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.total_chapters
-                            }}</span><span class="text-md">
+                    <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.total_chapters}}</span><span class="text-md">
                             chương</span></p>
-                    <button class="btn-alert my-4">Đọc truyện</button>
-                    <p><input type="checkbox" :value="stories.id">
+                    <button @click="readBook(stories.story_id)" class="btn-alert my-4">Đọc truyện</button>
+                    <p><input type="checkbox" :value="stories.story_id">
                         Nhận thông báo khi có chương mới </input></p>
                 </div>
             </div>
@@ -25,6 +24,8 @@
 import { ref, onMounted } from 'vue';
 import { getListPostLike } from "@/api/stories";
 import { useAuthStore } from "@/stores/auth";
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const auth = useAuthStore()
 const listStoryChecked = false;
 const categoryList = ref([]);
@@ -36,6 +37,9 @@ onMounted(async () => {
     const res = await getListPostLike(user_id);
     categoryList.value = res
 })
+function readBook(id) {
+    router.push({ name: 'story', params:  {id: id}  })
+}
 </script>
 
 <style scoped>

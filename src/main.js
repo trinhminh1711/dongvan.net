@@ -13,6 +13,7 @@ import { QuillEditor } from '@vueup/vue-quill'
 import { createPinia } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
+
 const app = createApp(App)
 const pinia = createPinia();
 app.use(pinia);

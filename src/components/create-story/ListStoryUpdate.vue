@@ -27,12 +27,12 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column v-if="filterStoryData == 1" prop="last_chapter_id">
+            <el-table-column prop="last_chapter_id">
                 <template #header>
                     <span class="table-header">Số chương</span>
                 </template>
                 <template #default="scope">
-                    {{ scope.row.last_chap_number?? 1 }} Chương
+                    {{ scope.row.last_chap_number ?? 1 }} Chương
                 </template>
             </el-table-column>
 
@@ -44,40 +44,28 @@
                     {{ formatDateVN(scope.row.create_at) }}
                 </template>
             </el-table-column>
-            <el-table-column v-if="filterStoryData == 3" prop="last_chapter_id">
-                <template #header>
-                    <span class="table-header">Số từ</span>
-                </template>
+            <el-table-column align="center" width="250">
                 <template #default="scope">
-                    {{ scope.row.total_word_count }}
-                </template>
-            </el-table-column>
-            <el-table-column v-if="filterStoryData == 3" prop="last_chapter_id">
-                <template #header>
-                    <span class="table-header">Lượt đọc</span>
-                </template>
-                <template #default="scope">
-                    {{ scope.row.total_view_count > 0
-                        ? scope.row.total_view_count + ' lượt'
-                        : 'Chưa có lượt đọc' }}
-                </template>
-            </el-table-column>
-            <el-table-column align="center" width="250" v-if="filterStoryData != 3">
-                <template #default="scope">
-                    <el-button @click="handleAdd(scope.row.story_id)">
-                        <el-icon>
-                            <Plus />
-                        </el-icon>
-                    </el-button>
-                    <el-button @click="handleEdit(scope.$index, scope.row)"><el-icon>
-                            <Finished />
-                        </el-icon></el-button>
-                    <el-button @click="handleDelete(scope.$index, scope.row)"><el-icon>
-                            <Edit />
-                        </el-icon></el-button>
-                    <el-button @click="handleSupport(scope.$index, scope.row)"><el-icon>
-                            <ChatLineRound />
-                        </el-icon></el-button>
+                    <el-tooltip class="box-item" effect="dark" content="Thêm chương" placement="top-start">
+                        <el-button @click="handleAdd(scope.row.story_id)">
+                            <img src="@/assets/icon/plus.svg" alt="">
+                        </el-button>
+                    </el-tooltip>
+                    <el-tooltip class="box-item" effect="dark" content="Danh sách chương" placement="top-start">
+                        <el-button @click="handleOpenListChapter(scope.$index, scope.row)">
+                            <img src="@/assets/icon/menu-04.svg" alt="">
+                        </el-button>
+                    </el-tooltip>
+                    <el-tooltip class="box-item" effect="dark" content="Chỉnh sửa truyện" placement="top-start">
+                        <el-button @click="handleDelete(scope.$index, scope.row)">
+                            <img src="@/assets/icon/edit-05.svg" alt="">
+                        </el-button>
+                    </el-tooltip>
+                    <el-tooltip class="box-item" effect="dark" content="Hỗ trợ" placement="top-start">
+                        <el-button @click="handleSupport(scope.$index, scope.row)">
+                            <img src="@/assets/icon/message-check-circle.svg" alt="">
+                        </el-button>
+                    </el-tooltip>
                 </template>
             </el-table-column>
         </el-table>
@@ -135,6 +123,46 @@
                 </div>
             </el-form>
         </el-dialog>
+        <el-dialog v-model="openDialogListChapter" width="80%">
+            <el-table v-if="dataTableStoryChapter" :data="dataTableStoryChapter" style="width: 100%" :fit="true">
+                <el-table-column type="index" label="STT" width="80">
+                </el-table-column>
+                <el-table-column prop="title" width="300">
+                    <template #header>
+                        <span class="table-header">Tên chương</span>
+                    </template>
+                    <template #default="scope">
+                        <div class="d-flex align-items-center gap-2">
+                            {{ scope.row.chapter_title }}
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="Date" prop="create_at">
+                    <template #header>
+                        <span class="table-header">Thời gian đăng</span>
+                    </template>
+                    <template #default="scope">
+                        {{ formatDateVN(scope.row.created_at) }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="last_chapter_id">
+                    <template #header>
+                        <span class="table-header">Số từ</span>
+                    </template>
+                    <template #default="scope">
+                        {{ scope.row.word_count}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="last_chapter_id">
+                    <template #header>
+                        <span class="table-header">Lượt đọc</span>
+                    </template>
+                    <template #default="scope">
+                        {{ scope.row.total_reads }}
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
     </div>
 </template>
 
@@ -144,12 +172,14 @@ import { useRouter } from "vue-router"
 import { genFileId } from 'element-plus'
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
 import { getStory } from "@/api/stories"
+import { getStoryFullInfo } from '@/api/stories'
 import { useAuthStore } from "@/stores/auth";
 const auth = useAuthStore();
 const router = useRouter()
 const tableData = ref<Story[]>([])
 const upload = ref<UploadInstance>()
 interface Story {
+    story_id: Number,
     urlImg: String
     create_at: string
     title: string
@@ -169,7 +199,9 @@ const options = [
     { value: 3, label: 'Đã xuất bản' },
 ]
 const dialogVisible = ref(false)
+const openDialogListChapter = ref(false)
 const filterStoryData = ref(options[0].value)
+const dataTableStoryChapter = ref([])
 const search = ref('')
 const currentPage = ref(1)
 const pageSize = ref(5)
@@ -189,8 +221,6 @@ onMounted(async () => {
     const res = await getStory(auth.userId)
     tableData.value = res
     console.log(tableData.value);
-    
-
 
 })
 const filterTableData = computed(() =>
@@ -211,12 +241,13 @@ function handleAdd(value) {
 
 }
 
-function handleEdit(index: number, row: Story) {
-    console.log('Sửa:', index, row)
+async function handleOpenListChapter(index: number, row: Story) {
+    openDialogListChapter.value = true
+    const res = await getStoryFullInfo(row.story_id);
+    dataTableStoryChapter.value = res.data
 }
 
 function handleDelete(index: number, row: Story) {
-    console.log('Xóa:', index, row)
 }
 
 function handleSupport(index: number, row: Story) {
@@ -262,17 +293,19 @@ function formatDateVN(isoString) {
     border-radius: 10px;
     padding-top: 10px;
 }
-.story-table .el-button, .el-button.is-round
-{
+
+.story-table .el-button,
+.el-button.is-round {
     padding: 0;
     border: none;
 }
-.story-table .el-button span, .story-table .el-button.is-round span
-{
+
+.story-table .el-button span,
+.story-table .el-button.is-round span {
     font-weight: bold;
     color: #344054;
     padding: 0 2px;
     font-size: 18px;
-    
+
 }
 </style>

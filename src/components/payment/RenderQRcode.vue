@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img style="max-width: 100%;" :src="qrSrc" alt="VietQR" />
+    <img style="max-width: 70%; display:block ; margin: 0 auto;" :src="qrSrc" alt="VietQR" />
     <p class="text-center fw-semibold text-lg">Sử dụng ứng dụng ngân hàng để quét mã QR và thanh toán</p>
     <p class="text-center mt-3">
       <button @click="downloadQR" class="btn-outline__alert text-center"> <el-icon>
@@ -23,9 +23,9 @@ const props = defineProps({
     default: ''
   }
 })
-const bin = '970436'                 // Vietcombank
-const account = '123456789'         // STK nhận
-const accountName = encodeURIComponent('NGUYEN VAN A')
+const bin = '970441'                 // Vietcombank
+const account = '003488097'         // STK nhận
+const accountName = encodeURIComponent('TRỊNH QUANG MINH')
 const qrSrc = ref("")
 onMounted(() => {
   qrSrc.value = `https://img.vietqr.io/image/${bin}-${account}-compact.png?amount=${props.amount}&addInfo=${props.addInfo}&accountName=${accountName}`

@@ -161,6 +161,8 @@ const handleFileChange = (file: UploadFile) => {
 }
 
 const submitForm = async () => {
+    console.log(ruleFormRef);
+    
     if (!ruleFormRef.value) return
     await ruleFormRef.value.validate(async (valid, fields) => {
         const toastAddStories = toast.loading("Đang xử lý...");
@@ -188,10 +190,17 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     upload.value!.handleStart(file)
 }
 
-const selectPreset = (img) => {
-    selectedImage.value = img
+const selectPreset = async(imgUrl) => {
+    selectedImage.value = imgUrl
     fileList.value = [] // reset upload
-    console.log("Chọn ảnh preset:", img)
+    ruleForm.cover = null // reset file upload
+
+    // fetch URL thành Blob
+    const response = await fetch(imgUrl)
+    const blob = await response.blob()
+    // tạo file từ blob
+    const file = new File([blob], "preset-image.png", { type: blob.type })
+    ruleForm.cover = file
 }
 </script>
 <style>

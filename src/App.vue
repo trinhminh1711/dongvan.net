@@ -22,7 +22,7 @@ const dialogVisible = ref(false)
   <header  v-if="route.name !== 'chap-detail'" class="pt-3">
     <Header />
   </header>
-  <main class="pb-8">
+  <main class="pb-8 mt-3">
     <transition name="fade" mode="out-in">
       <RouterView/>
     </transition>

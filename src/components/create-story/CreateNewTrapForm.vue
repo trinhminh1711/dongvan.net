@@ -12,6 +12,17 @@
                 <el-input v-model="newChapForm.chapNumber" size="large" disabled />
             </el-form-item>
 
+            <el-form-item>
+                <template #label><span class="form-createstory__label align-middle">Xác nhận
+                        <el-tooltip :content="'Chọn để xác nhận đã đăng đến chương cuối'" placement="top">
+                            <el-icon>
+                                <InfoFilled />
+                            </el-icon>
+                        </el-tooltip></span></template>
+                <el-checkbox v-model="newChapForm.isfinal" :true-label="1" :false-label="0" class="ms-2">Chương
+                    cuối</el-checkbox>
+            </el-form-item>
+
             <el-form-item prop="chapName">
                 <template #label><span class="form-createstory__label">Tên chương</span></template>
                 <el-input v-model="newChapForm.chapName" size="large" placeholder="Tên chương" />
@@ -38,7 +49,7 @@
             <button class="btn-outline-primary my-4 align-middle" @click="goBack">
                 <el-icon>
                     <Back />
-                </el-icon><span class="fw-semibold ms-1">Quay lại</span> 
+                </el-icon><span class="fw-semibold ms-1">Quay lại</span>
             </button>
             <button @click="submitForm" style="display: block;" class="btn-alert my-4 fw-semibold">
                 Đăng chương
@@ -81,7 +92,8 @@ interface chapData {
     chapAdsContent: String,
     story_id: number,
     countWords: number,
-    price: number
+    price: number,
+    isfinal: Number,
 }
 const newChapForm = reactive<chapData>({
     chapNumber: undefined,
@@ -91,7 +103,8 @@ const newChapForm = reactive<chapData>({
     chapContent: '',
     chapAdsContent: '',
     story_id: undefined,
-    price: 5
+    price: 5,
+    isfinal: 0
 
 })
 function goBack() {
@@ -130,6 +143,7 @@ const checkCondition = (value) => {
 const submitForm = async () => {
     const toastAddChapter = toast.loading("Đang xử lý...");
     if (!ruleFormRef.value) return
+    console.log(newChapForm);
     await ruleFormRef.value.validate(async (valid, fields) => {
         if (valid) {
             newChapForm.story_id = Number(route.params.storyId)

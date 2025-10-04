@@ -4,24 +4,19 @@
     </div>
     <div class="list-topvote">
         <div v-for="(item, index) in items" :key="index"
-            class="topvote-item align-items-start gap-4 d-flex text-start py-2">
+            class="topvote-item align-items-start d-flex gap-4 text-start py-2">
             <div class="d-flex align-items-start">
                 <img class="top-icon" v-if="index == 0" :src="rankingIcon1" alt="" srcset="">
                 <img class="top-icon" v-if="index == 1" :src="rankingIcon2" alt="" srcset="">
                 <img class="top-icon" v-if="index == 2" :src="rankingIcon3" alt="" srcset="">
-                <span v-if="index > 2" class="color-gray fw-bold mx-2"> {{ index < 9 ? '0' + (index + 1) : index +
-                        1}}</span>
+                <span v-if="index > 2" class="color-gray fw-bold mx-2"> {{ index < 9 ? '0' + (index + 1) : index + 1}}</span>
                         <div>
-                            <p>{{ item.story_title || item.title }}</p>
-                            <p class="text-sm text-color__tertiary" v-if="index == 0">Tác giả: {{ item.author_name }}
-                            </p>
-                            <p class="text-sm text-color__tertiary" v-if="index == 0">{{ item.coins_spent ? "Số đề cử "
-                                + item.coins_spent /2 : ""}}</p>
-
+                            <p>{{ item.author_name }}</p>
+                            <p class="text-sm text-color__tertiary" v-if="index == 0">{{ item.total_reads }} lượt đọc</p>
                         </div>
             </div>
             <div>
-                <img style="max-width: 40px;" v-if="index == 0" :src="item.urlImg" />
+                <img style="max-width: 40px;" v-if="index == 0" :src="item.link_thumbnail" />
             </div>
         </div>
     </div>

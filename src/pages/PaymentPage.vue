@@ -9,29 +9,18 @@
             Chọn mệnh giá
         </h3>
         <div class="d-flex justify-content-between">
-            <div class="payment-value-box text-center border rounded-3">
-                <h4 class="fw-bold text-xlg color-yellow">10.000đ</h4>
-                <p class="mt-2">100 Tang Diệp</p>
-            </div>
-            <div class="payment-value-box text-center border rounded-3">
-                <div class="popular-payment btn-alert">
-                    Phổ biến
-                </div>
-                <h4 class="fw-bold text-xlg color-yellow">20.000đ</h4>
-                <p class="mt-2">200 Tang Diệp</p>
-            </div>
-            <div class="payment-value-box text-center border rounded-3">
-                <h4 class="fw-bold text-xlg color-yellow">50.000đ</h4>
-                <p class="mt-2">550 Tang Diệp</p>
-            </div>
-            <div class="payment-value-box text-center border rounded-3">
-                <h4 class="fw-bold text-xlg color-yellow">100.000đ</h4>
-                <p class="mt-2">1.100 Tang Diệp</p>
+            <div @click="selectPayment(index)" v-for="(item, index) in payments" :key="index"
+                class="payment-value-box text-center border rounded-3" :class="{ active: selected === index }">
+                <h4 class="fw-bold text-xlg color-yellow">{{ item.price }}</h4>
+                <div v-if="item.budget" class="popular-payment btn-alert">Phổ biến</div>
+                <p class="mt-2">{{ item.value }} Tang Diệp</p>
             </div>
         </div>
         <div class="select-value py-3">
             <p class="fw-bold mb-3">Hoặc nhập số tiền tùy chỉnh</p>
-            <el-input size="large" v-model="inputValue" clearable placeholder="Nhập số tiền" />
+            <el-input @focus="handleFocus" size="large" v-model="inputValue" clearable placeholder="Nhập số tiền" />
+            <p class="mt-2" style="text-transform: uppercase; color: #AEAEAE;" v-if="inputValue">
+                {{ renderValueMoney(inputValue) }}</p>
         </div>
         <div class="row  d-flex justify-content-center mt-5">
             <el-tabs class="tab-payment" v-model="activeName" type="card">
@@ -58,7 +47,8 @@
                         </div>
                     </template>
                     <div class="col-5">
-                        <RenderQRcode :amount="100000" :add-info="'user123 Chuyển khoản'" />
+                        <RenderQRcode :key="valueRenderQRcode" :amount="valueRenderQRcode"
+                            :add-info="auth.userId + ' Chuyển khoản' + valueRenderQRcode + 'mua Tang diệp'" />
                     </div>
                 </el-tab-pane>
                 <el-tab-pane class="mt-5 full-weight" name="seconds">
@@ -86,14 +76,87 @@
             </el-tabs>
 
         </div>
-
+        <p class="mt-3 text-center">Đã thanh toán thành công, để Tang diệp có thể về tài khoản sớm nhất! <span
+                class="text-link" @click="sendRequest()">Gửi yêu cầu duyệt ngay</span></p>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { sendMail } from '@/api/mail';
+import { createRequest } from '@/api/mail';
 import BankInfo from '@/components/payment/BankInfo.vue';
 import RenderQRcode from '@/components/payment/RenderQRcode.vue';
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import vnNum2Words from "vn-num2words";
+import { toast } from "vue3-toastify";
+import { useAuthStore } from "@/stores/auth";
+const auth = useAuthStore();
+const payments = [
+    { price: "10.000đ", value: 100 },
+    { price: "20.000đ", value: 200, budget: true },
+    { price: "50.000đ", value: 550 },
+    { price: "100.000đ", value: 1100 },
+];
+const priceSelect = ref()
+const valueSelect = ref()
+function handleFocus() {
+    selected.value = null; // hủy chọn box khi focus vào input
+}
+function renderValueMoney(value) {
+    if (value > 10000) {
+        return vnNum2Words(value) + " đồng = " + value / 100 + " Tang diệp"
+    }
+    return "Số tiền chưa hợp lệ"
+}
+function selectPayment(index) {
+    inputValue.value = "";
+    selected.value = index;
+    priceSelect.value = Number(payments[index].price.replace(/\./g, "").replace("đ", ""));
+    valueSelect.value = payments[index].value
+}
+async function sendRequest() {
+    if (priceSelect.value && valueSelect.value) {
+        const res = await createRequest(auth.userId, priceSelect.value, valueSelect.value)
+        if (res.success) {
+            toast.success("Đã gửi yêu cầu duyệt cho Admin. Tang Diệp sẽ được cộng vào tài khoản sau 1-5 phút")
+        }
+        else {
+            toast.error("Chức năng nạp tiền đang bảo trì, vui lòng thử lại sau")
+        }
+    }
+    else if (inputValue.value) {
+        const res = await createRequest(auth.userId, inputValue.value, valueSelect.value)
+        if (res.success) {
+            toast.success("Đã gửi yêu cầu duyệt cho Admin. Tang Diệp sẽ được cộng vào tài khoản sau 1-5 phút")
+        }
+        else {
+            toast.error("Chức năng nạp tiền đang bảo trì, vui lòng thử lại sau")
+        }
+    }
+    else {
+        toast.error("Vui lòng chọn hoặc nhập số tiền muốn nạp")
+    }
+
+}
+async function handleSend() {
+    try {
+        await sendMail({
+            to: "minhdeptrai1711@gmail.com",
+            subject: "Thông báo từ hệ thống",
+            text: "Email test",
+        });
+        alert("Gửi email thành công!");
+    } catch (err) {
+        console.error(err);
+        alert("Gửi email thất bại!");
+    }
+}
+const valueRenderQRcode = computed(() => {
+    if (inputValue.value) return Number(inputValue.value);
+    if (priceSelect.value) return Number(priceSelect.value);
+    return 0;
+});
+const selected = ref(null);
 const activeName = ref("first")
 const inputValue = ref()
 </script>
@@ -110,6 +173,16 @@ const inputValue = ref()
     left: 50%;
     padding: 5px 15px;
     position: absolute;
+}
+
+.payment-value-box {
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.payment-value-box.active {
+    border-color: #28a745;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
 }
 </style>
 <style>

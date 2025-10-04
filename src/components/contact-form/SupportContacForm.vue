@@ -1,8 +1,9 @@
 <template>
     <div class="form-container">
-        <h3 class="text-xlg color-alert fw-bold"><img  style="width: 20px; margin-right: 10px;" src="@/assets/icon/user.png" alt="">Gửi yêu cầu hỗ trợ</h3>
+        <h3 class="text-xlg color-alert fw-bold"><img style="width: 20px; margin-right: 10px;"
+                src="@/assets/icon/user.png" alt="">Gửi yêu cầu hỗ trợ</h3>
         <p class="mb-4 mt-2">Vui lòng mô tả chi tiết vấn đề bạn gặp phải để chúng tôi hỗ trợ tốt nhất.</p>
-        <el-form class="contact-form" :rules="rules" label-position="top" ref="formRef">
+        <el-form class="contact-form" :model="form" :rules="rules" label-position="top" ref="formRef">
             <el-row :gutter="20">
                 <el-col :span="12">
                     <el-form-item label="Họ tên" prop="name">
@@ -42,11 +43,11 @@
             <div class="upload-file my-3">
                 <div class=" d-flex gap-2">
                     <el-upload class="upload-demo" action="#" :limit="1" :auto-upload="false" accept=".jpg,.png,.pdf"
-                        v-model:file-list="fileList">
-                        <button type="primary">Chọn tệp</button>
+                        v-model:file-list="form.fileList">
+                        <button type="button">Chọn tệp</button>
                     </el-upload>
                     <!-- Text khi chưa có file -->
-                    <p v-if="fileList.length === 0" style="margin-top:8px; color:#888;">
+                    <p v-if="form.fileList === 0" style="margin-top:8px; color:#888;">
                         Chưa có tệp nào được chọn
                     </p>
                 </div>
@@ -64,18 +65,17 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
-
+import { ref, reactive } from "vue"
+import { createSupportRequest } from "@/api/mail";
 const formRef = ref()
-const form = ref({
+const form = reactive({
     name: "",
     email: "",
     title: "",
     issue: "",
     description: "",
-})
-const fileList = ref([])
-
+    fileList: []
+});
 const rules = {
     name: [{ required: true, message: "Vui lòng nhập họ tên", trigger: "blur" }],
     email: [
@@ -87,18 +87,23 @@ const rules = {
     description: [{ required: true, message: "Vui lòng nhập mô tả", trigger: "blur" }],
 }
 
-const submitForm = () => {
-    console.log("abc");
-    
-    formRef.value.validate((valid) => {
+const submitForm = async () => {
+
+    await formRef.value.validate(async (valid) => {
         if (valid) {
-            alert("Form hợp lệ, gửi thành công!")
-            console.log("Dữ liệu form:", form.value)
-        } else {
-            console.log("Form chưa hợp lệ")
-            return false
+            const formData = new FormData();
+            formData.append("name", form.name);
+            formData.append("email", form.email);
+            formData.append("title", form.title);
+            formData.append("issue", form.issue);
+            formData.append("description", form.description);
+            if (form.fileList[0]) {
+                formData.append("file", form.fileList[0].raw);
+            }             
+            const res = await createSupportRequest(formData);
+            console.log("Kết quả:", res);
         }
-    })
+    });
 }
 </script>
 <style>
@@ -116,5 +121,4 @@ const submitForm = () => {
     font-weight: 700;
     padding: 7px 17px
 }
-
 </style>

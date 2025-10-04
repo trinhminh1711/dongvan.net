@@ -1,52 +1,54 @@
 <template>
     <h3 class="text-color_primary fw-bold mb-4">Truyện Đã Hoàn Thành</h3>
-    <div class="row d-flex align-items-center">
+    <div v-if="storyComplete" class="row d-flex align-items-center">
         <div class="col-3">
             <div class="box-img__vertical d-flex flex-column gap-2">
-                <img class="img-boxshadow" src="@/assets/image/story-completed.png" alt="">
-                <p class="text-center">Nửa Chừng Xuân</p>
+                <img class="img-boxshadow" :src="storyComplete?.[0].urlImg" alt="">
+                <p class="text-center">{{ storyComplete?.[0].title }}</p>
                 <p class="text-center color-alert text-md mt-1">
-                    <span class="fw-bold"> 290 </span> chương
+                    <span class="fw-bold"> {{ storyComplete?.[0].chap_number }} </span> chương
                 </p>
-                <p class="text-sm text-center">Mong các đạo hữu ủng hộ truyện và Converter bằng các cách sau: -
-                    Vote 5*, bấm 2 chương tiếp để</p>
-                <p class="text-center mt-2"> <button class="btn-alert__rounded">Đọc truyện</button></p>
+                <p class="text-sm text-center text-three-line">{{ storyComplete?.[0].description }}</p>
+                <p @click="gotoStory(storyComplete?.[0].story_id)" class="text-center mt-2"> <button class="btn-alert__rounded">Đọc ngay</button></p>
             </div>
         </div>
         <div class="list-container col-9">
             <div class="row">
-                <div v-for="(item, index) in storyCompleted" class="card-story-completed col-4 px-4 pb-3">
+                <div v-for="(item, index) in listStoryCompleteWithCategory"
+                    class="card-story-completed col-4 px-4 pb-3">
                     <p class="d-flex align-items-center d-flex justify-content-between border-bottom mb-3">
-                        <span class="fw-bold">{{ item.category }}</span>
+                        <span class="fw-bold">{{ item.category_name }}</span>
                         <img :src="item.image" alt="">
                     </p>
+                    <div >
                     <p v-for="(detail, key) in item.content">
-                        <span class="text-sm">[{{ detail.author }}]</span> <span
-                            class="text-color_primary fw-bold text-sm">{{ detail.name
-                            }}</span>
+                        <span class="text-sm">[{{ detail.author }}]</span>
+                        <span @click="gotoStory(detail.story_id)" class="text-color_primary fw-bold text-sm text-link_alert">{{ detail.name
+                        }}</span>
                     </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row d-flex align-items-center mt-4">
+    <div v-if="storyComplete" class="row d-flex align-items-center mt-4">
         <div class="col-3">
-            <div class="box-img__vertical d-flex flex-column gap-2">
-                <img class="img-boxshadow" src="@/assets/image/story-completed2.png" alt="">
-                <p class="text-center">Nửa Chừng Xuân</p>
+            <div class="box-img__vertical d-flex flex-column gap-2 px-2">
+                <img class="img-boxshadow" :src="storyComplete?.[1].urlImg" alt="">
+                <p class="text-center">{{ storyComplete?.[1].title }}</p>
                 <p class="text-center color-alert text-md mt-1">
-                    <span class="fw-bold"> 290 </span> chương
+                    <span class="fw-bold"> {{ storyComplete?.[1].chap_number }} </span> chương
                 </p>
-                <p class="text-sm text-center">Mong các đạo hữu ủng hộ truyện và Converter bằng các cách sau: -
-                    Vote 5*, bấm 2 chương tiếp để</p>
-                <p class="text-center mt-2"> <button class="btn-alert__rounded">Đọc truyện</button></p>
+                <p class="text-sm text-center text-three-line">{{ storyComplete?.[1].description }}</p>
+                <p @click="gotoStory(storyComplete?.[1].story_id)" class="text-center mt-2"> <button class="btn-alert__rounded">Đọc ngay</button></p>
             </div>
         </div>
         <div class="list-container col-9">
             <div class="row">
-                <div v-for="(item, index) in storyCompleted2" class="card-story-completed col-4 px-4 pb-3">
+                <div v-for="(item, index) in listStoryCompleteWithCategory"
+                    class="card-story-completed col-4 px-4 pb-3">
                     <p class="d-flex align-items-center d-flex justify-content-between border-bottom mb-3">
-                        <span class="fw-bold">{{ item.category }}</span>
+                        <span class="fw-bold">{{ item.category_name }}</span>
                         <img :src="item.image" alt="">
                     </p>
                     <p v-for="(detail, key) in item.content">
@@ -59,172 +61,126 @@
         </div>
     </div>
     <div class="bottom-card-image mt-5">
-        <div class="d-flex flex-column align-items-center gap-2 py-3" v-for="(item, index) in storycCompletedBottom">
-            <img style="max-width: 70px; box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 10px;" :src="item.imgUrl" alt="">
-            <p class="text-color_primary fw-bold text-md">{{ item.name }}</p>
-            <small class="d-block"> {{ item.genre }} </small>
-            <button class="btn-outline">Đọc ngay</button>
+        <div class="d-flex flex-column align-items-center gap-2 py-3" v-for="(item, index) in storyCompletedBottom">
+            <img style="max-width: 70px; box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 10px;" :src="item.urlImg" alt="">
+            <p class="text-color_primary fw-bold text-md">{{ item.title }}</p>
+            <small class="d-block"> {{ item.genre_name }} </small>
+            <button @click="gotoStory(item.story_id)" class="btn-outline">Đọc ngay</button>
         </div>
     </div>
 </template>
 
-<script>
-
-export default {
-    data() {
-        return {
-            storyCompleted: [
-                {
-                    category: "Linh dị",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed1.png', import.meta.url).href
-                },
-                {
-                    category: "Trinh thám",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed2.png', import.meta.url).href
-                },
-                {
-                    category: "Truyện ngắn",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed3.png', import.meta.url).href
-                },
-                {
-                    category: "Lịch sử",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed4.png', import.meta.url).href
-                },
-                {
-                    category: "Ngôn tình",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed5.png', import.meta.url).href
-                },
-                {
-                    category: "Thơ",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed6.png', import.meta.url).href
-                }
-
-            ],
-            storyCompleted2: [
-                {
-                    category: "Huyền ảo",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed7.png', import.meta.url).href
-                },
-                {
-                    category: "Cổ đại",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed8.png', import.meta.url).href
-                },
-                {
-                    category: "Tản văn",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed9.png', import.meta.url).href
-                },
-                {
-                    category: "Viễn tưởng",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed10.png', import.meta.url).href
-                },
-                {
-                    category: "Hiện thực",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed11.png', import.meta.url).href
-                },
-                {
-                    category: "Tất cả",
-                    content: [
-                        { author: "Bố Cốc Liêu", name: "Tiên Lục" },
-                        { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
-                        { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
-                        { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
-                        { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
-                    ],
-                    image: new URL('@/assets/icon/category-completed12.png', import.meta.url).href
-                }
-
-            ],
-            storycCompletedBottom:
-                [
-                    { name: "Trăng và máu", genre: "Truyện ngắn", imgUrl: new URL('@/assets/image/img-complete-bottom1.png', import.meta.url).href },
-                    { name: "Trong rừng nho", genre: "Hiện thực", imgUrl: new URL('@/assets/image/img-complete-bottom2.png', import.meta.url).href },
-                    { name: "Nô lệ", genre: "Truyện ngắn", imgUrl: new URL('@/assets/image/img-complete-bottom3.png', import.meta.url).href },
-                    { name: "Lều chõng", genre: "Hiện thực", imgUrl: new URL('@/assets/image/img-complete-bottom4.png', import.meta.url).href },
-                    { name: "Điếu văn", genre: "Truyện ngắn", imgUrl: new URL('@/assets/image/img-complete-bottom5.png', import.meta.url).href },
-                    { name: "Duyên số", genre: "Truyện ngắn", imgUrl: new URL('@/assets/image/img-complete-bottom1.png', import.meta.url).href },
-                    { name: "Giông tố", genre: "Hiện thực", imgUrl: new URL('@/assets/image/img-complete-bottom2.png', import.meta.url).href },
-                ]
-        }
+<script setup>
+import { onMounted, ref } from "vue";
+import { getStoryRandom, getStoryComplete } from '@/api/stories';
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const storyCompletedBottom = ref([])
+const storyComplete = ref(null)
+const storyCompleted1 = ref([
+    {
+        category: 1,
+        content: [
+            { author: "Bố Cốc Liêu", name: "Tiên Lục" },
+            { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
+            { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
+            { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
+            { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
+        ],
+        image: new URL('@/assets/icon/category-completed1.png', import.meta.url).href
     },
+    {
+        category: 2,
+        content: [
+            { author: "Bố Cốc Liêu", name: "Tiên Lục" },
+            { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
+            { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
+            { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
+            { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
+        ],
+        image: new URL('@/assets/icon/category-completed2.png', import.meta.url).href
+    },
+    {
+        category: 3,
+        content: [
+            { author: "Bố Cốc Liêu", name: "Tiên Lục" },
+            { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
+            { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
+            { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
+            { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
+        ],
+        image: new URL('@/assets/icon/category-completed3.png', import.meta.url).href
+    },
+    {
+        category: 4,
+        content: [
+            { author: "Bố Cốc Liêu", name: "Tiên Lục" },
+            { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
+            { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
+            { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
+            { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
+        ],
+        image: new URL('@/assets/icon/category-completed4.png', import.meta.url).href
+    },
+    {
+        category: 5,
+        content: [
+            { author: "Bố Cốc Liêu", name: "Tiên Lục" },
+            { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
+            { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
+            { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
+            { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
+        ],
+        image: new URL('@/assets/icon/category-completed5.png', import.meta.url).href
+    },
+    {
+        category: 6,
+        content: [
+            { author: "Bố Cốc Liêu", name: "Tiên Lục" },
+            { author: "Phạm A Lâm", name: "Ta Tại Sông Vô Định Vớt" },
+            { author: "Tiêu Tiềm", name: "Ất Mộc Tu Tiên Lục" },
+            { author: "Đổng Cầu Đế", name: "Lục Nhân Thiên Kiêu" },
+            { author: "Bán Hồ Sinh Khương", name: "Tộc Trưởng Mang" },
+        ],
+        image: new URL('@/assets/icon/category-completed6.png', import.meta.url).href
+    }
 
+])
+const listStoryCompleteWithCategory = ref([])
+async function getStoryData() {
+    const res = await getStoryRandom(10);
+    storyCompletedBottom.value = res
 }
+async function getAllStoryComplete() {
+    const res = await getStoryComplete(10);
+    storyComplete.value = res
+    console.log(storyComplete.value);
+    
+    listStoryCompleteWithCategory.value = (mapStoriesToCategories(storyCompleted1.value, storyComplete.value));
+}
+function mapStoriesToCategories(categories, stories) {
+    return categories.map(cat => {
+        // lọc ra những story khớp với genres_id
+        const filteredStories = stories.filter(story => story.genres_id === cat.category)
+        return {
+            ...cat,
+            category_name: filteredStories[0]?.genre_name || "",
+            content: filteredStories.map(story => ({
+                 story_id: story.story_id,
+                author: story.author_name,
+                name: story.title
+            }))
+        }
+    })
+}
+
+function gotoStory(params) {
+    router.push({ name: 'story', params: { id: params } })
+}
+onMounted(async () => {
+    await getStoryData()
+    await getAllStoryComplete()
+})
 </script>
 
 <style scoped>
@@ -257,8 +213,18 @@ export default {
 .bottom-card-image>div:nth-child(even) {
     background-color: #f7f6f2;
 }
-.img-boxshadow
-{
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 10px;;
+
+.img-boxshadow {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 10px;
+    ;
+}
+
+.text-three-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    /* số dòng muốn hiển thị */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

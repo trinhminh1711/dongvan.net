@@ -39,9 +39,7 @@ async function fetchData() {
 onMounted(() => {
   fetchData()
 })
-function handlePageChange(page) {
-    console.log('Trang mới:', page) // In ra số trang
-}
+
 function goToStory(post_id) {
     router.push({
     name: 'story',   // Tên route bạn đã định nghĩa trong router/index.js

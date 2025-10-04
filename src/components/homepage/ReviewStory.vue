@@ -1,10 +1,9 @@
 <template>
-    <h3 class="list-title text-color_primary">Chương mới cập nhật</h3>
+    <h3 class="list-title text-color_primary">Review tác phẩm</h3>
     <div class="list-container">
-        <div @click="gotoChapDetail(item.story_id, item.chap_number)" v-for="(item, index) in items" :key="index"
-            class="list-item">
-            <span class="text-one-line">{{ item.title }}</span>
-            <span class="text-color__tertiary">Chương {{ item.chap_number }}</span>
+        <div @click="gotoPost(value.post_id)" class="list-item" v-for="value in items">
+            <p class="text-ellipsis" style="max-width: 70%;;">{{ value.title }}</p>
+            <p style="color: #AEAEAE;">{{ value.username }}</p>
         </div>
     </div>
 </template>
@@ -12,10 +11,11 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { getListChapterUpdate } from "@/api/chapter";
+import { getPostForumByTopic } from "@/api/forum";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const emit = defineEmits(["update:items"]);
-const items = ref();
+const items = ref([]);
 function gotoChapDetail(storyId, chapterId) {
     router.push({
         name: "chap-detail",
@@ -25,17 +25,13 @@ function gotoChapDetail(storyId, chapterId) {
         }
     });
 }
+function gotoPost(id) {
+    router.push({ name: 'post-detail', params: { id: id } });
+}
 onMounted(async () => {
     try {
-        const res = await getListChapterUpdate()
-
-        const result = res.map((bItem) => ({
-            title: bItem.title,
-            text: "Chương " + bItem.chap_number,
-            chap_number: bItem.chap_number,
-            story_id: bItem.story_id
-        }));
-        items.value = res
+        const res = await getPostForumByTopic(2)
+        items.value = res.data
     } catch (err) {
         console.error("Lỗi khi fetch API:", err);
     }
@@ -61,10 +57,23 @@ onMounted(async () => {
     transition: all .2s ease-in;
 }
 
-.text-one-line {
-    max-width: 70%;
-    text-wrap: nowrap;
+.text-two-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* số dòng muốn hiển thị */
+    -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.text-ellipsis {
+    max-width: 70%;
+    /* giới hạn chiều ngang */
+    white-space: nowrap;
+    /* không xuống dòng */
+    overflow: hidden;
+    /* ẩn phần dư thừa */
+    text-overflow: ellipsis;
+    /* hiển thị ... */
 }
 </style>

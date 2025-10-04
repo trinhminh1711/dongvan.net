@@ -27,10 +27,8 @@
                         placement="left-start" :width="400" trigger="click">
                         <div>
                             <p class="d-flex justify-content-between mb-4 pt-2"><span
-                                    class="text-lg fw-bold text-color_primary">Thông
-                                    báo</span>
-                                <span class="color-blue">Đánh dấu tất cả đã
-                                    đọc</span>
+                                    class="text-lg fw-bold text-color_primary">Thông báo</span>
+                                <span class="color-blue">Đánh dấu tất cả đã đọc</span>
                             </p>
                             <div v-for="value in listNotifi" class="d-flex align-items-start gap-3 pb-4">
                                 <div>
@@ -39,16 +37,18 @@
                                 <div>
                                     <p style="font-size: 12px;">{{ timeAgo(value.created_at) }}</p>
                                     <p @click="goToNoti(value.post_id)" class="fw-bold text-color_primary hover_link">
-                                        {{
-                                            value.title }}</p>
+                                        {{ value.title }}</p>
                                     <p class="text-scroll" styl v-html="value.content"
                                         style="line-height: 1.5; font-size: 13px; color: #606266;"></p>
                                 </div>
                             </div>
+                            <div v-if="listNotifi.length < 1">
+                                <p>Chưa có thông báo mới !</p>
+                            </div>
                         </div>
                         <template #reference>
                             <el-badge :value="notiNumber" class="item">
-                                <img src="@/assets/icon/bell-02.svg" alt="">
+                                <img  class="hover_link" src="@/assets/icon/bell-02.svg" alt="">
                             </el-badge>
                         </template>
                     </el-popover>
@@ -59,17 +59,17 @@
                         <div>
                             <div class="pb-3 d-flex align-items-center gap-2 "
                                 style="border: none;border-bottom: 1px solid #ccc;">
-                                <img style="width: 50px; border-radius: 50%; height: 50px;"
+                                <img  style="width: 50px; border-radius: 50%; height: 50px;"
                                     :src="auth.user.link_thumbnail" alt="">
                                 <div>
-                                    <p class="fw-bold text-color_primary">{{ auth.user.username }}</p>
+                                    <p class="fw-bold text-color_primary">{{ auth.user.username }} ({{ auth.user.role }})</p>
                                     <p>ID: {{ auth.user.user_id }}</p>
                                 </div>
                             </div>
                             <div class="drop-menu">
                                 <ul class="px-0" style="list-style: none;">
                                     <li @click=" goToPage('profile')">
-                                        <img src="@/assets/icon/icon-user.png" alt="">
+                                        <img  src="@/assets/icon/icon-user.png" alt="">
                                         <span class="hover_link">Thông tin cá nhân</span>
                                     </li>
                                     <li @click=" goToPage('my-post')">
@@ -80,7 +80,7 @@
                                         <img src="@/assets/icon/icon-buy.png" alt="">
                                         <span class="hover_link">Nạp Tang Diệp</span>
                                     </li>
-                                    <li>
+                                    <li @click="goToPage('transaction-history')">
                                         <img src="@/assets/icon/icon-pay.png" alt="">
                                         <span class="hover_link">Lịch sử giao dịch</span>
                                     </li>
@@ -95,7 +95,7 @@
                             </div>
                         </div>
                         <template #reference>
-                            <img src="@/assets/icon/user-icon.svg" alt="">
+                            <img class="hover_link" src="@/assets/icon/user-icon.svg" alt="">
                         </template>
                     </el-popover>
                 </div>
@@ -106,7 +106,8 @@
         <div class="container text-center">
             <div class="row align-items-start align-items-center justify-content-between">
                 <div class="col-3 d-flex align-items-center">
-                    <el-popover :disabled="route.name == 'Home'" popper-class="my-popover" placement="bottom-start" :width="300" trigger="hover">
+                    <el-popover :disabled="route.name == 'Home'" popper-class="my-popover" placement="bottom-start"
+                        :width="300" trigger="hover">
                         <div class="row col-12  d-flex align-items-center menu-category">
                             <div @click="goToCategory(item)" v-for="(item, index) in items" :key="index"
                                 class="col-6 d-flex align-items-center menu-category__item">
@@ -237,13 +238,6 @@ const loadAll = () => {
     ]
 }
 const listNotifi = ref([])
-const handleSelect = (item: Record<string, any>) => {
-    console.log(item)
-}
-
-const handleIconClick = (ev: Event) => {
-    console.log(ev)
-}
 async function getNotification() {
     const res = await getPostForumByTopic(1);
     listNotifi.value = getPostsToday(res.data)
@@ -332,8 +326,6 @@ function goToPage(name) {
 }
 onMounted(async () => {
     await getNotification();
-    console.log(auth.user);
-
 })
 </script>
 

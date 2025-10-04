@@ -23,7 +23,7 @@ const route = useRoute();
 const router = useRouter();
 
 import type { TabsPaneContext } from 'element-plus'
-import Create from '@/components/create-story/create.vue'
+import Create from '@/components/create-story/Create.vue'
 import CreateNewTrap from '@/components/create-story/CreateNewTrap.vue'
 import CreateNewTrapForm from '@/components/create-story/CreateNewTrapForm.vue'
 import ListStoryUpdate from '@/components/create-story/ListStoryUpdate.vue'

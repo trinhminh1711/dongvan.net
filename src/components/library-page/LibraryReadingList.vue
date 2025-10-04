@@ -3,8 +3,8 @@
         <div class="row mt-4">
             <div v-for="(stories, index) in categoryList" :key="index" class="box-left__content col-md-6">
                 <div class="book-card">
-                    <div v-if="!stories" class="ribbon">FULL</div>
-                    <div v-if="stories" class="ribbon-vip">VIP</div>
+                    <div v-if="!stories.is_vip_story" class="ribbon">FULL</div>
+                    <div v-if="stories.is_vip_story" class="ribbon-vip">VIP</div>
                     <img style="max-width: 150px;" :src="stories.link_img" alt=""></img>
                 </div>
                 <div class="left-content">
@@ -40,6 +40,7 @@ async function getListReading() {
     const auth = useAuthStore();
     const res = await getListUserReading(auth.userId);
     categoryList.value = res.data;
+    
 
 }
 function readOnBook(storyId, chapId) {
