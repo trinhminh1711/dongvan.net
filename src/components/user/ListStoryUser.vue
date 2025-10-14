@@ -1,23 +1,18 @@
 <template>
     <div class="container">
-        <div class="row mt-4">
+        <div v-if="categoryList.length" class="row">
             <div v-for="(stories, index) in categoryList" :key="index" class="box-left__content col-md-6">
-                <div class="book-card">
-                    <div v-if="!stories.is_vip_story" class="ribbon">FULL</div>
-                    <div v-if="stories.is_vip_story" class="ribbon-vip">VIP</div>
-                    <img style="max-width: 150px;" :src="stories.link_img" alt=""></img>
+                <div class="book-card col-4">
+                    <img style="max-width: 100%;" class="d-block" :src="stories.urlImg" alt=""></img>
                 </div>
-                <div class="left-content">
-                    <p class="text-color_primary fw-bold text-lg">{{ stories.story_title }}</p>
-                    <p class="text-md fw-semibold">{{ stories.author_name }}</p>
-                    <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.total_chapters }}</span>
+                <div class="left-content col-8">
+                    <p class="text-color_primary fw-bold text-lg">{{ stories.title }}</p>
+                    <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.last_chap_number > 0 ? stories.last_chap_number : "Chưa có" }}</span>
                         <span class="text-md">
                             chương</span>
                     </p>
-                    <p class="text-md fw-semibold"> Chương đang đọc: [Chương {{ stories.chapter_number }}] {{
-                        stories.chapter_title }} </p>
-                    <button @click="readOnBook(stories.story_id, stories.chapter_number)" class="btn-alert my-3">Đọc
-                        tiếp</button>
+                    <button @click="readOnBook(stories.story_id)" class="btn-alert my-3">Đọc
+                        ngay</button>
                 </div>
             </div>
         </div>
@@ -32,24 +27,31 @@
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../../stores/auth';
 import { getListUserReading } from '@/api/stories';
+import { getStory } from '@/api/stories';
 import { useRouter } from "vue-router";
 const router = useRouter();
 const currentPage = 1
 const categoryList = ref([]);
+const props = defineProps({
+    userId: {
+        type: Number,
+        required: true
+    },
+})
 function handlePageChange(page) {
     console.log('Trang mới:', page) // In ra số trang
 }
 async function getListReading() {
-    const auth = useAuthStore();
-    const res = await getListUserReading(auth.userId);
-    categoryList.value = res.data;
-
-
+    const res = await getStory(props.userId)
+    console.log(res);
+    categoryList.value = res
+    console.log(categoryList.value);
 }
-function readOnBook(storyId, chapId) {
+
+function readOnBook(storyId) {
     router.push({
-        name: "chap-detail",
-        params: { id: storyId, chapId: chapId }
+        name: "story",
+        params: { id: storyId }
     });
 }
 onMounted(async () => {

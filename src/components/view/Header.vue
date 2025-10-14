@@ -5,16 +5,28 @@
                 <router-link to="/"><img class="header-logo" src="@/assets/logo.png" /></router-link>
             </div>
             <div class="col">
-                <el-autocomplete class="search-bar" v-model="state" :fetch-suggestions="querySearch"
-                    popper-class="my-autocomplete" placeholder="Tìm kiếm tên truyện" @select="handleSelect">
+                <el-autocomplete class="search-bar" v-model="searchText" :fetch-suggestions="querySearch"
+                    placeholder="Tìm kiếm tên truyện" popper-class="my-autocomplete" @select="handleSelect">
+                    <!-- Icon search -->
                     <template #suffix>
-                        <el-icon style="color: black;" class="el-input__icon" @click="handleIconClick">
+                        <el-icon style="color: black;">
                             <Search />
                         </el-icon>
                     </template>
+
+                    <!-- Template hiển thị từng gợi ý -->
                     <template #default="{ item }">
-                        <div class="value">{{ item.value }}</div>
-                        <span class="link">{{ item.link }}</span>
+                        <div class="value-search d-flex justify-content-between py-2 px-2">
+                            <div class="value d-flex align-items-center gap-2">
+                                <img style="max-width: 30px;" :src="item.urlImg" alt="" srcset="">
+                                <span>{{ item.value }}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="author">{{ item.total_chapters ? item.total_chapters : "Chưa có" }}
+                                    chương</span>
+                            </div>
+
+                        </div>
                     </template>
                 </el-autocomplete>
             </div>
@@ -48,7 +60,7 @@
                         </div>
                         <template #reference>
                             <el-badge :value="notiNumber" class="item">
-                                <img  class="hover_link" src="@/assets/icon/bell-02.svg" alt="">
+                                <img class="hover_link" src="@/assets/icon/bell-02.svg" alt="">
                             </el-badge>
                         </template>
                     </el-popover>
@@ -59,17 +71,18 @@
                         <div>
                             <div class="pb-3 d-flex align-items-center gap-2 "
                                 style="border: none;border-bottom: 1px solid #ccc;">
-                                <img  style="width: 50px; border-radius: 50%; height: 50px;"
+                                <img style="width: 50px; border-radius: 50%; height: 50px;"
                                     :src="auth.user.link_thumbnail" alt="">
                                 <div>
-                                    <p class="fw-bold text-color_primary">{{ auth.user.username }} ({{ auth.user.role }})</p>
+                                    <p class="fw-bold text-color_primary">{{ auth.user.username }} ({{ auth.user.role
+                                        }})</p>
                                     <p>ID: {{ auth.user.user_id }}</p>
                                 </div>
                             </div>
                             <div class="drop-menu">
                                 <ul class="px-0" style="list-style: none;">
                                     <li @click=" goToPage('profile')">
-                                        <img  src="@/assets/icon/icon-user.png" alt="">
+                                        <img src="@/assets/icon/icon-user.png" alt="">
                                         <span class="hover_link">Thông tin cá nhân</span>
                                     </li>
                                     <li @click=" goToPage('my-post')">
@@ -88,6 +101,34 @@
                                         <span class="hover_link">Liên hệ hỗ trợ</span>
                                     </li>
                                     <hr style="  border: none;border-top: 1px solid #ccc;">
+                                    <div class="admin-permision">
+                                        <li v-if="auth.user.role == 'master_admin'"
+                                            @click=" goToPage('UserManagement')">
+                                            <el-icon>
+                                                <Key />
+                                            </el-icon>
+                                            <span class="hover_link">Quản lý người dùng</span>
+                                        </li>
+                                        <li v-if="auth.user.role == 'master_admin'"
+                                            @click=" goToPage('PaymentHistory')">
+                                            <el-icon>
+                                                <Key />
+                                            </el-icon>
+                                            <span class="hover_link">Quản lý giao dịch</span>
+                                        </li>
+                                        <li @click=" goToPage('profile')">
+                                            <el-icon>
+                                                <Key />
+                                            </el-icon>
+                                            <span class="hover_link">Quản lý bài viết</span>
+                                        </li>
+                                        <li @click=" goToPage('profile')">
+                                            <el-icon>
+                                                <Key />
+                                            </el-icon>
+                                            <span class="hover_link">Quản lý truyện</span>
+                                        </li>
+                                    </div>
                                     <li @click="logout()"><img src="@/assets/icon/icon-logout.png" alt="">
                                         <span class="hover_link"> Đăng xuất</span>
                                     </li>
@@ -138,12 +179,12 @@
                 <div class="col-5">
                     <div class="menu-item d-flex justify-content-center">
                         <el-menu class="el-menu-top " background-color="rgb(42, 41, 41)" back mode="horizontal"
-                            text-color="#fff" active-text-color="#ffd04b" @select="handleSelect">
+                            text-color="#fff" active-text-color="#ffd04b">
                             <div style="display: flex;">
                                 <router-link :to="{ name: 'forum' }"><el-menu-item index="1">Diễn
                                         đàn</el-menu-item></router-link>
-                                <router-link :to="{ name: 'forum' }"><el-menu-item index="2">Bảng xếp
-                                        hạng</el-menu-item></router-link>
+                               <el-menu-item @click="goHome" index="2">Bảng xếp
+                                        hạng</el-menu-item>
                                 <router-link :to="{ name: 'support' }"><el-menu-item index="3">Hỗ
                                         trợ</el-menu-item></router-link>
                             </div>
@@ -179,6 +220,7 @@ import LoginPage from '@/pages/LoginPage.vue'
 import { useAuthStore } from "@/stores/auth";
 import { getPostForumByTopic } from '@/api/forum';
 import { useRouter } from "vue-router";
+import { getAllStory } from '@/api/stories';
 import { useRoute } from "vue-router"
 import storyIcon from '@/assets/icon/StoryIcon.png'
 import vectorIcon2 from '@/assets/icon/Vector (2).svg'
@@ -192,6 +234,20 @@ import vectorIcon9 from '@/assets/icon/helmet 1.svg'
 import vectorIcon10 from '@/assets/icon/building 1.svg'
 import vectorIcon11 from '@/assets/icon/poem 1.svg'
 import vectorIcon12 from '@/assets/icon/Vector (8).svg'
+interface Story {
+    story_id: number;
+    title: string;
+    author: string;
+    description?: string;
+    urlImg?: string;
+}
+
+interface SuggestItem extends Story {
+    value: string; // cần cho el-autocomplete
+    link: string;  // đường dẫn chi tiết
+}
+const searchText = ref("");
+const stories = ref<SuggestItem[]>([]);
 const router = useRouter();
 const route = useRoute()
 const auth = useAuthStore();
@@ -213,19 +269,12 @@ interface LinkItem {
 const state = ref('')
 const links = ref<LinkItem[]>([])
 const notiNumber = ref()
-const querySearch = (queryString: string, cb) => {
-    const results = queryString
-        ? links.value.filter(createFilter(queryString))
-        : links.value
-    // call callback function to return suggestion objects
-    cb(results)
-}
-const createFilter = (queryString: string) => {
-    return (restaurant: LinkItem) => {
-        return (
-            restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-        )
-    }
+function goHome() {
+  router.push({ name: 'Home' }).then(() => {
+    setTimeout(() => {
+      document.getElementById('ranking')?.scrollIntoView({ behavior: 'smooth' })
+    }, 1000)
+  })
 }
 const loadAll = () => {
     return [
@@ -243,6 +292,30 @@ async function getNotification() {
     listNotifi.value = getPostsToday(res.data)
     notiNumber.value = listNotifi.value.length
 
+}
+async function getStoryList() {
+    try {
+        const res = await getAllStory(); // gọi API backend
+        stories.value = res.map((story: Story) => ({
+            ...story,
+            value: story.title, // el-autocomplete yêu cầu có 'value'
+            link: `/story/${story.story_id}`,
+        }));
+    } catch (err) {
+        console.error("Lỗi khi lấy danh sách truyện:", err);
+    }
+}
+function querySearch(queryString: string, cb: (results: SuggestItem[]) => void) {
+    const results = queryString
+        ? stories.value.filter((story) =>
+            story.value.toLowerCase().includes(queryString.toLowerCase())
+        )
+        : stories.value;
+
+    cb(results.slice(0, 10)); // chỉ trả về tối đa 10 gợi ý
+}
+function handleSelect(item: SuggestItem) {
+    router.push(item.link); // điều hướng đến trang chi tiết
 }
 function logout() {
     toast.loading("Đang đăng xuất...");
@@ -326,6 +399,7 @@ function goToPage(name) {
 }
 onMounted(async () => {
     await getNotification();
+    await getStoryList()
 })
 </script>
 
@@ -512,5 +586,10 @@ onMounted(async () => {
     cursor: pointer;
     background-color: #f7f6f2;
     transition: all .2s ease-in;
+}
+
+.value-search:hover {
+    background-color: #f7f6f2;
+    color: #fc6c28;
 }
 </style>

@@ -10,20 +10,22 @@ import CreateStory from '@/pages/CreateStory.vue'
 import ForumPage from '@/pages/ForumPage.vue'
 import HomePage from '@/pages/HomePage.vue'
 import PaymentHistory from '@/admin/PaymentHistory.vue'
+import CommitCreate from '@/components/create-story/CommitCreate.vue'
 import InstructPage from '@/pages/InstructPage.vue'
 import PaymentPage from '@/pages/PaymentPage.vue'
 import ProfilePage from '@/pages/ProfilePage.vue'
 import Forbidden from '@/pages/Forbiden.vue'
 import ReadStory from '@/pages/ReadStory.vue'
 import StoryDetail from '@/pages/StoryDetail.vue'
-import {requireAuth} from "@/middleware/auth";
-import {checkAdminAuth} from "@/middleware/auth";
+import { requireAuth } from "@/middleware/auth";
+import UserPage from '@/components/user/UserPage.vue'
+import { checkAdminAuth } from "@/middleware/auth";
 import TransactionHistory from '@/pages/TransactionHistory.vue'
 import SupportPage from '@/pages/SupportPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import EditStory from '@/components/create-story/EditStory.vue'
 import NotFound from '@/pages/NotFound.vue'
-// Import các page
+import adminRoutes from "./admin"; // 👈 Import admin routes
 
 
 const routes = [
@@ -34,12 +36,12 @@ const routes = [
         path: '/forum', name: 'forum', component: ForumPage, children: [
             {
                 path: "list-post/:id",
-                name:"list-post",
+                name: "list-post",
                 component: ListPost
             },
             {
                 path: "post-detail/:id",
-                name:"post-detail",
+                name: "post-detail",
                 component: PostDetail
             },
             {
@@ -49,28 +51,29 @@ const routes = [
             },
         ]
     },
-    { path: '/payment-approval', name: 'payment-approval', component: PaymentHistory , beforeEnter: checkAdminAuth },
+    { path: '/terms-of-service', name: 'commit-create', component: CommitCreate },
     { path: '/transaction-history', name: 'transaction-history', component: TransactionHistory },
     { path: '/instruct-page', name: 'instruct', component: InstructPage },
-    { path: '/support', name: 'support', component: SupportPage },
+    { path: '/support', name: 'support', component: SupportPage, beforeEnter: checkAdminAuth },
     { path: '/story-detail/:id', name: 'story', component: StoryDetail },
     { path: '/story-detail/:id/chap/:chapId', name: 'chap-detail', component: ReadStory },
     { path: '/create-story', name: 'create-story', component: CreateStory },
     { path: '/profile', name: 'profile', component: ProfilePage, beforeEnter: requireAuth },
     { path: '/create-story/new-chap/:storyId', name: 'create-newchap', component: CreateNewTrapForm },
     { path: '/edit-story/:id', name: 'edit-story', component: EditStory },
-    { path: '/forbidden', name: 'forbidden', component: Forbidden},
+    { path: '/forbidden', name: 'forbidden', component: Forbidden },
     {
         path: '/article-page/:id', name: 'article', component: ArticleCategoryList, children: [
 
         ]
     },
+    { path: '/user/:id', name: 'user', component: UserPage },
     { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFound },
+    adminRoutes,
 ]
 
 const router = createRouter({
     history: createWebHistory(), // dùng HTML5 history mode
     routes
 })
-
 export default router

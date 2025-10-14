@@ -82,6 +82,14 @@ export const getStory = async (authorId) => {
         return err
     }
 };
+export const getAllStory = async () => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/story/get-all`);
+        return res.data
+    } catch (err) {
+        return err
+    }
+};
 
 export const getStoryById = async (storyId) => {
     try {
@@ -134,8 +142,6 @@ export const getStoryRandom = async (limit) => {
 
 export const getStoryComplete = async (limit) => {
   try {
-    console.log("abc");
-    
     const res = await axiosClient.get(`${API_URL}/complete/story`, {
       params: { limit }   // query param ?limit=10
     });

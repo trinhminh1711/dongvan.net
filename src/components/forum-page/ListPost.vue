@@ -12,11 +12,11 @@
     </div>
     <el-table class="mt-4" :data="tableData" style="width: 100%">
         <!-- Cột 1: Tên -->
-        <el-table-column label="Chủ đề" prop="name" width="450">
+        <el-table-column label="Chủ đề" prop="name" width="500">
             <template #default="scope">
                 <div class="post-info py-3">
                     <div class="imgAuthor">
-                        <img style="width: 50px;" :src="scope.row.avatarImg" alt="">
+                        <img style="width: 70px; height: 70px; border-radius: 50%;" :src="scope.row.avatarImg" alt="">
                     </div>
                     <div class="info">
                         <p> <span class="text-sm fw-semibold color-blue post-topic"><span class="dot"></span>
@@ -57,7 +57,7 @@
         <!-- Cột 3: Ngày đăng -->
         <el-table-column label="Tương tác gần nhất" prop="publishDate">
             <template #default="scope">
-                <div class="closest-interaction d-flex align-items-center gap-1">
+                <div class="closest-interaction justify-content-between d-flex align-items-center gap-1">
                     <div>
                         <p class="text-md color-blue">{{ scope.row.closestInteraction.date }}</p>
                         <p class="text-sm">{{ scope.row.closestInteraction.name }}</p>

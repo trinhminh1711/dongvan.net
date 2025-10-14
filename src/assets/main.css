@@ -149,6 +149,24 @@ a,
     color: #ff6114;
     cursor: pointer;
 }
+.border-b
+{
+  border-bottom: solid 1px #344054;
+ 
+}
+.hover-link:hover
+{
+   color: #FC6C28;
+   cursor: pointer;
+}
+.text-one-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    /* số dòng muốn hiển thị */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);

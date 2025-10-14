@@ -17,6 +17,10 @@
                 </div>
             </div>
         </div>
+        <div v-if="!categoryList.length">
+            <img style="display: block; margin: 0 auto;" src="@/assets/icon/nodata.png" />
+            <p style="text-align: center;">Không có dữ liệu</p>
+        </div>
     </div>
 </template>
 
@@ -29,9 +33,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const listStoryChecked = false;
 const categoryList = ref([]);
-function handlePageChange(page) {
-    console.log('Trang mới:', page) // In ra số trang
-}
+
 onMounted(async () => {
     const user_id = auth.userId
     const res = await getListPostLike(user_id);

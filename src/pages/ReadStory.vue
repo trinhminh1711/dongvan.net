@@ -93,7 +93,7 @@
                 <div class="dialog-footer d-flex">
                     <el-button style="width: 50%; font-size: 12px;" @click="unlockFullChapterDialog = false">Quay
                         lại</el-button>
-                    <el-button
+                    <el-button @click="unlockFullChapter()"
                         style="width: 50%; background-color: #FF6114; font-size: 12px; color: #fff; font-weight: 900;">
                         Xác nhận
                     </el-button>
@@ -155,6 +155,12 @@ async function unlockChapter() {
     unlockChapterDialog.value = true
 
 }
+async function unlockFullChapterOpen() {
+    unlockFullChapterDialog.value = true
+    console.log("abc");
+    
+
+}
 async function unlockChap(chapter) {
 
     const listChap = [chapter]
@@ -177,9 +183,7 @@ async function unlockFullChapter() {
     const newArr = res.map(item => item.chap_number);
     const unlockChap = await unlockChapters(route.params.id, auth.userId, newArr)
     chapterNumber.value = res 
-   
-
-}
+     }
 function handleFontSize(action) {
     if (action === "increase" && fontSize.value < 40) fontSize.value += 2;
     if (action === "decrease" && fontSize.value > 6) fontSize.value -= 2;

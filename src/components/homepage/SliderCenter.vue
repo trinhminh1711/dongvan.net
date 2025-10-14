@@ -2,84 +2,118 @@
   <div class="row">
     <div class="carousel-wrapper col-6">
       <!-- Swiper -->
-      <Swiper :modules="[EffectCoverflow, Pagination]" :effect="'coverflow'" :centered-slides="true"
-        :slides-per-view="3" :coverflow-effect="{
+      <Swiper :modules="[EffectCoverflow, Pagination, Autoplay]" effect="coverflow" centered-slides :slides-per-view="3"
+        :coverflow-effect="{
           rotate: 0,
           stretch: 0,
           depth: 150,
           modifier: 1.5,
           slideShadows: false
-        }" :pagination="{ clickable: true }" :loop="true" class="mySwiper" @slideChange="onSlideChange">
+        }" :autoplay="{
+          delay: 3000,       // thời gian giữa mỗi slide (ms)
+          disableOnInteraction: false // vẫn auto chạy dù user bấm
+        }" :pagination="{ clickable: true }" loop class="mySwiper" @slideChange="onSlideChange">
         <SwiperSlide v-for="(item, i) in items" :key="i">
           <img class="slide-centermode-img" :src="item" alt="" />
         </SwiperSlide>
       </Swiper>
-
     </div>
+
     <div class="slide-content col-6">
-      <h3 class="text-start text-color_primary fw-bold">Tố tâm</h3>
-      <p class="text-start text-color__tertiary slide-content__desc text-sm">{{ descriptions[currentIndex] }}</p>
-      <p class="text-start"> <button class="btn-alert__rounded">Đọc truyện</button></p>
+      <h3 @click="gotoStory(idStory[currentIndex])" class="text-start text-color_primary fw-bold">{{ title[currentIndex]
+        }}</h3>
+      <p class="text-start text-color__tertiary slide-content__desc text-sm">
+        {{ descriptions[currentIndex] }}
+      </p>
+      <p class="text-start">
+        <button @click="gotoStory(idStory[currentIndex])" class="btn-alert__rounded mt-3">Đọc truyện</button>
+      </p>
     </div>
   </div>
-
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+// Import Swiper và modules
 import { Swiper, SwiperSlide } from "swiper/vue";
-import { EffectCoverflow, Pagination } from "swiper/modules";
+import { EffectCoverflow, Pagination, Autoplay } from "swiper/modules"; 
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
-import slideImg1 from '@/assets/image/slide-img1.jpg'
-import slideImg2 from '@/assets/image/slide-img2.jpg'
-import slideImg3 from '@/assets/image/slide-img3.jpg'
-import slideImg4 from '@/assets/image/slide-img4.jpg'
-import slideImg5 from '@/assets/image/slide-img5.jpg'
-export default {
-  components: { Swiper, SwiperSlide },
-  data() {
-    return {
-      items: [
-        slideImg1,
-        slideImg2,
-        slideImg3,
-        slideImg4,
-        slideImg5,
-        slideImg1,
-        slideImg2,
-        slideImg3,
-        slideImg4,
-        slideImg5,
-      ],
-      descriptions: [
-        "Đường nhỏ du du diêu diêu, trời xanh phiêu phiêu miểu miểu. Một ngày chuyển...",
-        "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour,",
-        "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
-        "Mô tả cho ảnh 4",
-        "Mô tả cho ảnh 5",
-        "Mô tả cho ảnh 6",
-        "Mô tả cho ảnh 7",
-        "Mô tả cho ảnh 8",
-        "Mô tả cho ảnh 9",
-        "Mô tả cho ảnh 10",
-      ],
-      currentIndex: 0
-    };
-  },
-  setup() {
-    return { EffectCoverflow, Pagination };
-  },
-  methods: {
-    onSlideChange(swiper) {
-      // swiper.realIndex bỏ qua các slide nhân bản khi loop
-      this.currentIndex = swiper.realIndex;
-    }
-  }
-};
+
+// Import ảnh
+import slideImg1 from "@/assets/image/slide-img1.jpg";
+import slideImg2 from "@/assets/image/slide-img2.jpg";
+import slideImg3 from "@/assets/image/slide-img3.jpg";
+import slideImg4 from "@/assets/image/slide-img4.jpg";
+import slideImg5 from "@/assets/image/slide-img5.jpg";
+
+const router = useRouter();
+
+// ==================== DỮ LIỆU ====================
+const items = [
+  'https://res.cloudinary.com/djr4f7ceu/image/upload/v1757504771/stories_covers/ogwdojbwe0glf4n0rffp.jpg',
+  'https://res.cloudinary.com/djr4f7ceu/image/upload/v1757505108/stories_covers/r3dxz4bwg1ybvajyqc3u.jpg',
+  'https://res.cloudinary.com/djr4f7ceu/image/upload/v1757505108/stories_covers/r3dxz4bwg1ybvajyqc3u.jpg',
+  'https://res.cloudinary.com/djr4f7ceu/image/upload/v1758071874/stories_covers/lpobtjqolnlrikegvywx.jpg',
+  'https://res.cloudinary.com/djr4f7ceu/image/upload/v1759544568/stories_covers/k2sasaop7xzouifw60nx.jpg',
+  'https://res.cloudinary.com/djr4f7ceu/image/upload/v1760266390/stories_covers/kcashihxqcgsbtiqenhi.jpg',
+  slideImg2,
+  slideImg3,
+  slideImg4,
+  slideImg5,
+];
+
+const idStory = [20, 21, 23, 24, 25, 26, 22];
+
+const descriptions = [
+  "Cạm bẫy người là một tác phẩm phóng sự của nhà văn Vũ Trọng Phụng",
+  '"Cơm thầy cơm cô" là một thiên phóng sự mô tả thực trạng di dân từ nông thôn ra thành thị"',
+  "Tác phẩm ra đời năm 1934, phản ánh chân thực cuộc sống xã hội Việt Nam thời Pháp thuộc",
+  "Số đỏ là tiểu thuyết nổi tiếng của Vũ Trọng Phụng, đăng trên Hà Nội báo từ năm 1936",
+  "Lều chõng là tiểu thuyết phóng sự của Ngô Tất Tố, ra mắt năm 1939 tại Hà Nội.",
+  'Tác phẩm "Vỡ đê" của Vũ Trọng Phụng ra đời năm 1936',
+  'Truyện "Giông Tố" phản ánh xã hội Việt Nam những năm 1930',
+  "Mô tả cho ảnh 9",
+  "Mô tả cho ảnh 10",
+];
+
+const title = [
+  "Cạm Bẫy Người",
+  "Cơm thầy cơm cô",
+  "Kỹ Nghệ Lấy Tây",
+  "Số đỏ",
+  "Lều chõng",
+  "Tiêu Sơn Tráng Sĩ",
+  "Giông tố",
+  "Mô tả cho ảnh 8",
+  "Mô tả cho ảnh 9",
+  "Mô tả cho ảnh 10",
+];
+
+// Chỉ mục slide hiện tại
+const currentIndex = ref(0);
+
+// ==================== HÀM XỬ LÝ ====================
+
+// Khi Swiper đổi slide
+function onSlideChange(swiper) {
+  // realIndex bỏ qua các slide clone khi loop
+  currentIndex.value = swiper.realIndex;
+}
+
+// Chuyển trang tới truyện
+function gotoStory(id) {
+  router.push({
+    name: "story",
+    params: { id },
+  });
+}
 </script>
 
-<style>
+<style scoped>
 .swiper-coverflow {
   padding: 20px 0;
 }
@@ -112,9 +146,6 @@ export default {
 .slide-content {
   margin-top: 20px;
   text-align: center;
-}
-
-.slide-content {
   line-height: 2;
 }
 
@@ -122,9 +153,13 @@ export default {
   line-height: 1.5;
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
-  /* Giới hạn 2 dòng */
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+}
+
+.text-start:hover {
+  cursor: pointer;
+  color: #FF6114;
 }
 </style>

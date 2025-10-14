@@ -1,9 +1,9 @@
 <template>
-    <h3 class="list-title text-color_primary">Review tác phẩm</h3>
+    <h3 class="list-title text-color_primary border-b">Review tác phẩm</h3>
     <div class="list-container">
         <div @click="gotoPost(value.post_id)" class="list-item" v-for="value in items">
-            <p class="text-ellipsis" style="max-width: 70%;;">{{ value.title }}</p>
-            <p style="color: #AEAEAE;">{{ value.username }}</p>
+            <p class="text-ellipsis" style="max-width: 60%;;">{{ value.title }}</p>
+            <p style="color: #AEAEAE; font-size: 14px; text-wrap: nowrap;">{{ value.username }}</p>
         </div>
     </div>
 </template>

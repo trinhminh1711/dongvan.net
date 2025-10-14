@@ -1,5 +1,5 @@
 <template>
-    <div class="container py-3 text-center">
+    <div class="container text-center">
         <div class="row align-items-start  justify-content-between">
             <div class="row col-3 col d-flex align-items-center menu-category">
                 <div @click="goToCategory(item)" v-for="(item, index) in items" :key="index"
@@ -14,43 +14,19 @@
                 </div>
             </div>
             <div class="col-6 el-menu-story">
-                <img style="width: 100%; height: 250px;"
-                    src="https://www.quehuong.org.vn/wp-content/uploads/2018/07/dung-noi-chuyen-voi-co-ay.jpg" alt=""
-                    srcset="">
-                <div class="banner-tabs">
-                    <el-tabs v-model="activeTabs" class="tabs-category">
-                        <el-tab-pane label="TTV Translate" name="first">
-                            <div class="d-flex">
-                                <img src="@/assets/image/img-cateory1.png" />
-                                <img src="@/assets/image/img-cateory2.png" />
-                                <img src="@/assets/image/img-cateory3.png" />
-                            </div>
-                        </el-tab-pane>
-                        <el-tab-pane label="Lâm Uyên Hành" name="second">
-                            <div class="d-flex">
-                                <img src="@/assets/image/img-cateory3.png" />
-                                <img src="@/assets/image/img-cateory1.png" />
-                                <img src="@/assets/image/img-cateory2.png" />
+                <div class="banner-top" :style="{ backgroundImage: `url(${currentBg})` }">
+                    <div class="buttons">
+                        <button v-for="(bg, index) in backgrounds" :key="index"
+                            :class="{ active: index === currentIndex }" @click="changeBackground(index)">
+                            {{ labels[index] }}
+                        </button>
+                    </div>
+                </div>
+                <div class="list-img">
+                    <img src="@/assets/image/img-cateory3.png" />
+                    <img src="@/assets/image/img-cateory1.png" />
+                    <img src="@/assets/image/img-cateory2.png" />
 
-                            </div>
-                        </el-tab-pane>
-                        <el-tab-pane label="Vạn Cổ Tối Cường" name="third">
-                            <div class="d-flex">
-                                <img src="@/assets/image/img-cateory3.png" />
-                                <img src="@/assets/image/img-cateory2.png" />
-                                <img src="@/assets/image/img-cateory1.png" />
-
-                            </div>
-                        </el-tab-pane>
-                        <el-tab-pane label="Quỷ Bí Chi Chủ" name="fourth">
-                            <div class="d-flex">
-                                <img src="@/assets/image/img-cateory2.png" />
-                                <img src="@/assets/image/img-cateory1.png" />
-                                <img src="@/assets/image/img-cateory3.png" />
-
-                            </div>
-                        </el-tab-pane>
-                    </el-tabs>
                 </div>
             </div>
             <div class="col-3 p-0 banner-newfeeds">
@@ -71,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onUnmounted } from 'vue'
 import { Edit } from '@element-plus/icons-vue'
 import { spaceProps } from 'element-plus'
 import storyIcon from '@/assets/icon/StoryIcon.png'
@@ -112,7 +88,7 @@ async function getNotification() {
         topic: b.topic_title,
         text: b.title,
         link: b.post_id
-    }));
+    })).slice(0, 5);
 }
 const items = [
     { image: storyIcon, text: 'Linh dị', number: '236460', id: 1 },
@@ -157,18 +133,41 @@ const loadAll = () => {
         { value: 'babel', link: 'https://github.com/babel/babel' },
     ]
 }
-const handleSelect = (item: Record<string, any>) => {
-    console.log(item)
+const labels = ['TTV Translate', 'Lâm Uyên Hành', 'Vạn Cổ Tối Cường', 'Quỷ Bí Chi Chủ', 'Phàm Nhân Tu Tiên']
+const backgrounds = [
+     new URL('@/assets/image/link.jpg', import.meta.url).href,
+    'https://www.quehuong.org.vn/wp-content/uploads/2018/07/dung-noi-chuyen-voi-co-ay.jpg',
+    'https://cdn-media.sforum.vn/storage/app/media/wp-content/uploads/2024/01/hinh-nen-anime-thumb.jpg',
+    'https://i.pinimg.com/736x/3a/20/8e/3a208e3d33f2d65b18588a3f2060d65a.jpg',
+    'https://www.quehuong.org.vn/wp-content/uploads/2018/07/dung-noi-chuyen-voi-co-ay.jpg',
+]
+
+const currentIndex = ref(0)
+const currentBg = ref(backgrounds[currentIndex.value])
+
+function changeBackground(index) {
+    currentIndex.value = index
+    currentBg.value = backgrounds[index]
+}
+let timer = null
+function autoChange() {
+  timer = setTimeout(() => {
+    currentIndex.value = (currentIndex.value + 1) % backgrounds.length
+    currentBg.value = backgrounds[currentIndex.value]
+    autoChange() // gọi lại chính nó
+  }, 2000)
 }
 
 const handleIconClick = (ev: Event) => {
     console.log(ev)
 }
 onMounted(async () => {
+    autoChange()
     links.value = loadAll();
     await getNotification();
 
 })
+onUnmounted(() => clearTimeout(timer))
 </script>
 <style>
 .tabs-category .el-tabs__item {
@@ -194,13 +193,18 @@ onMounted(async () => {
     width: 100%;
 }
 
-.banner-tabs {
+.tabs-category {
     position: relative;
-    top: -46px;
 }
 
+.tabs-category .el-tabs__header {
+    position: relative;
+    bottom: 0px;
+}
+
+
 .banner-tabs .el-tabs__header {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .banner-tabs .el-tabs__header .el-tabs__item {
@@ -208,6 +212,57 @@ onMounted(async () => {
 }
 </style>
 <style scoped>
+.banner-top {
+    height: 250px;
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.el-menu-story .list-img {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 cột bằng nhau */
+    width: 100%;
+    padding-top: 20px;
+}
+
+.el-menu-story .list-img img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+}
+
+.banner-top button {
+    background-color: rgba(0, 0, 0, 0.6);
+    border: none;
+    font-size: 10px;
+    color: #fff;
+}
+
+.banner-top button.active {
+    background-color: #BF2C24;
+}
+
+.banner-top .buttons {
+    display: flex;
+    position: relative;
+    top: 88%;
+}
+
+.banner-top .buttons button {
+    flex: 1;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+    /* viền giữa */
+}
+
+.buttons button:last-child {
+    border-right: none;
+}
+
 .menu-category span {
     text-align: left;
 }
@@ -243,10 +298,6 @@ onMounted(async () => {
 .banner-tabs .el-menu-item {
     height: auto !important;
     padding: 0 10px;
-}
-
-.el-menu-story .el-tab-pane img {
-    max-width: 33%;
 }
 
 .banner-newfeeds img {

@@ -2,7 +2,7 @@
     <div v-loading="loading" class="comment-box px-3 pb-2 pt-3 mt-3">
         <div class="post-main__info d-flex justify-content-between gap-1">
             <div class="d-flex align-items-start">
-                <img style="max-width: 40px;" :src="authStore.user.link_thumbnail" alt="">
+                <img style="max-width: 40px;" :src="authStore.user?.link_thumbnail" alt="">
             </div>
             <el-mention v-model="commentContent" type="textarea" placeholder="Thêm bình luận của bạn"
                 style="height: 100px; resize: none;" />

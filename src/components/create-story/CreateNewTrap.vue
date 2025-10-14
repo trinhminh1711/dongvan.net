@@ -1,20 +1,28 @@
 <template>
-    <div class="container">
+    <div v-if="categoryList?.length > 0" class="container">
         <div class="row mt-4">
             <div v-for="stories in categoryList" :key="stories.id" class="box-left__content col-6">
                 <img class="img-cover" :src="stories.urlImg" alt="">
                 <div class="left-content">
-                    <router-link  :to="{ name: 'story', params: { id: stories.story_id } }"><h4 class="text-color_primary fw-bold hover_link">{{ stories.title }}</h4></router-link>
+                    <router-link :to="{ name: 'story', params: { id: stories.story_id } }">
+                        <h4 class="text-color_primary fw-bold hover_link">{{ stories.title }}</h4>
+                    </router-link>
                     <p class="color-red fst-italic">
                         <span class="text-md">
-                            <span class="fw-bold">{{ stories.last_chap_number ?? 1  }}</span> chương</span></p>
-                    <p class="text-md fw-semibold py-2"> Chương đang viết: [Chương {{  stories.last_chap_number ?? 1 }}] {{ stories.last_chapter_title }} </p>
+                            <span class="fw-bold">{{ stories.last_chap_number ?? 1 }}</span> chương</span>
+                    </p>
+                    <p class="text-md fw-semibold py-2"> Chương đang viết: [Chương {{ stories.last_chap_number ?? 1 }}]
+                        {{ stories.last_chapter_title }} </p>
                     <button @click="$router.push(`/create-story/new-chap/${stories.story_id}`)"
                         class="btn-alert my-4">Đăng chương</button>
                 </div>
             </div>
         </div>
 
+    </div>
+    <div v-if="!categoryList?.length > 0">
+        <img style="display: block; margin: 0 auto;" src="@/assets/icon/nodata.png" />
+        <p style="text-align: center;">Không có dữ liệu</p>
     </div>
 </template>
 
@@ -29,8 +37,6 @@ const currentPage = 1
 const categoryList = ref([]);
 onMounted(async () => {
     const res = await getStory(auth.userId)
-    console.log(res);
-    
     categoryList.value = res
 })
 function handlePageChange(page) {

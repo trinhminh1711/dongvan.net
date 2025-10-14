@@ -1,5 +1,5 @@
 <template>
-    <h3 class="list-title text-color_primary">Chương mới cập nhật</h3>
+    <h3 class="list-title text-color_primary border-b pb-2">Chương mới cập nhật</h3>
     <div class="list-container">
         <div @click="gotoChapDetail(item.story_id, item.chap_number)" v-for="(item, index) in items" :key="index"
             class="list-item">

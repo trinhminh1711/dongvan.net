@@ -31,7 +31,7 @@
                         Giới thiệu
                     </span>
                 </template>
-                <el-mention placeholder="Giới thiệu ngắn" v-model="ruleForm.storyDesc" type="textarea" />
+                <el-mention placeholder="Phần giới thiệu truyện là ấn tượng đầu tiên mà bạn tạo ra với người đọc – hãy tận dụng cơ hội này để truyền tải nội dung cốt lõi, điểm hấp dẫn và phong cách riêng của bạn. Giới thiệu càng rõ ràng, mạch lạc và thu hút thì càng có nhiều người muốn theo dõi truyện!" v-model="ruleForm.storyDesc" type="textarea" />
             </el-form-item>
             <el-form-item class="list-imageupload">
                 <template #label>
@@ -161,12 +161,10 @@ const handleFileChange = (file: UploadFile) => {
 }
 
 const submitForm = async () => {
-    console.log(ruleFormRef);
-    
     if (!ruleFormRef.value) return
     await ruleFormRef.value.validate(async (valid, fields) => {
-        const toastAddStories = toast.loading("Đang xử lý...");
         if (valid) {
+            const toastAddStories = toast.loading("Đang xử lý...");
             const res = await createStory(ruleForm)
             if (res.success) {
                 toast.remove(toastAddStories);
@@ -177,9 +175,10 @@ const submitForm = async () => {
             }
 
         } else {
-            console.log('error submit!', fields)
+            toast.error("Thông tin truyện không hợp lệ");
         }
     })
+  
 }
 const upload = ref<UploadInstance>()
 

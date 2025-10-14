@@ -9,12 +9,15 @@
                     <p class="color-red fst-italic"><span class="fw-bold text-md">
                         {{ stories.last_chap_number > 0 ? stories.last_chap_number + ' Chương' : 'Chưa đăng chương' }}</span><span class="text-md"></span></p>
                     <p class="text-sm"> Chương đang đọc: [Chương 1] Trùng Sinh Tỉnh Lại </p>
-                     <button v-if="!stories.last_chapter_is_final" class="btn-alert my-3">Đăng Chương</button>
+                     <button  @click="$router.push(`/create-story/new-chap/${stories.story_id}`)" v-if="!stories.last_chapter_is_final" class="btn-alert my-3">Đăng Chương</button>
                     <button v-if="stories.last_chapter_is_final" class="btn-success my-3">Hoành thành</button>
                 </div>
             </div>
         </div>
-
+        <div v-if="!categoryList.length">
+            <img style="display: block; margin: 0 auto;" src="@/assets/icon/nodata.png" />
+            <p style="text-align: center;">Không có dữ liệu</p>
+        </div>
     </div>
 </template>
 

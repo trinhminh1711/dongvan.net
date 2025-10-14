@@ -6,11 +6,11 @@
         <ListStory />
       </div>
       <div class="col-6 el-menu-story">
-        <h3 class="text-color_primary fw-bold text-start">Biên tập viên đề cử</h3>
-        <div class="container text-center border-bottom py-4">
+        <h3 class="text-color_primary fw-bold text-start border-b pb-2">Biên tập viên đề cử</h3>
+        <div class="container text-center border-bottom pt-3 pb-5">
           <SliderCenter />
         </div>
-        <div class="container text-center py-4">
+        <div class="container text-center pt-2">
           <div class="row align-items-center gap-10">
             <div v-for="(item, index) in dataPropose" :key="index" class="col-4 px-2 mb-2">
               <p class="text-start text-md fw-bold mt-1 text-capitalize text-nowrap">{{ item.title }}</p>
@@ -23,9 +23,9 @@
             </div>
           </div>
         </div>
-        <div class="container text-center mt-5">
+        <div class="container text-center mt-3">
           <div class="row align-items-center gap-3 flex-nowrap">
-            <div class="col-6 px-2 mb-2 d-flex story-card__horizontal color-layout">
+            <div @click="goToStory(28)" class="col-6 px-2 mb-2 d-flex story-card__horizontal color-layout hover-link">
               <div>
                 <h4 class="color-yellow fw-semibold">Tiêu Sơn Tráng Sĩ</h4>
                 <p class="text-color_primary text-sm">[cao định hai mươi ngàn, tinh phẩm bảo đảm ] Tỉnh dậy, Lục </p>
@@ -36,7 +36,7 @@
             </div>
             <div class="col-6 px-2 mb-2 d-flex story-card__horizontal color-layout">
               <div>
-                <h4 class="color-blue fw-semibold">Việt Nam Sử Lược</h4>
+                <h4 @click="goToStory(29)" class="color-blue fw-semibold hover-link">Việt Nam Sử Lược</h4>
                 <p class="text-color_primary text-sm">Cảnh Huyên xuyên qua đến một cái chư quốc loạn chiến, rung </p>
               </div>
               <div class="story-card__img">
@@ -50,8 +50,8 @@
         <ReviewStory />
       </div>
     </div>
-    <div class="row align-items-start mt-5 justify-content-between">
-      <div class="row col-3 px-0 d-flex align-items-center">
+    <div id="ranking" class="row align-items-start mt-5 justify-content-between">
+      <div style="border-radius: 10px; background: linear-gradient(to bottom, #F3FAFF 0%, #F3FAFF 55%, #FCFEFF 100%);"  class="row py-4 col-3 px-0 d-flex align-items-center">
         <RankingList :items="topUserReadersRecoment">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
@@ -61,7 +61,7 @@
         </RankingList>
 
       </div>
-      <div class="row col-3 px-0 d-flex align-items-center">
+      <div style="border-radius: 10px; background: linear-gradient(to bottom, #FFF7EC 0%, #FFF7EC 55%, #FFFDF9 70%, #FFFDF9 100%);"  class="row col-3 px-0 py-4 d-flex align-items-center">
         <RankingList :items="topStoryRead">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
@@ -71,17 +71,17 @@
         </RankingList>
 
       </div>
-      <div class="row col-3 px-0 d-flex align-items-center">
+       <div style="border-radius: 10px; background: linear-gradient(to bottom, #FFF7EC 0%, #FFF7EC 55%, #FFFDF9 70%, #FFFDF9 100%);" class="row col-3 px-0 py-4 d-flex align-items-center">
         <RankingList :items="topStoryMonthRead">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
-            <h3 class="topvote-title color-light-blue">Đọc nhiều trong tháng </h3>
+            <h3 style="color:#EAAE00 ;" class="topvote-title color-light-blue">Đọc nhiều trong tháng </h3>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon2.svg" alt="">
           </template>
         </RankingList>
 
       </div>
-      <div class="row col-3 px-0 d-flex align-items-center">
+      <div style="border-radius: 10px; background: linear-gradient(to bottom, #F3FAFF 0%, #F3FAFF 55%, #FCFEFF 100%);" class="row py-4  col-3 px-0 d-flex align-items-center">
         <RankingListUser :items="topAuthorWeek">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
@@ -163,6 +163,7 @@ import StoryCompleted from '@/components/homepage/StoryCompleted.vue'
 import { getTopUserRead } from '../api/chapter'
 import { getTopStoryReaded, getTopStoryReadedMonth, getTopAuthorWeek, getTopUserReaders, getListStoryUpdatedNew, getTopStoryRecomment } from '../api/stories'
 const activeName = ref('first')
+import { useRouter } from 'vue-router'
 const topUserRead = ref()
 const topStoryRead = ref()
 const topAuthorWeek = ref()
@@ -174,6 +175,13 @@ const topStoryUpdatedNew = ref()
 const items = ref([
   { title: "mock", text: "mock text" }
 ]);
+const router = useRouter()
+function goToStory(post_id) {
+    router.push({
+        name: 'story',   // Tên route bạn đã định nghĩa trong router/index.js
+        params: { id: post_id }       // Truyền param id
+    })
+}
 const handleClick = (tab: TabsPaneContext, event: Event) => {
 
 };
@@ -223,6 +231,10 @@ const dataPropose = [
 </script>
 
 <style>
+.topvote-title
+{
+  font-weight: bold;
+}
 .demo-tabs>.el-tabs__content {
   color: #6b778c;
   font-size: 32px;

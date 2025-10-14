@@ -22,7 +22,10 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 app.component('QuillEditor', QuillEditor)
 app.use(Vue3Toastify, {
-  autoClose: 3000,  // 3 giây tự động tắt
+  timeout: 2000, // 2s
+  closeOnClick: true,
+  pauseOnFocusLoss: true,
+  pauseOnHover: true,
   position: "top-right"
 })
 app.use(ElementPlus)

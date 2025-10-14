@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div v-show="!showCommitPage" class="container">
         <el-form class="form-createstory mt-5" :model="newChapForm" :rules="rules" ref="ruleFormRef" label-width="auto">
             <el-form-item prop="chapNumber">
                 <template #label><span class="form-createstory__label align-middle">Chương thứ
@@ -51,7 +51,7 @@
                     <Back />
                 </el-icon><span class="fw-semibold ms-1">Quay lại</span>
             </button>
-            <button @click="submitForm" style="display: block;" class="btn-alert my-4 fw-semibold">
+            <button @click="validateForm()" style="display: block;" class="btn-alert my-4 fw-semibold">
                 Đăng chương
             </button>
         </div>
@@ -70,10 +70,46 @@
             </div>
         </el-dialog>
     </div>
+    <div v-show="showCommitPage" class="container">
+        <h2>Cam kết</h2>
+        <div style="line-height: 2;">
+            <p>
+                Tôi. [Tên tác giả/Bút danh], chủ tài khoản [Tên tài khoản tác giả] tại Đông Văn, xin cam kết tuân thủ
+                các quy định và chính sách nội dung của nền tảng như sau:
+            </p>
+            <p class="fw-semibold">
+                1. Mọi tác phẩm đăng tải là nguyên bản, do chính tôi sáng tác và thuộc quyền sở hữu hợp pháp của
+                tôi.<br></br>
+                2.Tôi cam kết không sao chép, sử dụng trái phép, hay vi phạm bản quyền nội dung của cá nhân/tổ chức
+                khác.<br></br>
+                3. Tôi cam kết không đăng tải nội dung chống phá nhà nước, xuyên tạc lịch sử.<br></br>
+                4. Tôi cam kết không kỳ thị, miệt thị, bôi nhọ, xúc phạm, chia rẽ liên quan đến sắc tộc, giới Tôi cam
+                kết
+                không đăng tải nội dung khiêu dâm, đồi trụy, mô tả chi tiết hành vi tình dục phản cảm.<br></br>
+                5. Tôi cam kết không cổ súy, hướng dẫn các hành vi vi phạm pháp luật, tệ nạn xã hội (ma túy, cờ bạc, mại
+                dâm, bạo lực...), không xuyên tạc giá trị văn hóa, lịch sử, hoặc xúc phạm danh nhân. <br></br>6. Mọi nội
+                dung đăng
+                tải phải tuân thủ pháp luật Việt Nam về quản lý thông tin
+                trên mạng.
+                Bằng việc nhấn nút "Đồng ý", tôi xác nhận đã đọc, hiểu và đồng ý hoàn toàn với các điều khoản nêu trên.
+                Tôi
+                chịu trách nhiệm hoàn toàn về nội dung mà tôi đăng tải trên nền tảng Đông Văn.</p>
+        </div>
+        <div class="d-flex gap-4 justify-content-end">
+            <button class="btn-outline-primary my-4 align-middle" @click="showCommitPage = false">
+                <el-icon>
+                    <Back />
+                </el-icon><span class="fw-semibold ms-1">Quay lại</span>
+            </button>
+            <button @click="submitForm()" style="display: block;" class="btn-alert my-4 fw-semibold">
+                Xác nhận
+            </button>
+        </div>
+    </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import EditorUI from '../text-editor/EditorUI.vue'
 import { getLastChapter, postNewChapter } from "@/api/chapter"
@@ -83,6 +119,7 @@ const isCreateChapVip = ref(false)
 const ruleFormRef = ref<FormInstance>()
 const emit = defineEmits(["created-success"])
 const router = useRouter();
+const showCommitPage = ref(false)
 const route = useRoute();
 interface chapData {
     chapNumber: number,
@@ -140,10 +177,19 @@ const checkCondition = (value) => {
     }
 
 }
+const validateForm = () => {
+    if (!ruleFormRef.value) return 0
+    ruleFormRef.value.validate(async (valid, fields) => {
+        if (valid) {
+            showCommitPage.value = true
+        } else {
+            toast.error("Vui lòng điền đầy đủ thông tin", fields);
+        }
+    })
+}
 const submitForm = async () => {
     const toastAddChapter = toast.loading("Đang xử lý...");
     if (!ruleFormRef.value) return
-    console.log(newChapForm);
     await ruleFormRef.value.validate(async (valid, fields) => {
         if (valid) {
             newChapForm.story_id = Number(route.params.storyId)
@@ -165,23 +211,24 @@ const submitForm = async () => {
         }
     })
 }
+
 function countWordsFromHtml(html) {
     const text = html.replace(/<[^>]+>/g, '').trim()
     if (!text) return 0
     return text.split(/\s+/).length
 }
 
-onMounted(async () => {
-    const res = await getLastChapter(route.params.storyId)
-    console.log(res);
+onMounted(
+    async () => {
+        const res = await getLastChapter(route.params.storyId)
+        console.log(res);
 
-    if (res.status == 404) {
-        newChapForm.chapNumber = 1;
-    }
-    else {
-        newChapForm.chapNumber = res.chap_number + 1
-    }
-
-})
+        if (res.status == 404) {
+            newChapForm.chapNumber = 1;
+        }
+        else {
+            newChapForm.chapNumber = res.chap_number + 1
+        }
+    })
 </script>
 <style></style>
