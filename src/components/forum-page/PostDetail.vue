@@ -2,29 +2,37 @@
     <div v-if="postData">
         <div>
             <div>
-                <h2 class="text-color_primary fw-bold"><el-icon>
-                        <Back />
-                    </el-icon> {{ postData[0].title }}</h2>
+                <h2 class="text-color_primary fw-bold d-flex gap-2 align-items-center cursor-pointer">
+                    <div @click="goBack()">
+                        <el-icon>
+                            <Back />
+                        </el-icon>
+                    </div>
+                    {{ postData[0].title }}
+                </h2>
             </div>
         </div>
         <div class="post-main p-3 mt-3">
             <div class="post-main__info d-flex align-items-center gap-1">
-                <img style="max-width: 50px;" :src="postData[0].post_link_thumbnail" alt="">
-                <p class="ms-3"> <span class="fw-bold">{{ postData[0].post_username }}</span> <span class="text-sm ms-2">{{
-                    timeAgo(postData[0].created_at) }}</span></p>
+                <img style="width: 50px; height: 50px; border-radius: 50%;" :src="postData[0].post_link_thumbnail"
+                    alt="">
+                <p class="ms-3"> <span class="fw-bold">{{ postData[0].post_username }}</span> <span
+                        class="text-sm ms-2">{{
+                            timeAgo(postData[0].created_at) }}</span></p>
             </div>
-            <div  class="post-main__content text-sm ps-5 pe-3 mt-3">
+            <div class="post-main__content text-sm ps-5 pe-3 mt-3">
                 <div v-html="postData[0].content"></div>
                 <div class="post-comment">
                     <p class="like-share d-flex gap-4 py-4">
-                        <span class="d-flex align-items-center gap-2 text-md">
-                            <svg width="20" height="18" viewBox="0 0 20 18" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
+                        <span @click="likePost(postData[0].post_id)"
+                            class="d-flex align-items-center gap-2 cursor-pointer text-md">
+                            <svg width="20" height="18" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
                                     d="M9.99431 3.27985C8.32819 1.332 5.54981 0.808035 3.46227 2.59168C1.37472 4.37532 1.08083 7.35748 2.72019 9.467C4.0832 11.2209 8.20816 14.9201 9.5601 16.1174C9.71136 16.2513 9.78698 16.3183 9.8752 16.3446C9.95219 16.3676 10.0364 16.3676 10.1134 16.3446C10.2016 16.3183 10.2773 16.2513 10.4285 16.1174C11.7805 14.9201 15.9054 11.2209 17.2684 9.467C18.9078 7.35748 18.6498 4.35656 16.5264 2.59168C14.4029 0.826798 11.6604 1.332 9.99431 3.27985Z"
-                                    stroke="#667085" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    :fill="isLiked ? '#FF0000' : 'none'" :stroke="isLiked ? 'none' : '#667085'"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
-                            {{ postData[0].total_likes }}
+                            {{ listLiked?.total_likes || 0 }}
                         </span>
                         <span class="d-flex align-items-center gap-2 text-md">
                             <svg width="21" height="20" viewBox="0 0 21 20" fill="none"
@@ -41,29 +49,41 @@
             </div>
 
         </div>
-        <div class="post__comment mt-5">
-            <h4 v-if=" showComment" class=" mb-3 fw-bold">Bình luận ({{ listComment.length }})</h4>
+        <div class="post__comment mt-5 ms-2">
+            <h4 v-if="showComment" class=" mb-3 fw-bold">Bình luận ({{ listComment.length }})</h4>
         </div>
     </div>
-    <PostComment v-if="showComment" v-for="value in listComment" :comment_id = "value.comment_id" :like ="value.comment_total_likes" 
-    :user="value.comment_username" :user_thumbnail="value.comment_link_thumbnail" :comment="value.comment_content" :date="value.comment_created_at" />
-    <div class="post__comment mt-5">
+    <PostComment v-if="showComment" v-for="value in listComment" :comment_id="value.comment_id"
+        :like="value.comment_total_likes" :user="value.comment_username" :user_thumbnail="value.comment_link_thumbnail"
+        :comment="value.comment_content" :date="value.comment_created_at" />
+    <div class="post__comment">
 
         <div class="user-comment">
-            <InputCommentPost :postId="Number(route.params.id)"/>
+            <InputCommentPost :postId="Number(route.params.id)" />
         </div>
     </div>
 </template>
 <script setup lang="ts">
+import { toggleLike, getListLikePost } from '../../api/forum';
 import PostComment from './PostComment.vue';
 import { useRoute } from "vue-router";
+import { useRouter } from 'vue-router'
 import { getPostDetail } from '@/api/forum';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
+import { useAuthStore } from "@/stores/auth";
+const isLiked = ref(false)
 import InputCommentPost from './inputCommentPost.vue';
 const route = useRoute();
+const auth = useAuthStore()
 const showComment = ref()
 const postData = ref();
+const listLiked = ref()
 const listComment = ref([])
+const router = useRouter()
+
+function goBack() {
+  router.back()
+}
 onMounted(async () => {
     const postId = route.params.id;
     const res = await getPostDetail(postId);
@@ -77,9 +97,16 @@ onMounted(async () => {
         comment_content: item.comment_content,
         comment_created_at: item.comment_created_at,
         comment_total_likes: item.comment_total_likes
-    }))
-    
+    }));
+    getListLike()
 })
+async function getListLike() {
+    const res = await getListLikePost(route.params.id);
+    listLiked.value = res
+    isLiked.value = res.liked_users.some(
+        (u) => u.user_id == auth.userId
+    );
+}
 function timeAgo(isoString) {
     const now = new Date();
     const past = new Date(isoString);
@@ -101,7 +128,11 @@ function timeAgo(isoString) {
         return `${diffMonths} tháng trước`;
     }
 }
-
+async function likePost(id) {
+    isLiked.value = !isLiked.value // đảo trạng thái like
+    await toggleLike(auth.userId, id)
+    await getListLike()
+}
 // ví dụ test
 
 </script>
@@ -115,5 +146,9 @@ function timeAgo(isoString) {
 .post-main__content {
     line-height: 1.5rem;
 
+}
+
+.cursor-pointer:hover {
+    cursor: pointer;
 }
 </style>

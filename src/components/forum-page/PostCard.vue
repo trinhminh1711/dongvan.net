@@ -39,7 +39,7 @@
                 {{ topic_title }}
             </button>
         </div>
-        <h3 class="post-title fw-bold mt-3">{{ title }}</h3>
+        <h3 @click="gotoPost(postId)" class="post-title fw-bold mt-3 hover-link">{{ title }}</h3>
         <div class="d-flex gap-3 align-items-center mt-3">
             <p class="d-flex gap-1 align-items-center">
                 <el-icon>
@@ -73,6 +73,12 @@
 </template>
 
 <script lang="ts" setup>
+import { useRoute } from "vue-router";
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute();    
+
 import CreatePostForum from './CreatePostForum.vue';
 import { computed } from 'vue';
 const topicColor = computed(() => {
@@ -85,6 +91,7 @@ const topicColor = computed(() => {
 });
 const props = defineProps({
     STT: Number,
+    postId:Number,
     topic_id: Number,
     title: String,
     username: String,
@@ -96,6 +103,12 @@ const props = defineProps({
     hashtag: String,
     isActive: Boolean
 })
+function gotoPost(postId) {
+    router.push({
+        name: 'post-detail',   // Tên route bạn đã định nghĩa trong router/index.js
+        params: { id: postId }       // Truyền param id
+    })
+}
 </script>
 
 <style scoped>

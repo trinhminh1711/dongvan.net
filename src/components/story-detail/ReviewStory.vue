@@ -39,7 +39,7 @@
       </div>
     </div>
   </div>
-  <el-dialog v-model="rateDialog" title="Đánh giá và nhận xét" width="500" :before-close="handleClose">
+  <el-dialog v-model="rateDialog" title="Đánh giá và nhận xét" width="500">
     <div class="d-flex align-items-center gap-2">
       <span class="fw-bold">Đánh giá</span>
       <el-rate v-model="rateValue" :texts="['Chưa hay', 'Bình thường', 'Tạm được', 'Khá hay', 'Tuyệt vời']" show-text />
@@ -63,7 +63,7 @@ import { toast } from "vue3-toastify"; // nếu dùng toast
 const auth = useAuthStore();
 const props = defineProps({
   story_id: {
-    type: Number,
+    type: [Number, String],
     required: true
   },
 })
@@ -94,7 +94,6 @@ async function getRateting() {
   rateData.value.forEach(r => {
     ratingCounts.value[r.rating] = (ratingCounts.value[r.rating] || 0) + 1;
   });
-  console.log(ratingCounts);
 }
 const getPercentage = (star) => {
   const total = Object.values(ratingCounts.value).reduce((a, b) => a + b, 0);

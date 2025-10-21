@@ -6,13 +6,13 @@
             </div>
             <!-- Cột ảnh bìa -->
             <div v-if="!loading" class="col-md-4 text-center">
-                <img :src="storyData.urlImg" fit="cover" style="width: 70%; border-radius: 12px;" />
+                <img :src="storyData?.urlImg" fit="cover" style="width: 70%; border-radius: 12px;" />
             </div>
 
             <!-- Cột nội dung -->
             <div v-if="!loading" class="col-md-8">
                 <!-- Tiêu đề + rating -->
-                <h3 class="fw-bold">{{ storyData.story_title }}</h3>
+                <h3 class="fw-bold">{{ storyData?.story_title }}</h3>
                 <div class="d-flex align-items-center mb-3">
                     <el-rate v-model="rating" disabled show-score text-color="#ff9900" />
                     <span class="ms-3 text-muted">0 đánh giá</span>
@@ -73,15 +73,15 @@
                             src="@/assets/icon/book.png" alt=""><span class="fw-bold"> Đọc truyện ngay</span></button>
                 </div>
                 <!-- Mô tả -->
-                <p :class="!isExpanded ? 'text-four-line' : ''" class="text-secondary mt-5 ">{{ storyData.description }}
+                <p :class="!isExpanded ? 'text-four-line' : ''" class="text-secondary mt-5 ">{{ storyData?.description }}
 
                 </p>
-                <a class="text-link" v-if="storyData.description.length > 100" @click="toggleExpand" type="primary">
+                <a class="text-link" v-if="storyData?.description.length > 100" @click="toggleExpand" type="primary">
                     {{ isExpanded ?
                         'Thu gọn' : 'Xem thêm' }}</a>
                 <div class="mt-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="fw-bold">Danh sách chương ( {{ fullStoryData.data.length }})</h3>
+                        <h3 class="fw-bold">Danh sách chương ({{ fullStoryData.data.length }})</h3>
                         <el-select v-model="sort" placeholder="Sắp xếp" size="small" style="width: 150px">
                             <el-option label="Mới nhất" value="desc" />
                             <el-option label="Cũ nhất" value="asc" />
@@ -89,7 +89,7 @@
                     </div>
                     <div>
                         <el-table :data="chapters" style="width: 100%">
-                            <el-table-column min-width="200">
+                            <el-table-column min-width="250">
                                 <template #default="scope">
                                     <p><span v-if="scope.row.is_vip" class="me-2">
                                             <img src="@/assets/icon/key.png" alt="">
@@ -111,8 +111,7 @@
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <div class="d-flex justify-content-end mt-3"> <el-pagination layout="prev, pager, next"
-                                :total="50" /></div>
+                        <div class="d-flex justify-content-end mt-3"> </div>
                     </div>
                 </div>
             </div>
@@ -142,7 +141,7 @@
                 <ReviewStory :story_id="route.params.id" />
             </el-tab-pane>
         </el-tabs>
-        <el-dialog v-model="voteDialog" title="Đề cử" width="500" :before-close="handleClose">
+        <el-dialog v-model="voteDialog" title="Đề cử" width="500">
             <span class="fw-bold text-color_primary text-md ">Số lượng Tang Diệp đề cử</span>
             <el-input class="mt-1" v-model="inputCoinVote" placeholder="10" />
             <ul class="list-note mt-3">
@@ -153,7 +152,7 @@
             <button @click="onVote()" style="width: 100%; height: 40px;" class="btn-alert mt-3"><span class="py-2">Đề
                     cử</span></button>
         </el-dialog>
-        <el-dialog v-model="rateDialog" title="Đánh giá và nhận xét" width="500" :before-close="handleClose">
+        <el-dialog v-model="rateDialog" title="Đánh giá và nhận xét" width="500">
             <div class="d-flex align-items-center gap-2">
                 <span class="fw-bold">Đánh giá</span>
                 <el-rate v-model="rateValue" :texts="['Chưa hay', 'Bình thường', 'Tạm được', 'Khá hay', 'Tuyệt vời']"
@@ -168,7 +167,7 @@
                     nhận
                     xét</span></button>
         </el-dialog>
-        <el-dialog v-model="giftDialog" title="Đánh giá và nhận xét" width="500" :before-close="handleClose">
+        <el-dialog v-model="giftDialog" title="Đánh giá và nhận xét" width="500">
             <div class="gap-2">
                 <span>Số lượng Tang diệp ủng hộ</span>
                 <span>

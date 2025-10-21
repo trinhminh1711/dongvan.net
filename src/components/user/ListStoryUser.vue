@@ -3,7 +3,7 @@
         <div v-if="categoryList.length" class="row">
             <div v-for="(stories, index) in categoryList" :key="index" class="box-left__content col-md-6">
                 <div class="book-card col-4">
-                    <img style="max-width: 100%;" class="d-block" :src="stories.urlImg" alt=""></img>
+                    <img style="width: 150px; height: auto; border-radius: 10px;" class="d-block" :src="stories.urlImg" alt=""></img>
                 </div>
                 <div class="left-content col-8">
                     <p class="text-color_primary fw-bold text-lg">{{ stories.title }}</p>
@@ -34,7 +34,7 @@ const currentPage = 1
 const categoryList = ref([]);
 const props = defineProps({
     userId: {
-        type: Number,
+        type: [Number, String],
         required: true
     },
 })
@@ -103,6 +103,7 @@ onMounted(async () => {
 .box-left__content {
     display: flex;
     padding: 10px;
+
 }
 
 .box-left__content .left-content {

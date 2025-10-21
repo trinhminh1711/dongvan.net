@@ -45,4 +45,3 @@ export const updateUserInfo = async (payload) => {
   }
 };
 
-

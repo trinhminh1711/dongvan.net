@@ -5,7 +5,7 @@
                 <img style="width: auto; max-height:100%; max-width:50px" :src="dataUser.link_thumbnail" alt=""></img>
             </div>
             <div>
-                <p> <span class="fw-bold text-color_primary">{{ dataUser.username }}</span><span style="color: #667085;"> (ID: 0000{{ dataUser.user_id }})</span></p>
+                <p> <span class="fw-bold text-color_primary">{{ dataUser.username }}</span><span style="color: #667085;"> (ID: 2025{{ dataUser.user_id }})</span></p>
                 <p style="color: #667085;">Người đọc cấp 2</p>
                  <p style="color: #667085;">Ngày tham gia: {{ dataUser.created_at.split("T")[0] }}</p>
             </div>
@@ -39,11 +39,8 @@ const props = defineProps({
 })
 const dataUser = ref()
 onMounted(async () => {
-    const res = await getPostUserInfo(1);
+    const res = await getPostUserInfo(props.idUserComment);
     dataUser.value = res
-    console.log(dataUser.value);
-
-
 })
 </script>
 

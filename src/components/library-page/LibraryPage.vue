@@ -1,5 +1,5 @@
 <template>
-  <div class="container d-flex justify-content-center">
+  <div class="container">
     <el-tabs v-model="activeName" class="tab-name__center" @tab-click="handleClick">
       <el-tab-pane label="Đang đọc" name="first"><LibraryReadingList /></el-tab-pane>
       <el-tab-pane label="Yêu thích" name="second"> <LibraryFavoriteList /> </el-tab-pane>

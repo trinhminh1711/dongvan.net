@@ -2,13 +2,15 @@
     <div>
         <LoadingSpiner :show="loading" />
     </div>
-    <div :style="{ backgroundColor: backgroundColor, color: textColor, transition: 'all 0.3s ease' }" v-if="!loading">
+    <div style="margin-top: -15px;"
+        :style="{ backgroundColor: backgroundColor, color: textColor, transition: 'all 0.3s ease' }" v-if="!loading">
         <div class="tab-bar">
             <button class="hover_link" @click="goBack"><el-icon style="color: white; font-size: 24px;">
                     <ArrowLeft />
                 </el-icon>
             </button>
-            <h4 class="text-white fw-bold text-md">{{ chapterData?.story_title }}</h4>
+            <h4 @click="gotoStory(chapterData?.story_id)" class="text-white fw-bold text-md hover-link">{{
+                chapterData?.story_title }}</h4>
             <div class="button-function">
                 <button @click="drawer = true, showOption = true"><img style="max-width: 40px;"
                         src="@/assets/icon/bookmark-add.png" alt=""></img></button>
@@ -16,11 +18,12 @@
                         src="@/assets/icon/icon-list.png" alt=""></img></button>
                 <button @click="drawer = true, showOption = false"><img style="max-width: 40px;"
                         src="@/assets/icon/icon-fontsize.png" alt=""></img></button>
-                <button><img style="max-width: 40px;" src="@/assets/icon/icon-maximize.png" alt=""></img></button>
+                <button @click="toggleFullScreen"><img style="max-width: 40px;" src="@/assets/icon/icon-maximize.png"
+                        alt=""></img></button>
             </div>
         </div>
-        <div class="container mt-3">
-            <div class="story">
+        <div style="padding-bottom: 140px;" class="container mt-3">
+            <div class="story story-content" :class="['story-content', { 'two-column': isTwoColumn }]">
                 <div :style="{ fontFamily: fontFamily, fontSize: fontSize + 'px', marginTop: '20px' }"
                     v-html="chapterData?.content"></div>
             </div>
@@ -53,6 +56,34 @@
                 </div>
             </div>
         </div>
+
+        <div class="bottom-bar">
+            <div class="d-flex justify-content-center align-items-center">
+                <input :style="{
+                    background: `linear-gradient(to right, #d6cbcb 0%, #d6cbcb ${scrollPercent}%, #a3a2a2 ${scrollPercent}%, #a3a2a2 100%)`
+                }" type="range" min="0" max="100" step="0.1" v-model="scrollPercent" @input="onSeek"
+                    class="seek-bar" />
+                <span style="color: #d6cbcb;" class="percent-label">{{ scrollPercentLabel }}%</span>
+            </div>
+            <div class="bottom-bar__nextslide">
+                <div>
+                    <button @click="gotoChap(prevChap)" class="cursor-pointer" :disabled="!prevChap"
+                        :class="{ 'active-chap': prevChap }">
+                        <el-icon>
+                            <ArrowLeft />
+                        </el-icon> Chương trước
+                    </button>
+                </div>
+                <div>
+                    <button @click="gotoChap(nextChap)" class="cursor-pointer" :disabled="!nextChap"
+                        :class="{ 'active-chap': nextChap }">
+                        Chương sau <el-icon>
+                            <ArrowRight />
+                        </el-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
         <el-drawer v-model="drawer" direction="rtl" size="400px">
             <template #header>
                 <div class="flex items-center justify-between w-full">
@@ -60,8 +91,8 @@
                 </div>
             </template>
             <MenuBar :storyId="Number(route.params.id)" :chapterId="Number(route.params.chapId)" v-if="showOption" />
-            <MenuEditUI @change-font="handleFontChange" @changeTheme="handleTheme" @changeFontSize="handleFontSize"
-                v-if="!showOption" />
+            <MenuEditUI @set-layout="setLayout" :isTwoColumn="isTwoColumn" @change-font="handleFontChange"
+                @changeTheme="handleTheme" @changeFontSize="handleFontSize" v-if="!showOption" />
         </el-drawer>
         <el-dialog v-model="unlockChapterDialog" title="Mở khóa chương" width="300">
             <p class="mt-2">Chương sẽ mở: <strong style="color: #344054;">Chương {{ route.params.chapId }}</strong></p>
@@ -106,16 +137,18 @@
 <script lang="ts" setup>
 import MenuBar from '@/components/read-story/MenuBar.vue';
 import MenuEditUI from '@/components/read-story/MenuEditUI.vue';
-import { ref, onMounted, watch, onBeforeUnmount } from "vue";
+import { ref, onMounted, watch, onBeforeUnmount, onUnmounted, computed } from "vue";
 import { useRoute, onBeforeRouteLeave, useRouter } from "vue-router";
 import { getChapterWithId, updateMarkReadChapter } from '@/api/chapter';
-import { updateUserReadingBook, getNumberChapterStory, getNumberChapterNotPurchaseStory, unlockChapters } from '@/api/stories';
+import { updateUserReadingBook, getNumberChapterStory, getNumberChapterNotPurchaseStory, unlockChapters, getStoryFullInfo } from '@/api/stories';
 import { useAuthStore } from "@/stores/auth";
 import { getUserInfo } from '@/api/users';
 import { toast } from "vue3-toastify";
+import { } from '@/api/stories';
 const auth = useAuthStore();
 import LoadingSpiner from '@/components/loadding/LoadingSpiner.vue';
 const route = useRoute();
+const content = ref(null);
 const router = useRouter()
 const drawer = ref(false);
 const cointUser = ref();
@@ -133,6 +166,12 @@ const fontSize = ref(18); // px
 const liveTimeReadStory = ref();
 const startTime = ref(null)
 const required_time_seconds = ref();
+const storyFullInfo = ref
+const isTwoColumn = ref(false);
+const scrollPercent = ref(0);
+const prevChap = ref(null);
+const nextChap = ref(null);
+const currentChap = ref(Number(route.params.chapId));
 async function fetchChapter() {
     loading.value = true;
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -143,7 +182,6 @@ async function fetchChapter() {
         chapterData.value = res.data
         IsPurchased.value = res.IsPurchased
         required_time_seconds.value = (res.data.word_count / 1000) * 2
-        
     } catch (err) {
         console.error("Lỗi API:", err);
     } finally {
@@ -151,29 +189,51 @@ async function fetchChapter() {
     }
 
 }
+
+async function getChaptersAround() {
+    const res = await getStoryFullInfo(route.params.id)
+    if (res.data.length === 0) {
+        prevChap.value = null;
+        nextChap.value = null;
+        return;
+    }
+    const maxChap = Math.max(...res.data.map(ch => ch.chap_number));
+    const minChap = Math.min(...res.data.map(ch => ch.chap_number));
+    prevChap.value = currentChap.value > minChap ? currentChap.value - 1 : null;
+
+    // next: nếu < max thì tăng 1, nếu là chương cuối thì null
+    nextChap.value = currentChap.value < maxChap ? currentChap.value + 1 : null;
+    console.log(prevChap.value, nextChap.value, currentChap.value);
+
+}
 async function unlockChapter() {
     unlockChapterDialog.value = true
 
 }
-async function unlockFullChapterOpen() {
-    unlockFullChapterDialog.value = true
-    console.log("abc");
-    
-
+const scrollPercentLabel = computed(() => scrollPercent.value.toFixed(0));
+function setLayout(value) {
+    isTwoColumn.value = value;
 }
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
+
 async function unlockChap(chapter) {
 
     const listChap = [chapter]
     const res = await unlockChapters(route.params.id, auth.userId, listChap)
     if (res.status == 201) {
         toast.success("Mở khóa chương thành công");
-         window.location.reload();
+        window.location.reload();
     }
     else {
         toast.error(res.message, {
             toastId: "unlock-error"
         });
-         window.location.reload();
     }
 
 }
@@ -182,8 +242,9 @@ async function unlockFullChapter() {
     const res = await getNumberChapterNotPurchaseStory(route.params.id, auth.userId)
     const newArr = res.map(item => item.chap_number);
     const unlockChap = await unlockChapters(route.params.id, auth.userId, newArr)
-    chapterNumber.value = res 
-     }
+    console.log(res);
+
+}
 function handleFontSize(action) {
     if (action === "increase" && fontSize.value < 40) fontSize.value += 2;
     if (action === "decrease" && fontSize.value > 6) fontSize.value -= 2;
@@ -221,12 +282,42 @@ function goBack() {
     router.back()       // quay lại 1 bước trong history
     // hoặc: router.go(-1)
 }
+async function gotoChap(id) {
+    await getChaptersAround()
+    router.push({
+        name: "chap-detail",
+        params: {
+            id: route.params.id,
+            chapId: id
+        }
+    });
+
+}
+async function gotoStory(id) {
+    router.push({
+        name: "story",
+        params: { id },
+    });
+
+}
 async function updateReadingUser() {
     const storyId = route.params.id;
     const chapterId = route.params.chapId;
     const userId = auth.userId;
     const res = await updateUserReadingBook(userId, storyId, chapterId);
 
+}
+function updateScroll() {
+    const scrollTop = window.scrollY || window.pageYOffset;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    scrollPercent.value = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+}
+
+// Khi kéo seek bar
+function onSeek() {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollTo = (scrollPercent.value / 100) * docHeight;
+    window.scrollTo({ top: scrollTo, behavior: "auto" }); // có thể dùng "smooth"
 }
 watch(
     () => route.params,
@@ -239,9 +330,12 @@ watch(
 onMounted(async () => {
     await updateReadingUser()
     await fetchChapter();
+    await getChaptersAround()
     const res = await getUserInfo(auth.userId);
     cointUser.value = res.coin_balance
+    window.addEventListener("scroll", updateScroll);
 });
+onUnmounted(() => window.removeEventListener("scroll", updateScroll));
 onBeforeUnmount(() => {
     cleanupReadingTracker()
 })
@@ -250,6 +344,7 @@ onBeforeUnmount(() => {
 <style>
 .story {
     line-height: 2;
+
 }
 
 .tab-bar {
@@ -260,10 +355,54 @@ onBeforeUnmount(() => {
     padding: 10px 50px
 }
 
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-color: #3E3D43;
+    z-index: 9999;
+}
+
+.bottom-bar__nextslide {
+    background-color: #3E3D43;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0px 50px 20px 50px;
+    gap: 20px;
+}
+
+.bottom-bar button {
+    background-color: #49484E;
+    color: #AEAEAE;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+}
+
 .button-function {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.scroll-progress {
+    width: 80%;
+    height: 5px;
+    margin-top: 20px;
+    background-color: #e5e5e5;
+    z-index: 9999;
+}
+
+.scroll-progress .progress-bar {
+    height: 5px;
+    width: 0%;
+    background-color: #4f46e5;
+    transition: width 0.1s linear;
 }
 
 .tab-bar button {
@@ -279,7 +418,7 @@ onBeforeUnmount(() => {
     display: flex;
     justify-content: center;
     position: relative;
-    margin-top: 100px;
+    margin-top: 50px;
 }
 
 .unlock-chapter img {
@@ -324,5 +463,57 @@ onBeforeUnmount(() => {
 
 .dialog-footer button span {
     font-weight: 900;
+}
+
+.story-content {
+    column-count: 1;
+    /* Mặc định 1 cột */
+    column-gap: 40px;
+    line-height: 1.8;
+    text-align: justify;
+
+}
+
+.story-content.two-column {
+    column-count: 2;
+    /* Khi bật chế độ 2 cột */
+}
+
+.active-chap {
+    color: #FFFFFF !important;
+    background-color: #5B5A5D !important;
+}
+
+.seek-bar {
+    width: 80%;
+    /* tương tự thanh progress trước */
+    margin: 16px 5px;
+    display: block;
+    height: 8px;
+    -webkit-appearance: none;
+    border-radius: 3px;
+    background: #e5e5e5;
+    outline: none;
+}
+
+.seek-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #d6cbcb;
+    cursor: pointer;
+    border: none;
+    margin-top: 0px;
+}
+
+.seek-bar::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #4f46e5;
+    cursor: pointer;
+    border: none;
 }
 </style>

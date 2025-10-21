@@ -1,5 +1,5 @@
 <template>
-  <el-tabs v-if="storyData"  v-model="activeName">
+  <el-tabs v-if="storyData" v-model="activeName">
     <el-tab-pane label="Mục lục" name="first">
       <ul class="list-menu" style="list-style: none;">
         <li @click="gotoChap(value.chap_number)" class="my-3" v-for="(value, index) in bookIndex" :key="index">
@@ -28,13 +28,13 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const props = defineProps({
+  type: [Number, String],
   storyId: Number,
   chapterId: Number,
 });
 const storyData = ref(null)
 async function fetchChapter() {
   storyData.value = await getStoryFullInfo(props.storyId);
-    console.log(storyData.value);
 
   bookIndex.value = (storyData.value.data).map(chap => ({
     chap_number: chap.chap_number,
@@ -56,12 +56,7 @@ onMounted(async () => {
   await fetchChapter();
 });
 const activeName = ref('first')
-const handleOpen = (key, keyPath) => {
-  console.log("Open:", key, keyPath);
-};
-const handleClose = (key, keyPath) => {
-  console.log("Close:", key, keyPath);
-};
+
 const bookmark = ref([])
 const bookIndex = ref([])
 </script>

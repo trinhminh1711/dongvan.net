@@ -5,33 +5,54 @@
             </h2>
         </div>
         <div class="mt-4">
-            <el-table v-if="tableData.length" :data="tableData" style="width: 100%">
-                <el-table-column prop="user_id" label="ID" width="100" />
+            <el-table highlight-current-row v-if="tableData.length" :data="tableData" class="table-data"
+                style="width: 100%">
+                <el-table-column prop="user_id" label="ID" width="50" />
                 <el-table-column prop="created_at" label="Ngày tạo tài khoản" width="180">
                     <template #default="{ row }">
                         {{ formatDate(row.created_at) }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="description" label="Bút danh" width="150">
+                <el-table-column prop="description" label="Bút danh" width="180">
                     <template #default="{ row }">
                         <span>{{ row.username }} </span>
                     </template>
                 </el-table-column>
 
                 <!-- Cột direction dùng template -->
-                <el-table-column label="Email đăng nhập" width="250">
+                <el-table-column label="Email đăng nhập" width="230">
                     <template #default="{ row }">
                         <span> {{ row.email }} </span>
                     </template>
                 </el-table-column>
-                <el-table-column label="Số điện thoại" width="180">
+                <el-table-column label="Số điện thoại" width="130">
                     <template #default="{ row }">
                         <span>{{ row.phone_number ? row.phone_number : 'Chưa đăng ký' }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="Trạng thái" width="180">
+                <el-table-column label="Quyền tài khoản" width="130">
                     <template #default="{ row }">
-                        <el-button :type="row.status === 'active' ? 'success' : 'danger'" size="small" plain
+                        <el-button size="small" :type="row.role === 'master_admin'
+                            ? 'danger'
+                            : row.role === 'content_admin'
+                                ? 'success'
+                                : 'info'
+                            ">
+                            {{
+                                row.role === 'user'
+                                    ? 'Người dùng'
+                                    : row.role === 'content_admin'
+                                        ? 'Biên tập viên'
+                                        : row.role === 'master_admin'
+                                            ? 'Quản trị viên'
+                                            : 'Không xác định'
+                            }}</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column label="Trạng thái" width="150">
+                    <template #default="{ row }">
+                        <el-button v-if="row.role != 'master_admin'"
+                            :type="row.status === 'active' ? 'success' : 'danger'" size="small" plain
                             @click="handleStatusClick(row)">
                             <el-icon style="margin-right: 4px;">
                                 <component :is="row.status === 'active' ? 'Unlock' : 'Lock'" />
@@ -67,18 +88,20 @@ import { ref, onMounted } from 'vue'
 import { getTransactions, approveTransaction } from '@/api/mail';
 import { useAuthStore } from "@/stores/auth";
 import { getAllUsers } from '@/api/admin';
+import { updateUserStatus } from '@/api/other.user';
 import { toast } from 'vue3-toastify';
 const currentPage = ref(1);
 const unlockUserDialog = ref(0)
 const dateRange = ref();
 const selectedId = ref()
 const auth = useAuthStore();
+const userSelected = ref();
+const statusSelected = ref()
 const tableData = ref([])
 const listUser = async () => {
     const res = await getAllUsers();
-    console.log(res);
-
-    tableData.value = res
+    const order = { master_admin: 1, content_admin: 2, user: 3 }
+    tableData.value = res.sort((a, b) => order[a.role] - order[b.role])
 
 }
 function formatDate(dateStr: string) {
@@ -95,26 +118,26 @@ function formatDate(dateStr: string) {
 }
 const handleStatusClick = (row) => {
     selectedUser.value = row;
-
+    userSelected.value = row.user_id
     if (row.status === "active") {
         dialogTitle.value = "Khóa người dùng";
         dialogMessage.value = `Bạn có chắc muốn khóa tài khoản của ${row.username}?`;
+        statusSelected.value = 'denied'
     } else {
         dialogTitle.value = "Mở khóa người dùng";
         dialogMessage.value = `Bạn có chắc muốn mở khóa tài khoản của ${row.username}?`;
+         statusSelected.value = 'active'
     }
 
     dialogVisible.value = true;
 };
 const confirmAction = async () => {
     const newStatus = selectedUser.value.status === "active" ? "locked" : "active";
-
-    // Gọi API cập nhật trạng thái
-    // await axios.put(`/api/admin/users/${selectedUser.value.user_id}/status`, { status: newStatus });
-
-    // Cập nhật tạm thời trong UI
+    const res = await updateUserStatus(userSelected.value, statusSelected.value)
+    console.log(res);
+    toast.success(res.data.message)
     selectedUser.value.status = newStatus;
-
+    await listUser();
     dialogVisible.value = false;
 };
 onMounted(() => {
@@ -122,4 +145,21 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style>
+.table-data {
+    transition: box-shadow 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.table-data:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.table-data .el-table__body tr:hover>td {
+    background-color: #afecff !important;
+    /* xanh nhạt */
+    transition: background-color 0.2s ease;
+}
+</style>

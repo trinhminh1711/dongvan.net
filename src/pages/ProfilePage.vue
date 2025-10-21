@@ -348,7 +348,8 @@ onMounted(() => {
 }
 
 .infomation_avatar img {
-    max-width: 150px;
+    width: 150px;
+    height: 150px;
     border: solid 3px #fff;
     border-radius: 50%;
     position: relative;

@@ -5,14 +5,14 @@
                 <div class="book-card">
                     <div v-if="!stories" class="ribbon">FULL</div>
                     <div v-if="stories" class="ribbon-vip">VIP</div>
-                    <img style="max-width: 150px;" :src="stories.urlImg" alt=""></img>
+                    <img style="width: 150px; height: auto; border-radius: 10px;" :src="stories.urlImg" alt=""></img>
                 </div>
                 <div class="left-content">
                     <p class="text-color_primary fw-bold text-lg">{{ stories.title }}</p>
                     <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.total_chapters}}</span><span class="text-md">
                             chương</span></p>
                     <button @click="readBook(stories.story_id)" class="btn-alert my-4">Đọc truyện</button>
-                    <p><input type="checkbox" :value="stories.story_id">
+                    <p class="text-nowrap"><input type="checkbox" :value="stories.story_id">
                         Nhận thông báo khi có chương mới </input></p>
                 </div>
             </div>
@@ -52,6 +52,7 @@ function readBook(id) {
 
 .box-left__content .left-content {
     padding: 10px 15px;
+    width: 60%;
 }
 
 .left-content__desc {

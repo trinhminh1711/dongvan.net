@@ -54,7 +54,7 @@ const routes = [
     { path: '/terms-of-service', name: 'commit-create', component: CommitCreate },
     { path: '/transaction-history', name: 'transaction-history', component: TransactionHistory },
     { path: '/instruct-page', name: 'instruct', component: InstructPage },
-    { path: '/support', name: 'support', component: SupportPage, beforeEnter: checkAdminAuth },
+    { path: '/support', name: 'support', component: SupportPage },
     { path: '/story-detail/:id', name: 'story', component: StoryDetail },
     { path: '/story-detail/:id/chap/:chapId', name: 'chap-detail', component: ReadStory },
     { path: '/create-story', name: 'create-story', component: CreateStory },

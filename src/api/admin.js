@@ -37,3 +37,16 @@ export const updateUserRole = async (userId, role) => {
   const res = await axiosClient.put(`${API_URL}/users/${userId}/role`, { role });
   return res.data;
 };
+export const getAllPublishedStories = async () => {
+  const res = await axiosClient.get(`/stories/stories/published`);
+  return res.data;
+};
+export const updateStoryStatus = async (storyId, status) => {
+  try {
+    const res = await axiosClient.put(`/stories/update/${storyId}/status`, { status })
+    return res.data
+  } catch (err) {
+    console.error(err)
+    return { success: false, message: 'Lỗi khi gọi API' }
+  }
+}

@@ -16,7 +16,8 @@
 
                     <!-- Template hiển thị từng gợi ý -->
                     <template #default="{ item }">
-                        <div class="value-search d-flex justify-content-between py-2 px-2">
+                        <div
+                            class="value-search d-flex justify-content-between py-2 px-2">
                             <div class="value d-flex align-items-center gap-2">
                                 <img style="max-width: 30px;" :src="item.urlImg" alt="" srcset="">
                                 <span>{{ item.value }}</span>
@@ -67,7 +68,7 @@
                     <router-link to="/library-page" class="d-flex align-items-center">
                         <img src="@/assets/icon/books-stack-of-three 1.svg" alt="">
                     </router-link>
-                    <el-popover class="px-2" placement="bottom-start" :width="200" trigger="click">
+                    <el-popover class="px-2" placement="bottom-start" :width="250" trigger="click">
                         <div>
                             <div class="pb-3 d-flex align-items-center gap-2 "
                                 style="border: none;border-bottom: 1px solid #ccc;">
@@ -75,7 +76,7 @@
                                     :src="auth.user.link_thumbnail" alt="">
                                 <div>
                                     <p class="fw-bold text-color_primary">{{ auth.user.username }} ({{ auth.user.role
-                                        }})</p>
+                                    }})</p>
                                     <p>ID: {{ auth.user.user_id }}</p>
                                 </div>
                             </div>
@@ -116,13 +117,13 @@
                                             </el-icon>
                                             <span class="hover_link">Quản lý giao dịch</span>
                                         </li>
-                                        <li @click=" goToPage('profile')">
+                                        <li @click=" goToPage('PostManagement')">
                                             <el-icon>
                                                 <Key />
                                             </el-icon>
                                             <span class="hover_link">Quản lý bài viết</span>
                                         </li>
-                                        <li @click=" goToPage('profile')">
+                                        <li @click=" goToPage('StoryManagement')">
                                             <el-icon>
                                                 <Key />
                                             </el-icon>
@@ -183,8 +184,8 @@
                             <div style="display: flex;">
                                 <router-link :to="{ name: 'forum' }"><el-menu-item index="1">Diễn
                                         đàn</el-menu-item></router-link>
-                               <el-menu-item @click="goHome" index="2">Bảng xếp
-                                        hạng</el-menu-item>
+                                <el-menu-item @click="goHome" index="2">Bảng xếp
+                                    hạng</el-menu-item>
                                 <router-link :to="{ name: 'support' }"><el-menu-item index="3">Hỗ
                                         trợ</el-menu-item></router-link>
                             </div>
@@ -253,15 +254,7 @@ const route = useRoute()
 const auth = useAuthStore();
 const dialogVisible = ref(false)
 import { toast } from "vue3-toastify";
-const handleClose = (done: () => void) => {
-    ElMessageBox.confirm('Are you sure to close this dialog?')
-        .then(() => {
-            done()
-        })
-        .catch(() => {
-            // catch error
-        })
-}
+
 interface LinkItem {
     value: string
     link: string
@@ -270,11 +263,11 @@ const state = ref('')
 const links = ref<LinkItem[]>([])
 const notiNumber = ref()
 function goHome() {
-  router.push({ name: 'Home' }).then(() => {
-    setTimeout(() => {
-      document.getElementById('ranking')?.scrollIntoView({ behavior: 'smooth' })
-    }, 1000)
-  })
+    router.push({ name: 'Home' }).then(() => {
+        setTimeout(() => {
+            document.getElementById('ranking')?.scrollIntoView({ behavior: 'smooth' })
+        }, 1000)
+    })
 }
 const loadAll = () => {
     return [
@@ -315,7 +308,8 @@ function querySearch(queryString: string, cb: (results: SuggestItem[]) => void) 
     cb(results.slice(0, 10)); // chỉ trả về tối đa 10 gợi ý
 }
 function handleSelect(item: SuggestItem) {
-    router.push(item.link); // điều hướng đến trang chi tiết
+    router.push({ name: 'story', params: { id: item.story_id } })
+
 }
 function logout() {
     toast.loading("Đang đăng xuất...");
@@ -326,6 +320,7 @@ function logout() {
         });
     }, 2000);
 }
+
 function goToCategory(item) {
     router.push({
         name: "article",

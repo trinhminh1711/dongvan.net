@@ -12,14 +12,13 @@ import PostComment from '../forum-page/PostComment.vue';
 import { getStoryComment } from "@/api/stories";
 const props = defineProps({
     story_id: {
-        type: Number,
+        type: [Number, String],
         default: () => []
     },
 });
 async function getComment() {
     const res = await getStoryComment(Number(props.story_id))
     listComment.value = res.data;
-    console.log(res);
     
 }
 onMounted(async () => {

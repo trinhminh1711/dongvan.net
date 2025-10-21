@@ -14,7 +14,6 @@ export const addStoryComment = async (story_id, user_id, content) => {
         return err
     }
 };
-
 export const increaseLike = async (comment_id) => {
     try {
         const res = await axiosClient.post(`${API_URL}/add-like`, {

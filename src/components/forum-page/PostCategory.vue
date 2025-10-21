@@ -1,11 +1,14 @@
 <template>
     <div>
-
-        <PostCard v-for="(post, index) in postData" :key="index" :title="post.title" :content="post.content"
-            :username="post.username" :created_at="timeAgo(post.created_at)" :hashtag="post.hashtag" :total_likes="post.total_likes"
-            :total_comments="post.total_comments" :is-active="true" :topic_title="post.topic_title" 
-            :topic_id="post.topic_id" :STT="index"/>
-
+        <PostCard v-for="(post, index) in paginatedPosts" :key="index" :title="post.title" :content="post.content"
+            :username="post.username" :created_at="timeAgo(post.created_at)" :hashtag="post.hashtag"
+            :postId="post.post_id"
+            :total_likes="post.total_likes" :total_comments="post.total_comments" :is-active="true"
+            :topic_title="post.topic_title" :topic_id="post.topic_id" :STT="index" />
+        <div class="flex justify-center mt-4">
+            <el-pagination background layout="prev, pager, next" :total="postData.length" :page-size="pageSize"
+                v-model:current-page="currentPage" @current-change="handlePageChange" />
+        </div>
     </div>
     <el-dialog v-model="dialogVisible" width="500">
         <CreatePostForum />
@@ -13,17 +16,27 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
+import { onMounted, ref, computed } from "vue"
 import { getPost } from "@/api/forum";
 import CreatePostForum from './CreatePostForum.vue';
 import PostCard from './PostCard.vue';
 const dialogVisible = ref(false)
+const currentPage = ref(1);
+const pageSize = ref(3); // số bài trên mỗi trang
 const postData = ref([])
 onMounted(async () => {
     const res = await getPost()
     postData.value = res.data
     console.log(postData.value);
 })
+const paginatedPosts = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value;
+    const end = start + pageSize.value;
+    return postData.value.slice(start, end);
+});
+function handlePageChange(page) {
+    currentPage.value = page;
+}
 function timeAgo(isoString) {
     const now = new Date();
     const past = new Date(isoString);

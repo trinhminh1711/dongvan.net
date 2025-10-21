@@ -32,10 +32,17 @@
         <el-button class="btn-login" type="primary" @click="submitForm(ruleFormRef)">
             Đăng nhập
         </el-button>
+        <el-button class="btn-login-google" @click="handleGoogleLogin">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"
+                style="width: 20px; margin-right: 8px;">
+            Đăng nhập với Google
+        </el-button>
+
     </el-form>
 </template>
 
 <script lang="ts" setup>
+declare const google: any;
 import { reactive, ref } from 'vue'
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
@@ -66,7 +73,32 @@ const ruleForm = reactive({
     email: '',
     password: '',
 })
+const handleGoogleLogin = () => {
+    /* global google */
+    google.accounts.id.initialize({
+        client_id: "1048571701439-un9b90ipid7e36p1nl4vc15pk5aeo6kg.apps.googleusercontent.com", // 🔹 Thay bằng client ID bạn lấy ở Google Cloud
+        callback: handleCredentialResponse,
+        ux_mode: "popup"
+    });
 
+    google.accounts.id.prompt(); // hiển thị popup chọn tài khoản Google
+};
+
+const handleCredentialResponse = async (response: any) => {
+     console.log("Google response:", response); 
+    try {
+        // response.credential là token JWT của Google
+        const res = await authService.loginGoogle({ credential: response.credential });
+
+        auth.setAuth(res.data.token, res.data.user.user_id);
+        await auth.fetchProfile();
+
+        toast.success("Đăng nhập bằng Google thành công!");
+        router.push({ name: "Home" });
+    } catch (error) {
+        toast.error("Đăng nhập Google thất bại!");
+    }
+};
 const rules = reactive<FormRules<typeof ruleForm>>({
     email: [
         { required: true, message: 'Email không được để trống', trigger: 'blur' },
@@ -108,8 +140,8 @@ const handleLogin = async () => {
             });
         }, 2000); // đợi toast chạy xong
     } catch (err) {
-        toast.error("Đang xử lý...");
-        console.error(err.response?.data || err.message);
+        toast.error(err.response.data.error);
+
     }
 };
 </script>

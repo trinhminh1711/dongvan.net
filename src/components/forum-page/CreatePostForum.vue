@@ -70,9 +70,9 @@ const selected = ref("")
 const options = [
     { value: "1", label: "Luận truyện" },
     { value: "2", label: "Ngôn Đề cử và Review truyện" },
-    { value: "3", label: "Nhập môn sáng tác dị" },
+    { value: "3", label: "Nhập môn sáng tác" },
     { value: "4", label: "Tìm bạn đồng sáng tác" },
-    { value: "5", label: "Thể loại khác" },
+    { value: "5", label: "Tin tức và sự kiện" },
     { value: "6", label: "Hỏi đáp cùng tác giả" },
 
 ]

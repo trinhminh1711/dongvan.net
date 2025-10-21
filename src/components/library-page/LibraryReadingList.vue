@@ -5,7 +5,7 @@
                 <div class="book-card">
                     <div v-if="!stories.is_vip_story" class="ribbon">FULL</div>
                     <div v-if="stories.is_vip_story" class="ribbon-vip">VIP</div>
-                    <img style="max-width: 150px;" :src="stories.link_img" alt=""></img>
+                    <img style="width: 150px; height: auto"  :src="stories.link_img" alt=""></img>
                 </div>
                 <div class="left-content">
                     <p class="text-color_primary fw-bold text-lg">{{ stories.story_title }}</p>
@@ -101,11 +101,14 @@ onMounted(async () => {
 .box-left__content {
     display: flex;
     padding: 10px;
+
 }
 
 .box-left__content .left-content {
     padding: 10px 15px;
+    width: 60%;
 }
+
 
 .left-content__desc {
     display: -webkit-box;
