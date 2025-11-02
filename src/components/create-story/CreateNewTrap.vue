@@ -13,26 +13,29 @@
                     </p>
                     <p class="text-md fw-semibold py-2"> Chương đang viết: [Chương {{ stories.last_chap_number ?? 1 }}]
                         {{ stories.last_chapter_title }} </p>
-                    <button @click="$router.push(`/create-story/new-chap/${stories.story_id}`)"
-                        class="btn-alert my-4">Đăng chương</button>
+                    <button  @click="createNewTrap(stories.story_id, stories)" class="btn-alert my-4">Đăng
+                        chương</button>
                 </div>
             </div>
         </div>
 
     </div>
-    <div v-if="!categoryList?.length > 0">
+    <div v-if="!(categoryList?.length > 0)">
         <img style="display: block; margin: 0 auto;" src="@/assets/icon/nodata.png" />
         <p style="text-align: center;">Không có dữ liệu</p>
     </div>
 </template>
 
-<script lang="ts" setup>
+<script setup>
+import { useRouter } from 'vue-router'
 import { ref, onMounted } from "vue"
+import { toast } from 'vue3-toastify';
 import { getStory } from "@/api/stories"
 import { useAuthStore } from "@/stores/auth";
 const auth = useAuthStore();
-const stories = ref<any[]>([])
+const stories = ref([])
 const loading = ref(false)
+const router = useRouter()
 const currentPage = 1
 const categoryList = ref([]);
 onMounted(async () => {
@@ -42,7 +45,15 @@ onMounted(async () => {
 function handlePageChange(page) {
     console.log('Trang mới:', page) // In ra số trang
 }
+function createNewTrap(story_id, stories) {
+    if (stories.last_chapter_is_final) {
+        toast.info("Bạn đã hoàn thành bộ truyện!")
+    }
+    else {
+        router.push(`/create-story/new-chap/${story_id}`)
+    }
 
+}
 </script>
 
 <style scoped>

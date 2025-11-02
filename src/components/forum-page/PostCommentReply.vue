@@ -5,8 +5,8 @@
                 <img style="width: 50px; height: 50px; border-radius: 50%;" :src="authStore.user?.link_thumbnail"
                     alt="">
             </div>
-            <el-mention v-model="commentContent" type="textarea" placeholder="Thêm bình luận của bạn"
-                style="height: 80px; resize: none;" />
+            <el-mention @focus="handleFocus" v-model="commentContent" type="textarea"
+                placeholder="Thêm bình luận của bạn" style="height: 80px; resize: none;" />
         </div>
         <div class="d-flex justify-content-end">
             <button @click="postComment()" class="btn-alert d-flex align-items-center gap-2">
@@ -19,6 +19,9 @@
 </template>
 
 <script lang="ts" setup>
+import { useLoginModal } from '@/stores/useLoginModal'
+
+const loginModal = useLoginModal()
 import { useAuthStore } from "@/stores/auth";
 import { addPostComment } from "@/api/forum";
 import { createReply } from "@/api/forum";
@@ -35,22 +38,22 @@ const commentContent = ref('')
 async function postComment() {
     loading.value = true
     const res = await createReply(props.commentId, authStore.userId, commentContent.value)
-    console.log(res);
-    
     if (res.success) {
         setTimeout(() => {
             loading.value = false
-            emit('reload'); 
+            emit('reload');
         }, 1000);
     } else {
         loading.value = false
         console.error("Server trả về lỗi:", res.error);
     }
 }
-onMounted(() => {
-
-
-})
+const handleFocus = (e) => {
+    if (!authStore.userId) {
+        e.target.blur() // ngăn người dùng nhập
+        loginModal.open() // mở popup login
+    }
+}
 </script>
 
 <style>

@@ -16,17 +16,19 @@
 
                     <!-- Template hiển thị từng gợi ý -->
                     <template #default="{ item }">
-                        <div
-                            class="value-search d-flex justify-content-between py-2 px-2">
+                        <div class="value-search d-flex justify-content-between align-items-center py-2 px-2">
                             <div class="value d-flex align-items-center gap-2">
-                                <img style="max-width: 30px;" :src="item.urlImg" alt="" srcset="">
-                                <span>{{ item.value }}</span>
+                                <img style="width: 30px; border-radius: 4px;" :src="item.urlImg" alt="" />
+                                <div class="d-flex flex-column">
+                                    <span class="fw-semibold">{{ item.value }}</span>
+                                    <small class="text-muted">Tác giả: {{ item.username }}</small>
+                                </div>
                             </div>
                             <div class="d-flex align-items-center">
-                                <span class="author">{{ item.total_chapters ? item.total_chapters : "Chưa có" }}
-                                    chương</span>
+                                <span class="author text-muted">
+                                    {{ item.total_chapters ? item.total_chapters : "Chưa có" }} chương
+                                </span>
                             </div>
-
                         </div>
                     </template>
                 </el-autocomplete>
@@ -76,7 +78,7 @@
                                     :src="auth.user.link_thumbnail" alt="">
                                 <div>
                                     <p class="fw-bold text-color_primary">{{ auth.user.username }} ({{ auth.user.role
-                                    }})</p>
+                                        }})</p>
                                     <p>ID: {{ auth.user.user_id }}</p>
                                 </div>
                             </div>
@@ -117,13 +119,15 @@
                                             </el-icon>
                                             <span class="hover_link">Quản lý giao dịch</span>
                                         </li>
-                                        <li @click=" goToPage('PostManagement')">
+                                        <li v-if="auth.user.role == 'master_admin' || auth.user.role == 'content_admin'"
+                                            @click=" goToPage('PostManagement')">
                                             <el-icon>
                                                 <Key />
                                             </el-icon>
                                             <span class="hover_link">Quản lý bài viết</span>
                                         </li>
-                                        <li @click=" goToPage('StoryManagement')">
+                                        <li v-if="auth.user.role == 'master_admin' || auth.user.role == 'content_admin'"
+                                            @click=" goToPage('StoryManagement')">
                                             <el-icon>
                                                 <Key />
                                             </el-icon>
@@ -240,6 +244,7 @@ interface Story {
     title: string;
     author: string;
     description?: string;
+    username?: string;
     urlImg?: string;
 }
 
@@ -299,14 +304,26 @@ async function getStoryList() {
     }
 }
 function querySearch(queryString: string, cb: (results: SuggestItem[]) => void) {
-    const results = queryString
-        ? stories.value.filter((story) =>
-            story.value.toLowerCase().includes(queryString.toLowerCase())
-        )
+   const query = removeVietnameseTones(queryString);
+      const results = query
+        ? stories.value.filter((story) => {
+            const title = removeVietnameseTones(story.value);
+            const author = removeVietnameseTones(story.username);
+            return title.includes(query) || author.includes(query);
+        })
         : stories.value;
 
-    cb(results.slice(0, 10)); // chỉ trả về tối đa 10 gợi ý
+    cb(results.slice(0, 10));
 }
+function removeVietnameseTones(str: string) {
+    return str
+        .normalize("NFD") // tách ký tự và dấu
+        .replace(/[\u0300-\u036f]/g, "") // xóa dấu thanh
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toLowerCase();
+}
+
 function handleSelect(item: SuggestItem) {
     router.push({ name: 'story', params: { id: item.story_id } })
 

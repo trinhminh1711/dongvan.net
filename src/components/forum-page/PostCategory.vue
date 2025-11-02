@@ -27,7 +27,6 @@ const postData = ref([])
 onMounted(async () => {
     const res = await getPost()
     postData.value = res.data
-    console.log(postData.value);
 })
 const paginatedPosts = computed(() => {
     const start = (currentPage.value - 1) * pageSize.value;

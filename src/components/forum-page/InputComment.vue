@@ -3,10 +3,13 @@
     <div v-loading="loading" class="comment-box px-3 pb-2 pt-3 mt-3">
         <div class="post-main__info d-flex justify-content-between gap-1">
             <div class="d-flex align-items-start">
-                <img style="max-width: 40px; border-radius: 50%;" :src="authStore.user.link_thumbnail" alt="">
+                <img style="    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;" :src="authStore.user?.link_thumbnail" alt="">
             </div>
-            <el-mention v-model="commentContent" type="textarea" placeholder="Thêm bình luận của bạn"
-                style="height: 100px; resize: none;" />
+            <el-mention @focus="handleFocus" v-model="commentContent" type="textarea"
+                placeholder="Thêm bình luận của bạn" style="height: 100px; resize: none;" />
         </div>
         <div class="d-flex justify-content-end">
             <button @click="postComment()" class="btn-alert d-flex align-items-center gap-2">
@@ -22,6 +25,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useLoginModal } from '@/stores/useLoginModal'
+const loginModal = useLoginModal()
 import { useAuthStore } from "@/stores/auth";
 import { addStoryComment } from "@/api/storyComment";
 const authStore = useAuthStore();
@@ -47,11 +52,12 @@ async function postComment() {
     }
 
 }
-onMounted(()=>
-{
-  
-
-})
+const handleFocus = (e) => {
+    if (!authStore.userId) {
+        e.target.blur() // ngăn người dùng nhập
+        loginModal.open() // mở popup login
+    }
+}
 </script>
 
 <style>

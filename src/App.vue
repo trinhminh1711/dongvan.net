@@ -14,23 +14,43 @@ import CreateStory from './pages/CreateStory.vue';
 import ForumPage from './pages/ForumPage.vue';
 import StoryDetail from './pages/StoryDetail.vue';
 import ReadStory from './pages/ReadStory.vue';
+import { useLoginModal } from '@/stores/useLoginModal'
+import LoginPage from '@/pages/LoginPage.vue'
+const loginModal = useLoginModal()
 import { useRoute } from "vue-router";
 const route = useRoute();
 const dialogVisible = ref(false)
 </script>
 <template>
-  <header  v-if="route.name !== 'chap-detail'" class="pt-3">
-    <Header />
-  </header>
-  <main class="mt-3">
-      <RouterView/>
-  </main>
-  <footer v-if="route.name !== 'chap-detail'" class="bg-footer border-top">
-    <Footer />
-  </footer>
+  <div class="layout">
+    <header v-if="route.name !== 'chap-detail'" class="pt-3">
+      <Header />
+    </header>
+    <main class="mt-3 main">
+      <RouterView />
+    </main>
+    <footer v-if="route.name !== 'chap-detail'" class="bg-footer border-top mt-4">
+      <Footer />
+    </footer>
+  </div>
+  <el-dialog v-model="loginModal.isVisible" width="400" destroy-on-close append-to-body>
+    <LoginPage />
+  </el-dialog>
 </template>
 
 <style scoped>
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* luôn chiếm toàn chiều cao màn hình */
+}
+
+.main {
+  flex: 1;
+  /* chiếm hết không gian còn lại giữa header và footer */
+}
+
 .bg-footer {
   background-color: #E7E7E7
 }

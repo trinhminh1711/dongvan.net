@@ -16,9 +16,10 @@
             <div class="post-main__info d-flex align-items-center gap-1">
                 <img style="width: 50px; height: 50px; border-radius: 50%;" :src="postData[0].post_link_thumbnail"
                     alt="">
-                <p class="ms-3"> <span class="fw-bold">{{ postData[0].post_username }}</span> <span
-                        class="text-sm ms-2">{{
-                            timeAgo(postData[0].created_at) }}</span></p>
+                <div class="ms-3">
+                    <p class="fw-bold">{{ postData[0].post_username }}</p>
+                    <p class="text-sm"> <el-icon><Calendar /></el-icon> {{ timeAgo(postData[0].created_at) }}</p>
+                </div>
             </div>
             <div class="post-main__content text-sm ps-5 pe-3 mt-3">
                 <div v-html="postData[0].content"></div>

@@ -27,7 +27,7 @@
                 <!-- Thông tin khác -->
                 <div class="el-descriptions-storyinfo">
                     <el-descriptions label-width="150px" :column="4" direction="vertical" size="small" class="mb-3">
-                        <el-descriptions-item label="Tác giả"><span class="fw-bold">{{ storyData.author_name
+                        <el-descriptions-item label="Tác giả"><span class="fw-bold">{{ storyData?.author_name
                         }}</span></el-descriptions-item>
                         <el-descriptions-item label="Thể loại"><span class="fw-bold">Ngôn
                                 tình</span></el-descriptions-item>
@@ -41,7 +41,7 @@
                     <el-descriptions label-width="120px" :column="4" direction="vertical" size="small" class="mb-3">
                         <el-descriptions-item><span class="fw-bold">{{ fullStoryData.data.length }}
                                 chương</span></el-descriptions-item>
-                        <el-descriptions-item><span class="fw-bold">{{ storyData.total_view }} lượt
+                        <el-descriptions-item><span class="fw-bold">{{ storyData?.total_view }} lượt
                                 đọc</span></el-descriptions-item>
                         <el-descriptions-item><span class="fw-bold">357 đề cử</span></el-descriptions-item>
                     </el-descriptions>
@@ -73,7 +73,8 @@
                             src="@/assets/icon/book.png" alt=""><span class="fw-bold"> Đọc truyện ngay</span></button>
                 </div>
                 <!-- Mô tả -->
-                <p :class="!isExpanded ? 'text-four-line' : ''" class="text-secondary mt-5 ">{{ storyData?.description }}
+                <p :class="!isExpanded ? 'text-four-line' : ''" class="text-secondary mt-5 ">{{ storyData?.description
+                }}
 
                 </p>
                 <a class="text-link" v-if="storyData?.description.length > 100" @click="toggleExpand" type="primary">
@@ -81,37 +82,51 @@
                         'Thu gọn' : 'Xem thêm' }}</a>
                 <div class="mt-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="fw-bold">Danh sách chương ({{ fullStoryData.data.length }})</h3>
+                        <h3 class="fw-bold">Danh sách chương {{ fullStoryData.data.length > 1 ? '(' +
+                            fullStoryData.data.length + ')' : '' }}</h3>
                         <el-select v-model="sort" placeholder="Sắp xếp" size="small" style="width: 150px">
                             <el-option label="Mới nhất" value="desc" />
                             <el-option label="Cũ nhất" value="asc" />
                         </el-select>
                     </div>
                     <div>
-                        <el-table :data="chapters" style="width: 100%">
-                            <el-table-column min-width="250">
+                        <div v-if="!chapters[0]?.chap_number">
+                            <img style="display: block; margin: 0 auto;" src="@/assets/icon/nodata.png" />
+                            <p style="text-align: center;">Chưa đăng chương</p>
+                        </div>
+                        <el-table v-if="chapters.length" :data="pagedChapters" style="width: 100%">
+                            <el-table-column min-width="290">
                                 <template #default="scope">
-                                    <p><span v-if="scope.row.is_vip" class="me-2">
+                                    <p>
+                                        <span v-if="scope.row.is_vip" class="me-2">
                                             <img src="@/assets/icon/key.png" alt="">
                                         </span>
-                                        <span class="fw-semibold">Chương {{ scope.row.chap_number }}</span> : {{
-                                            scope.row.chapter_title }}
+                                        <span class="fw-semibold">Chương {{ scope.row.chap_number }}</span> :
+                                        {{ scope.row.chapter_title }}
                                     </p>
                                 </template>
                             </el-table-column>
+
                             <el-table-column min-width="100">
                                 <template #default="scope">
                                     <p class="fw-semibold">{{ scope.row.word_count }} chữ</p>
                                 </template>
                             </el-table-column>
+
                             <el-table-column>
                                 <template #default="scope">
                                     <button @click="goReadChap(scope.row.chap_number)" style="padding: 10px 15px;"
-                                        class="btn-alert d-flex align-items-center fw-bold"> Đọc ngay</button>
+                                        class="btn-alert d-flex align-items-center fw-bold">
+                                        Đọc ngay
+                                    </button>
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <div class="d-flex justify-content-end mt-3"> </div>
+                        <div class="mt-3 d-flex justify-content-center">
+                            <el-pagination background layout="prev, pager, next" :page-size="pageSize"
+                                :current-page="currentPage" :total="chapters.length"
+                                @current-change="handlePageChange" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,26 +136,28 @@
     </div>
     <div class="container">
         <h3 class="fw-bold">Độc giả nói gì về {{ storyData?.story_title }}</h3>
-        <el-tabs class="mt-3" v-model="activeName">
-            <el-tab-pane label="User" name="first">
-                <template #label>
-                    <span class="custom-tab">
-                        <i class="el-icon-star-on"></i>
-                        Bình luận
-                    </span>
-                </template>
-                <Comment :story_id="route.params.id" />
-            </el-tab-pane>
-            <el-tab-pane label="Config" name="second">
-                <template #label>
-                    <span class="custom-tab">
-                        <i class="el-icon-star-on"></i>
-                        Đánh giá & nhận xét
-                    </span>
-                </template>
-                <ReviewStory :story_id="route.params.id" />
-            </el-tab-pane>
-        </el-tabs>
+        <div>
+            <el-tabs class="mt-3" v-model="activeName">
+                <el-tab-pane label="User" name="first">
+                    <template #label>
+                        <span class="custom-tab">
+                            <i class="el-icon-star-on"></i>
+                            Bình luận
+                        </span>
+                    </template>
+                    <Comment :story_id="route.params.id" />
+                </el-tab-pane>
+                <el-tab-pane label="Config" name="second">
+                    <template #label>
+                        <span class="custom-tab">
+                            <i class="el-icon-star-on"></i>
+                            Đánh giá & nhận xét
+                        </span>
+                    </template>
+                    <ReviewStory :story_id="route.params.id" />
+                </el-tab-pane>
+            </el-tabs>
+        </div>
         <el-dialog v-model="voteDialog" title="Đề cử" width="500">
             <span class="fw-bold text-color_primary text-md ">Số lượng Tang Diệp đề cử</span>
             <el-input class="mt-1" v-model="inputCoinVote" placeholder="10" />
@@ -151,6 +168,10 @@
             </ul>
             <button @click="onVote()" style="width: 100%; height: 40px;" class="btn-alert mt-3"><span class="py-2">Đề
                     cử</span></button>
+        </el-dialog>
+        <el-dialog v-model="noEnoughCoinDialog" title="Không đủ Tang Diệp" width="500">
+            <span class="text-color_primary text-md ">Vui lòng nạp thêm Tang Diệp để tiếp tục!</span>
+            <button @click="router.push({name: 'payment'})" style="width: 100%; height: 40px;" class="btn-alert mt-3"><span class="py-2">Nạp Tang Diệp</span></button>
         </el-dialog>
         <el-dialog v-model="rateDialog" title="Đánh giá và nhận xét" width="500">
             <div class="d-flex align-items-center gap-2">
@@ -199,7 +220,7 @@ import { voteStory, rateStory, giveSupport } from "@/api/author";
 import { getVoteStory } from "@/api/author";
 import { toast } from "vue3-toastify"; // nếu dùng toast
 import "vue3-toastify/dist/index.css";
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch, computed } from "vue"
 import { getStoryFullInfo } from "@/api/stories";
 import { useRoute, useRouter } from "vue-router";
 import { addFavorite } from "@/api/stories";
@@ -223,9 +244,12 @@ const isExpanded = ref(false);
 const inputCoinVote = ref(10);
 const rateValue = ref();
 const rateComment = ref();
+const noEnoughCoinDialog = ref(false)
 const coinVoted = ref();
 const giftDialog = ref()
 const giftValue = ref(10)
+const currentPage = ref(1)
+const pageSize = 10
 const giftMessenger = ref()
 const chapters = ref([
     { title: "Tập 46 - Chương 24: Ngoại truyện", words: "839 chữ" },
@@ -246,6 +270,17 @@ function goReadChap(chapNumber) {
         }
     });
 }
+const pagedChapters = computed(() => {
+    const start = (currentPage.value - 1) * pageSize
+    const end = start + pageSize
+    return chapters.value.slice(start, end)
+})
+
+// ✅ Sự kiện khi đổi trang
+const handlePageChange = (page) => {
+    currentPage.value = page
+}
+
 async function getData() {
     const id = route.params.id; // lấy id từ param
     try {
@@ -253,6 +288,7 @@ async function getData() {
         fullStoryData.value = res
         storyData.value = res.data[0]
         chapters.value = (fullStoryData.value.data);
+        console.log((chapters.value));
 
         loading.value = false;
 
@@ -268,6 +304,12 @@ async function onVote() {
             window.location.reload()
         }, 1000);
     }
+    else
+    {
+        voteDialog.value = false
+        noEnoughCoinDialog.value = true
+        toast.error(res.data.message)
+    }  
 }
 async function onGift() {
     if (!giftMessenger.value) {
@@ -282,7 +324,10 @@ async function onGift() {
         }, 1000);
     }
     else {
-        toast.error("Lỗi không xác định!")
+        giftDialog.value = false
+        noEnoughCoinDialog.value = true
+     toast.error(res.data.message)
+       
     }
 }
 async function onRate() {
@@ -309,7 +354,7 @@ async function checkLikeStory() {
     isFavorite.value = res.isFavorite
 }
 onMounted(async () => {
-    coinUser.value = auth.user.coin_balance
+    coinUser.value = auth.user?.coin_balance
     await checkLikeStory();
     await getData();
     await getAllVote()

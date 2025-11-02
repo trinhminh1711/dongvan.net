@@ -13,6 +13,7 @@
                     <div>
                         <h2 class="fw-bold text-color_primary mt-2">{{ user.username }}</h2>
                         <p class="text-secondary">ID:2025{{ user.id }}</p>
+                        <p class="text-secondary">{{ user.user_description }}</p>
                     </div>
                 </div>
                 <div class="mt-2 pe-3">
@@ -212,7 +213,7 @@ const handleAvatarChange = (file) => {
 function loadUserInfo() {
     const newUser = auth.user;
     console.log(auth.user);
-    
+
     if (newUser) {
         user.id = newUser.user_id;
         user.username = newUser.username;
@@ -226,34 +227,35 @@ function loadUserInfo() {
     }
 }
 const changeInfoApi = async () => {
-  try {
-    // Gộp thông tin user vào object
-    formUser.phone_number = otherInfo.phone;
-    formUser.user_description = user.user_description;
-    formUser.gender = user.gender;
 
-    let payload;
+    try {
+        // Gộp thông tin user vào object
+        formUser.phone_number = otherInfo.phone;
+        formUser.user_description = user.user_description;
+        formUser.gender = user.gender;
+        formUser.username = user.username;
+        let payload;
 
-    // ✅ Nếu có ảnh mới → gửi dạng FormData
-    if (avatarFile.value) {
-      payload = new FormData();
-      for (const key in formUser) {
-        payload.append(key, formUser[key]);
-      }
-      payload.append("link_thumbnail", avatarFile.value);
-    } 
-    // ✅ Nếu không có ảnh → gửi JSON thông thường
-    else {
-      payload = formUser;
+        // ✅ Nếu có ảnh mới → gửi dạng FormData
+        if (avatarFile.value) {
+            payload = new FormData();
+            for (const key in formUser) {
+                payload.append(key, formUser[key]);
+            }
+            payload.append("link_thumbnail", avatarFile.value);
+        }
+        // ✅ Nếu không có ảnh → gửi JSON thông thường
+        else {
+            payload = formUser;
+        }
+        console.log(payload);
+        const res = await updateUserInfo(payload);
+        toast.success(res.message);
+
+    } catch (err) {
+        console.error(err);
+        toast.error(err.message || "Cập nhật thất bại");
     }
-
-    const res = await updateUserInfo(payload);
-    toast.success(res.message);
-
-  } catch (err) {
-    console.error(err);
-    toast.error(err.message || "Cập nhật thất bại");
-  }
 };
 const updatePassword = async () => {
     formPassword.oldPassword = otherInfo.password

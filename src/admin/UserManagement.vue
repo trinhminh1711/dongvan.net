@@ -135,7 +135,7 @@ const confirmAction = async () => {
     const newStatus = selectedUser.value.status === "active" ? "locked" : "active";
     const res = await updateUserStatus(userSelected.value, statusSelected.value)
     console.log(res);
-    toast.success(res.data.message)
+    toast.success(res.message)
     selectedUser.value.status = newStatus;
     await listUser();
     dialogVisible.value = false;

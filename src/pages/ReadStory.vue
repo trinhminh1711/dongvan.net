@@ -325,7 +325,9 @@ watch(
         fetchChapter();
         initReadingTracker()
     },
+    
     { immediate: true }
+    
 );
 onMounted(async () => {
     await updateReadingUser()
@@ -348,11 +350,14 @@ onBeforeUnmount(() => {
 }
 
 .tab-bar {
+  position: sticky;
+    top: 0;
     background-color: #3E3D43;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 50px
+    padding: 10px 50px;
+    z-index: 999;
 }
 
 .bottom-bar {
@@ -362,7 +367,7 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 100px;
     background-color: #3E3D43;
-    z-index: 9999;
+
 }
 
 .bottom-bar__nextslide {

@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-5">
+    <div class="mt-4">
         <!-- Thanh tìm kiếm toàn bảng -->
         <div class="d-flex justify-content-between">
             <el-input v-model="search" placeholder="Tìm kiếm truyện" clearable
@@ -52,7 +52,7 @@
                         </el-button>
                     </el-tooltip>
                     <el-tooltip class="box-item" effect="dark" content="Danh sách chương" placement="top-start">
-                        <el-button @click="handleOpenListChapter(scope.$index, scope.row)">
+                        <el-button @click="goToListChap(scope.row.story_id)">
                             <img src="@/assets/icon/menu-04.svg" alt="">
                         </el-button>
                     </el-tooltip>
@@ -123,46 +123,7 @@
                 </div>
             </el-form>
         </el-dialog>
-        <el-dialog v-model="openDialogListChapter" width="80%">
-            <el-table v-if="dataTableStoryChapter" :data="dataTableStoryChapter" style="width: 100%" :fit="true">
-                <el-table-column type="index" label="STT" width="80">
-                </el-table-column>
-                <el-table-column prop="title" width="300">
-                    <template #header>
-                        <span class="table-header">Tên chương</span>
-                    </template>
-                    <template #default="scope">
-                        <div class="d-flex align-items-center gap-2">
-                            {{ scope.row.chapter_title }}
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column label="Date" prop="create_at">
-                    <template #header>
-                        <span class="table-header">Thời gian đăng</span>
-                    </template>
-                    <template #default="scope">
-                        {{ formatDateVN(scope.row.created_at) }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="last_chapter_id">
-                    <template #header>
-                        <span class="table-header">Số từ</span>
-                    </template>
-                    <template #default="scope">
-                        {{ scope.row.word_count}}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="last_chapter_id">
-                    <template #header>
-                        <span class="table-header">Lượt đọc</span>
-                    </template>
-                    <template #default="scope">
-                        {{ scope.row.total_reads }}
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-dialog>
+
     </div>
 </template>
 
@@ -172,7 +133,7 @@ import { useRouter } from "vue-router"
 import { genFileId } from 'element-plus'
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
 import { getStory } from "@/api/stories"
-import { getStoryFullInfo } from '@/api/stories'
+
 import { useAuthStore } from "@/stores/auth";
 const auth = useAuthStore();
 const router = useRouter()
@@ -186,7 +147,6 @@ interface Story {
     last_chapter_id: Number
     total_word_count: Number
     total_view_count: Number
-
 }
 const form = ref({
     name: '',
@@ -194,14 +154,14 @@ const form = ref({
     description: '',
 })
 const options = [
-    { value: 1, label: 'Tất cả' },
-    { value: 2, label: 'Đang chờ duyệt' },
-    { value: 3, label: 'Đã xuất bản' },
+    { value: 'all', label: 'Tất cả' },
+    { value: 'pending', label: 'Đang chờ duyệt' },
+    { value: 'published', label: 'Đã xuất bản' },
 ]
 const dialogVisible = ref(false)
 const openDialogListChapter = ref(false)
 const filterStoryData = ref(options[0].value)
-const dataTableStoryChapter = ref([])
+
 const search = ref('')
 const currentPage = ref(1)
 const pageSize = ref(5)
@@ -218,11 +178,12 @@ const submitUpload = () => {
     upload.value!.submit()
 }
 onMounted(async () => {
-    const res = await getStory(auth.userId)
-    tableData.value = res
-    console.log(tableData.value);
-
+    getDataStoryApi('all')
 })
+async function getDataStoryApi(status) {
+    const res = await getStory(auth.userId, status)
+    tableData.value = res
+}
 const filterTableData = computed(() =>
     tableData.value.filter(
         (data) =>
@@ -231,20 +192,13 @@ const filterTableData = computed(() =>
     )
 )
 
-function handleSelectStoryStatus(val) {
-    if (val == 1) {
+async function handleSelectStoryStatus(val) {
+    getDataStoryApi(val)
 
-    }
 }
 function handleAdd(value) {
     router.push(`/create-story/new-chap/${value}`)
 
-}
-
-async function handleOpenListChapter(index: number, row: Story) {
-    openDialogListChapter.value = true
-    const res = await getStoryFullInfo(row.story_id);
-    dataTableStoryChapter.value = res.data
 }
 
 function handleDelete(index: number, row: Story) {
@@ -254,6 +208,12 @@ function handleSupport(index: number, row: Story) {
     dialogVisible.value = true;
     form.value.name = row.title
 
+}
+function goToListChap(storyId) {
+    router.push({
+        name: 'list-chap',
+        params: { id: storyId }
+    });
 }
 function formatDateVN(isoString) {
     const date = new Date(isoString)

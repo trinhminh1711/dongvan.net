@@ -2,14 +2,14 @@
     <h3 class="text-color_primary fw-bold mb-4">Truyện Đã Hoàn Thành</h3>
     <div v-if="storyComplete" class="row d-flex align-items-center">
         <div class="col-3">
-            <div class="box-img__vertical d-flex flex-column gap-2 px-2">
+            <div @click="gotoStory(storyComplete?.[0].story_id)"  class="box-img__vertical d-flex flex-column gap-2 px-2 cursor-pointer">
                 <img class="img-boxshadow" :src="storyComplete?.[0].urlImg" alt="">
                 <p class="text-center">{{ storyComplete?.[0].title }}</p>
                 <p class="text-center color-alert text-md mt-1">
                     <span class="fw-bold"> {{ storyComplete?.[0].chap_number }} </span> chương
                 </p>
                 <p class="text-sm text-center text-three-line">{{ storyComplete?.[0].description }}</p>
-                <p @click="gotoStory(storyComplete?.[0].story_id)" class="text-center mt-2"> <button class="btn-alert__rounded">Đọc ngay</button></p>
+                <p class="text-center mt-2"> <button class="btn-alert__rounded">Đọc ngay</button></p>
             </div>
         </div>
         <div class="list-container col-9">
@@ -33,7 +33,7 @@
     </div>
     <div v-if="storyComplete" class="row d-flex align-items-center mt-4">
         <div class="col-3">
-            <div class="box-img__vertical d-flex flex-column gap-2 px-2">
+            <div @click="gotoStory(storyComplete?.[1].story_id)" class="box-img__vertical d-flex flex-column gap-2 px-2 cursor-pointer">
                 <img class="img-boxshadow" :src="storyComplete?.[1].urlImg" alt="">
                 <p class="text-center">{{ storyComplete?.[1].title }}</p>
                 <p class="text-center color-alert text-md mt-1">
@@ -61,9 +61,9 @@
         </div>
     </div>
     <div class="bottom-card-image mt-5">
-        <div class="d-flex flex-column align-items-center gap-2 py-3" v-for="(item, index) in storyCompletedBottom">
+        <div @click="gotoStory(item.story_id)" class="d-flex flex-column align-items-center gap-2 py-3 cursor-pointer" v-for="(item, index) in storyCompletedBottom">
             <img style="max-width: 70px; height: 100px; box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 10px; border-radius: 5px;" :src="item.urlImg" alt="">
-            <p class="text-color_primary fw-bold text-md text-one-line">{{ item.title }}</p>
+            <p class="text-color_primary fw-bold text-md text-one-line hover-link">{{ item.title }}</p>
             <small class="d-block"> {{ item.genre_name }} </small>
             <button @click="gotoStory(item.story_id)" class="btn-outline">Đọc ngay</button>
         </div>

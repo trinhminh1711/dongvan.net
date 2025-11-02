@@ -13,12 +13,12 @@
         <div class="container text-center pt-2">
           <div class="row align-items-center gap-10">
             <div v-for="(item, index) in dataPropose" :key="index" class="col-4 px-2 mb-2">
-              <p class="text-start text-md fw-bold mt-1 text-capitalize text-nowrap">{{ item.title }}</p>
+              <p @click="goToStory(item.story_id)" class="text-start text-md fw-bold mt-1 text-capitalize text-nowrap hover-link">{{ item.title }}</p>
               <p class="text-start color-alert text-md mt-1">
                 <span class="fw-bold">{{ item.numberChapter }} </span> Chương
               </p>
               <p style="text-align:justify" class="text-color__tertiary text-sm mt-1 two-line-ellipsis">{{ item.desc
-                }}
+              }}
               </p>
             </div>
           </div>
@@ -51,7 +51,8 @@
       </div>
     </div>
     <div id="ranking" class="row align-items-start mt-5 justify-content-between">
-      <div style="border-radius: 10px; background: linear-gradient(to bottom, #F3FAFF 0%, #F3FAFF 55%, #FCFEFF 100%);"  class="row py-4 col-3 px-0 d-flex align-items-center">
+      <div style="border-radius: 10px; background: linear-gradient(to bottom, #F3FAFF 0%, #F3FAFF 55%, #FCFEFF 100%);"
+        class="row py-4 col-3 px-0 d-flex align-items-center">
         <RankingList :items="topUserReadersRecoment">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
@@ -61,7 +62,9 @@
         </RankingList>
 
       </div>
-      <div style="border-radius: 10px; background: linear-gradient(to bottom, #FFF7EC 0%, #FFF7EC 55%, #FFFDF9 70%, #FFFDF9 100%);"  class="row col-3 px-0 py-4 d-flex align-items-center">
+      <div
+        style="border-radius: 10px; background: linear-gradient(to bottom, #FFF7EC 0%, #FFF7EC 55%, #FFFDF9 70%, #FFFDF9 100%);"
+        class="row col-3 px-0 py-4 d-flex align-items-center">
         <RankingList :items="topStoryRead">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
@@ -71,7 +74,9 @@
         </RankingList>
 
       </div>
-       <div style="border-radius: 10px; background: linear-gradient(to bottom, #FFF7EC 0%, #FFF7EC 55%, #FFFDF9 70%, #FFFDF9 100%);" class="row col-3 px-0 py-4 d-flex align-items-center">
+      <div
+        style="border-radius: 10px; background: linear-gradient(to bottom, #FFF7EC 0%, #FFF7EC 55%, #FFFDF9 70%, #FFFDF9 100%);"
+        class="row col-3 px-0 py-4 d-flex align-items-center">
         <RankingList :items="topStoryMonthRead">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
@@ -81,7 +86,8 @@
         </RankingList>
 
       </div>
-      <div style="border-radius: 10px; background: linear-gradient(to bottom, #F3FAFF 0%, #F3FAFF 55%, #FCFEFF 100%);" class="row py-4  col-3 px-0 d-flex align-items-center">
+      <div style="border-radius: 10px; background: linear-gradient(to bottom, #F3FAFF 0%, #F3FAFF 55%, #FCFEFF 100%);"
+        class="row py-4  col-3 px-0 d-flex align-items-center">
         <RankingListUser :items="topAuthorWeek">
           <template #header>
             <img class="vote-icon__yellow" src="@/assets/icon/vote-title-icon.svg" alt="">
@@ -99,14 +105,15 @@
             <div class="d-flex justify-content-between author-card__img">
               <div class="d-flex flex-column">
                 <span class="bg-red text-white fw-bold p-1 text-sm align-self-start">NO.1</span>
-                <p class="my-2">{{ topUserReadersStory[0].username }}</p>
-                <p class="text-start color-alert text-md mt-1">
+                <p @click="goToProfile(topUserReadersStory[0].user_id)" class="my-1 hover-link">{{
+                  topUserReadersStory[0].username }}</p>
+                <p class="text-start color-alert text-md">
                   <span class="color-red fw-bold">{{ topUserReadersStory[0].total_reads }}</span> <span
                     class="fst-italic color-red ">Chương</span>
                 </p>
               </div>
               <div>
-                <img style="max-width: 50px;" :src="topUserReadersStory[0].link_thumbnail" alt="">
+                <img style="width: 50px; height: 100%;" :src="topUserReadersStory[0].link_thumbnail" alt="">
               </div>
             </div>
           </template>
@@ -116,22 +123,23 @@
         <TopListUpdate :items="topStoryUpdatedNew" :content="'Truyện mới cập nhật'" />
       </div>
       <div class="col-3 px-3">
-        <TopListUser :content="'Top đại gia'">
+        <TopListUserSpending v-if="topSpendingUsers" :items = "topSpendingUsers" :content="'Top đại gia'">
           <template #author-top3>
             <div class="d-flex justify-content-between author-card__img">
               <div class="d-flex flex-column">
                 <span class="bg-red text-white fw-bold p-1 text-sm align-self-start">NO.1</span>
-                <p class="my-2">Lãnh Hàn Phong</p>
-                <p class="text-start color-alert text-md mt-1">
-                  <span class="color-red fw-bold">567</span> <span class="fst-italic color-red ">Chương</span>
+                   <p @click="goToProfile(topSpendingUsers[0].user_id)" class="my-1 hover-link text-start">{{
+                  topSpendingUsers[0].username }}</p>
+                <p class="text-start color-alert text-md">
+                  <span class="color-red fw-bold">{{    topSpendingUsers[0].total_spent % 1 === 0 ? parseInt( topSpendingUsers[0].total_spent) : topSpendingUsers[0].total_spent }}</span> <span class="fst-italic color-red ">Tang Diệp</span>
                 </p>
               </div>
               <div>
-                <img src="" alt="">
+                <img style="width: 50px; height: 100%;" :src="topSpendingUsers[0].link_thumbnail" alt="">
               </div>
             </div>
           </template>
-        </TopListUser>
+        </TopListUserSpending>
       </div>
     </div>
     <div class="row align-items-start mt-5">
@@ -159,15 +167,17 @@ import RankingListUser from '@/components/homepage/RankingListUser.vue'
 import TopListUpdate from '@/components/homepage/TopListUpdate.vue'
 import ReviewStory from '@/components/homepage/ReviewStory.vue'
 import TopAuthorWeek from '@/components/homepage/TopAuthorWeek.vue'
+import TopListUserSpending from '@/components/homepage/TopListUserSpending.vue'
 import StoryCompleted from '@/components/homepage/StoryCompleted.vue'
 import { getTopUserRead } from '../api/chapter'
-import { getTopStoryReaded, getTopStoryReadedMonth, getTopAuthorWeek, getTopUserReaders, getListStoryUpdatedNew, getTopStoryRecomment } from '../api/stories'
+import { getTopStoryReaded, getTopStoryReadedMonth, getTopAuthorWeek, getTopUserReaders, getListStoryUpdatedNew, getTopStoryRecomment , getTopUserSpending } from '../api/stories'
 const activeName = ref('first')
 import { useRouter } from 'vue-router'
 const topUserRead = ref()
 const topStoryRead = ref()
 const topAuthorWeek = ref()
 const topUserReadersStory = ref()
+const topSpendingUsers = ref()
 const topUserReadersRecoment = ref()
 const topStoryMonthRead = ref()
 const storyNewUpdated = ref()
@@ -177,10 +187,13 @@ const items = ref([
 ]);
 const router = useRouter()
 function goToStory(post_id) {
-    router.push({
-        name: 'story',   // Tên route bạn đã định nghĩa trong router/index.js
-        params: { id: post_id }       // Truyền param id
-    })
+  router.push({
+    name: 'story',   // Tên route bạn đã định nghĩa trong router/index.js
+    params: { id: post_id }       // Truyền param id
+  })
+}
+function goToProfile(params) {
+  router.push({ name: 'user', params: { id: params } })
 }
 const handleClick = (tab: TabsPaneContext, event: Event) => {
 
@@ -205,6 +218,10 @@ async function getTopStoryUpdate() {
 async function getTopRecomment() {
   topUserReadersRecoment.value = await getTopStoryRecomment();
 }
+async function getTopSpendingUsers() {
+  topSpendingUsers.value = await getTopUserSpending();
+  
+}
 onMounted(async () => {
   await getTopStory()
   await getTopStoryMonth()
@@ -212,29 +229,30 @@ onMounted(async () => {
   await getTopUserReader()
   await getTopStoryUpdate()
   await getTopRecomment()
+  await getTopSpendingUsers()
 })
 const reviewTitle = "Review Tác phẩm";
 const dataReview = [
-  { title: "Sống Sót Trong Trò", text: "Nhật Ánh" },
+  { title: "Số Đỏ", text: "Nhật Ánh" },
   { title: "Lan Nhược Tiên Du", text: "Huy Thiệp" },
   { title: "Trận Vấn Trường", text: "Anh Thái" }
 ];
 const dataPropose = [
-  { title: "Sống Sót Trong Trò", numberChapter: "567", desc: "Truyện dành cho fan của thể loại fantasy của " },
-  { title: "Lan nhược tiên truyện", numberChapter: "567", desc: "Truyện dành cho fan của thể loại fantasy" },
-  { title: "Trận vấn trường sinh", numberChapter: "567", desc: "Truyện dành cho fan của thể loại fantasy của " },
-  { title: "Đạo đồ thần tọa", numberChapter: "290", desc: "Truyện dành cho fan của thể loại fantasy của phương tây, fan diablo" },
-  { title: "Bỉ ngạn chi chủ", numberChapter: "290", desc: "Truyện dành cho fan của thể loại fantasy của phương " },
-  { title: "Cẩu tại sơ thánh ma môn", numberChapter: "290", desc: "Truyện dành cho fan của thể loại fantasy của " },
+  { title: "Số đỏ",  story_id: 24,  numberChapter: "20", desc: "“Số đỏ” là một trong những tiểu thuyết nổi tiếng của Vũ Trọng Phụng" },
+  { title: "Sống mòn", story_id: 56, numberChapter: "20", desc: "Tác phẩm Sống mòn là một trong những tiểu thuyết đặc sắc nhất của Nam Cao" },
+  { title: "Tắt đèn", story_id: 58, numberChapter: "27", desc: "Tắt đèn là tiểu thuyết hiện thực xuất sắc của Ngô Tất Tố, được viết vào năm 1939, phản ánh sâu sắc cuộc sống cơ cực của người nông dân Việt Nam dưới ách bóc lột tàn bạo của chế độ thực dân – phong kiến"  },
+  { title: "Vỡ đê", story_id: 27, numberChapter: "2", desc: "Tác phẩm phản ánh tình cảnh khốn khổ của người dân lao động trong nạn đói và lũ lụt, đồng thời phơi bày bộ mặt giả dối, vô cảm của tầng lớp thống trị và quan lại đương thời" },
+  { title: "Nửa chừng Xuân", story_id: 48, numberChapter: "18", desc: "Câu chuyện xoay quanh mối tình éo le giữa Lộc và Mai, hai con người trẻ tuổi chân thành nhưng bị ngăn trở bởi định kiến xã hội và lễ giáo gia đình" },
+  { title: "Phan Đình Phùng", story_id: 43, numberChapter: "21", desc: "Tác phẩm “Phan Đình Phùng” của Đào Trinh Nhất là một trong những cuốn tiểu sử – khảo cứu lịch sử tiêu biểu về nhân vật anh hùng yêu nước cuối thế kỷ XIX" },
 
 ]
 </script>
 
 <style>
-.topvote-title
-{
+.topvote-title {
   font-weight: bold;
 }
+
 .demo-tabs>.el-tabs__content {
   color: #6b778c;
   font-size: 32px;

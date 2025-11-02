@@ -14,14 +14,9 @@
                 </div>
             </div>
         </div>
+
         <div class="edit-ui mt-5">
-            <div class="d-flex gap-2 align-items-center justify-content-between">
-                <p class="fw-bold">Dàn trang</p>
-                <el-switch v-model="value1" @change="handleChange" />
-            </div>
-        </div>
-        <div class="edit-ui mt-5">
-            <p class="fw-bold">Cuộn dọc ngang</p>
+            <p class="fw-bold">Dàn trang</p>
             <div class="d-flex gap-2 align-items-center justify-content-between">
                 <div @click="emit('set-layout', false)" class="ui-dantrang">
                     <svg width="26" height="18" viewBox="0 0 26 18" fill="none" xmlns="http://www.w3.org/2000/svg">

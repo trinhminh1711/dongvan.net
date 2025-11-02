@@ -47,8 +47,10 @@
 import { useRouter } from "vue-router"
 const router = useRouter()
 import authService from "@/api/authService";
-import { reactive, ref } from 'vue'
+import { reactive, ref, nextTick } from 'vue'
 import { toast } from "vue3-toastify"
+import { useAuthStore } from "@/stores/auth";
+const auth = useAuthStore()
 const success = ref();
 const error = ref("");
 const errorMsg = ref("");
@@ -124,10 +126,16 @@ const handleRegister = async () => {
 
         success.value = res.data.success; // ví dụ backend trả "Registered successfully"
         toast.success("Đăng ký thành công 🎉")
-        localStorage.setItem("token", res.data.token); // lưu JWT token
+        const loginRes = await authService.login(
+            {
+                email: ruleForm.email,
+                password: ruleForm.password
+            })
+        auth.setAuth(loginRes.data.token, loginRes.data.user.user_id);
+        await auth.fetchProfile();
         setTimeout(() => {
-            router.push({ name: "profile" }).then(() => {
-            window.location.reload(); // reload sau khi điều hướng
+            router.push({ name: "Home" }).then(() => {
+                window.location.reload(); // reload sau khi điều hướng
             });
         }, 2000); // đợi toast chạy xong
     } catch (err) {
@@ -150,7 +158,7 @@ const handleRegister = async () => {
             // Lỗi khác (setup Axios, v.v.)
             errorMsg.value = ` Lỗi: ${err.message}`;
         }
-           toast.error(errorMsg.value)
+        toast.error(errorMsg.value)
     }
 };
 </script>

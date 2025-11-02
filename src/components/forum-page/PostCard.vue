@@ -1,7 +1,7 @@
 <template>
     <div class="post-card px-4 mt-4">
-        <div class="target mt-3">
-            <button v-if="STT < 1" style="padding: 5px 15px;" class="btn-alert me-3">
+        <div class="target mt-3 d-flex align-items-center">
+            <button v-if="STT < 1" style="padding: 5px 15px;" class="element-ouline me-3 btn-no-pointer">
                 <svg style="vertical-align: middle;" width="18" height="19" viewBox="0 0 18 19" fill="none"
                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <rect y="0.5" width="18" height="18" fill="url(#pattern0_160_6799)" />
@@ -17,7 +17,7 @@
             </button>
             <button v-if="STT < 2 && STT > 0"
                 style="padding: 5px 15px; background: linear-gradient(to right, #29DF9F 0%, #0CA876 50%);"
-                class="btn-alert me-3">
+                class="element-ouline me-3 btn-no-pointer">
                 <div class="d-flex align-items-center">
                     <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg"
                         xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -35,7 +35,7 @@
                     <span class="px-1" style="vertical-align: middle;">Mới</span>
                 </div>
             </button>
-            <button :class="['topic-box', 'topic-' + topic_id]" class="btn-outline__alert">
+            <button :class="['topic-box', 'topic-' + topic_id]" class="element-ouline btn-no-pointer">
                 {{ topic_title }}
             </button>
         </div>
@@ -177,5 +177,13 @@ function gotoPost(postId) {
 
 .topic-default:hover {
     background-color: #f5d8d8;
+}
+.element-ouline
+{
+     border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  background: #ff6114;
+  color: #fff;
 }
 </style>

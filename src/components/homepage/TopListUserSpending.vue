@@ -8,7 +8,7 @@
                 <span  :class="{ 'active-top': index < 2 }" :style="{ backgroundImage: index == 0 ? `url(${top2Icon})` : index == 1 ? `url(${top3Icon})` : 'none'}" class="text-color_primary fw-bold">{{ index + 2 }}</span>
                 <span @click="profileUser(item.user_id)" class="ps-3 hover-link">{{ item.username }}</span>
             </p>
-            <span class="text-color__tertiary">{{ item.total_reads }} lượt đọc</span>
+            <span class="text-color__tertiary">{{ item.total_spent % 1 === 0 ? parseInt(item.total_spent) : item.total_spent }}</span>
         </div>
     </div>
 </template>
@@ -27,8 +27,8 @@ function profileUser(id) {
 // props
 const props = defineProps({
   items: {
-    type: Array,
-    default: () => []
+    type: [Array, Object], // chấp nhận cả 2 loại
+    required: true
   },
   content: {
     type: String,

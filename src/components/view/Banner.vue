@@ -135,7 +135,7 @@ const loadAll = () => {
 }
 const labels = ['TTV Translate', 'Lâm Uyên Hành', 'Vạn Cổ Tối Cường', 'Quỷ Bí Chi Chủ', 'Phàm Nhân Tu Tiên']
 const backgrounds = [
-     new URL('@/assets/image/link.jpg', import.meta.url).href,
+    'https://res.cloudinary.com/djr4f7ceu/image/upload/v1761756647/Link_qm0djn.jpg',
     'https://www.quehuong.org.vn/wp-content/uploads/2018/07/dung-noi-chuyen-voi-co-ay.jpg',
     'https://cdn-media.sforum.vn/storage/app/media/wp-content/uploads/2024/01/hinh-nen-anime-thumb.jpg',
     'https://i.pinimg.com/736x/3a/20/8e/3a208e3d33f2d65b18588a3f2060d65a.jpg',

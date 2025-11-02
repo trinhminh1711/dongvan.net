@@ -74,14 +74,16 @@ export const updateStory = async (data, story_id) => {
         };
     };
 }
-export const getStory = async (authorId) => {
-    try {
-        const res = await axiosClient.get(`${API_URL}/${authorId}`);
-        return res.data
-    } catch (err) {
-        return err
-    }
-};
+export const getStory = async (authorId, status = 'published') => {
+  try {
+    const res = await axiosClient.get(`${API_URL}/${authorId}`, {
+      params: { status } // 👈 gửi query param ?status=...
+    })
+    return res.data
+  } catch (err) {
+    return err
+  }
+}
 export const getAllStory = async () => {
     try {
         const res = await axiosClient.get(`${API_URL}/story/get-all`);
@@ -108,15 +110,17 @@ export const getStoryByCategory = async (categoryId) => {
         return err
     }
 };
-export const getStoryFullInfo = async (story_id) => {
-    try {
-        const res = await axiosClient.get(`${API_URL}/story-allinfo/${story_id}`);
-        return res.data
-    } catch (err) {
-        return err
-    }
-};
-
+export const getStoryFullInfo = async (story_id, status = 'published') => {
+  try {
+    const res = await axiosClient.get(`${API_URL}/story-allinfo/${story_id}`, {
+      params: { status },
+    })
+    return res.data
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin truyện:', error)
+    return { success: false, message: error.message }
+  }
+}
 export const getStoryComment = async (story_id) => {
     try {
         const res = await axiosClient.get(`${API_URL}/${story_id}/comments`);
@@ -283,6 +287,16 @@ export const getTopStoryRecomment = async () => {
     try {
         const res = await axiosClient.get(`${API_URL}/story/recommendations`);
         return res.data;
+    } catch (error) {
+        console.error("Error fetching chapter count:", error);
+        throw error;
+    }
+};
+
+export const getTopUserSpending = async () => {
+    try {
+        const res = await axiosClient.get(`${API_URL}/check/top-user/spending`);
+        return res.data.data;
     } catch (error) {
         console.error("Error fetching chapter count:", error);
         throw error;

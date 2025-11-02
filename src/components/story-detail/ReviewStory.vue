@@ -79,6 +79,8 @@ function avgRating(ratings) {
 }
 async function onRate() {
   const res = await rateStory(props.story_id, auth.userId, rateValue.value, rateComment.value);
+  console.log(res);
+  
   if (res.status == 201) {
     toast.success("Đã gửi đánh giá truyện")
     setTimeout(() => {

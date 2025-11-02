@@ -7,8 +7,6 @@ export const voteStory = async (userId, storyId, coins) => {
         // trả nguyên response.data để component dùng
         return { success: true, status: res.status, data: res.data };
     } catch (error) {
-        console.log(error);
-
         if (error.response) {
             return {
                 success: false,
@@ -52,26 +50,30 @@ export const getStoryRate = async (storyId) => {
     return res.data;
 };
 
-export const fetchTransactions = async (userId , paramsDate) => {
-    const res = await axiosClient.get(`${API_URL}/transaction/${userId}` ,
-        {  params: paramsDate }
-     );
+export const fetchTransactions = async (userId, paramsDate) => {
+    const res = await axiosClient.get(`${API_URL}/transaction/${userId}`,
+        { params: paramsDate }
+    );
     return res.data;
 };
 
 
 export const giveSupport = async (fromUserId, toUserId, coins, message) => {
-  try {
-    console.log(fromUserId, toUserId, coins, message);
-    
-    const res = await axiosClient.post(`${API_URL}/give/gift-story`, {
-      from_user_id: fromUserId,
-      to_user_id: toUserId,
-      coins,
-      message
-    });
-    return { success: true, status: res.status, data: res.data };
-  } catch (error) {
-      return { success: false, status: 500, data: { message: "No response" } };
-  }
+    try {
+        console.log(fromUserId, toUserId, coins, message);
+
+        const res = await axiosClient.post(`${API_URL}/give/gift-story`, {
+            from_user_id: fromUserId,
+            to_user_id: toUserId,
+            coins,
+            message
+        });
+        return { success: true, status: res.status, data: res.data };
+    } catch (error) {
+        return {
+            success: false,
+            status: error.response.status,
+            data: error.response.data
+        };
+    }
 };

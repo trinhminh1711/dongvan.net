@@ -21,6 +21,7 @@ import { requireAuth } from "@/middleware/auth";
 import UserPage from '@/components/user/UserPage.vue'
 import { checkAdminAuth } from "@/middleware/auth";
 import TransactionHistory from '@/pages/TransactionHistory.vue'
+import ListChap from "@/components/create-story/ListStoryUpdateChap.vue"
 import SupportPage from '@/pages/SupportPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import EditStory from '@/components/create-story/EditStory.vue'
@@ -57,7 +58,20 @@ const routes = [
     { path: '/support', name: 'support', component: SupportPage },
     { path: '/story-detail/:id', name: 'story', component: StoryDetail },
     { path: '/story-detail/:id/chap/:chapId', name: 'chap-detail', component: ReadStory },
-    { path: '/create-story', name: 'create-story', component: CreateStory },
+    {
+        path: '/create-story', name: 'create-story', component: CreateStory, children:
+        [{
+            path: "list-chap/:id",
+            name: "list-chap",
+            component: ListChap
+        }]
+    },
+    {
+    path: '/edit-story/:id',
+        name: 'edit-story',
+        component: CreateStory, // hoặc EditStory nếu bạn tách riêng file
+        props: true
+    },
     { path: '/profile', name: 'profile', component: ProfilePage, beforeEnter: requireAuth },
     { path: '/create-story/new-chap/:storyId', name: 'create-newchap', component: CreateNewTrapForm },
     { path: '/edit-story/:id', name: 'edit-story', component: EditStory },

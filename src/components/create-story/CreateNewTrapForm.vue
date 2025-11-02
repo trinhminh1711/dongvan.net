@@ -155,8 +155,8 @@ function goBack() {
     }
 }
 const options = [
-    { label: 'Miễn phí', value: 1 },
-    { label: 'Chương Vip', value: 2 },
+    { label: 'Miễn phí', value: 0 },
+    { label: 'Chương Vip', value: 1 },
 ]
 const rules = reactive<FormRules<chapData>>({
     chapNumber: [
@@ -171,9 +171,9 @@ const rules = reactive<FormRules<chapData>>({
 
 })
 const checkCondition = (value) => {
-    if (newChapForm.chapNumber < 10 && value != 1) {
+    if (newChapForm.chapNumber < 10 && value == 1) {
         isCreateChapVip.value = true
-        newChapForm.isVip = 1
+        newChapForm.isVip = 0
     }
 
 }

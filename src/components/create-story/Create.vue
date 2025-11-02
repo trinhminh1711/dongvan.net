@@ -14,7 +14,7 @@
                         Tác giả
                     </span>
                 </template>
-                <el-input size="large" :value="auth.user.username" disabled />
+                <el-input size="large" :value="auth.user?.username" disabled />
             </el-form-item>
             <el-form-item prop="storyGenre">
                 <template #label>
@@ -31,7 +31,9 @@
                         Giới thiệu
                     </span>
                 </template>
-                <el-mention placeholder="Phần giới thiệu truyện là ấn tượng đầu tiên mà bạn tạo ra với người đọc – hãy tận dụng cơ hội này để truyền tải nội dung cốt lõi, điểm hấp dẫn và phong cách riêng của bạn. Giới thiệu càng rõ ràng, mạch lạc và thu hút thì càng có nhiều người muốn theo dõi truyện!" v-model="ruleForm.storyDesc" type="textarea" />
+                <el-mention
+                    placeholder="Phần giới thiệu truyện là ấn tượng đầu tiên mà bạn tạo ra với người đọc – hãy tận dụng cơ hội này để truyền tải nội dung cốt lõi, điểm hấp dẫn và phong cách riêng của bạn. Giới thiệu càng rõ ràng, mạch lạc và thu hút thì càng có nhiều người muốn theo dõi truyện!"
+                    v-model="ruleForm.storyDesc" type="textarea" />
             </el-form-item>
             <el-form-item class="list-imageupload">
                 <template #label>
@@ -87,10 +89,14 @@ import { createStory } from "@/api/stories"
 import type { FormInstance, FormRules } from 'element-plus'
 import { useAuthStore } from "@/stores/auth";
 import { toast } from "vue3-toastify";
+import { useLoginModal } from '@/stores/useLoginModal'
+
 import { useRouter } from "vue-router";
 const emit = defineEmits(["created-success"])
 const router = useRouter();
 const auth = useAuthStore();
+
+const loginModal = useLoginModal()
 interface RuleForm {
     storyName: string,
     storyGenre: string,
@@ -161,24 +167,30 @@ const handleFileChange = (file: UploadFile) => {
 }
 
 const submitForm = async () => {
-    if (!ruleFormRef.value) return
-    await ruleFormRef.value.validate(async (valid, fields) => {
-        if (valid) {
-            const toastAddStories = toast.loading("Đang xử lý...");
-            const res = await createStory(ruleForm)
-            if (res.success) {
-                toast.remove(toastAddStories);
-                toast.success("Thêm truyện thành công");
-                emit("created-success", "second")
-            } else {
-                console.log(res.message);
-            }
+    if (auth.userId) {
+        if (!ruleFormRef.value) return
+        await ruleFormRef.value.validate(async (valid, fields) => {
+            if (valid) {
+                const toastAddStories = toast.loading("Đang xử lý...");
+                const res = await createStory(ruleForm)
+                if (res.success) {
+                    toast.remove(toastAddStories);
+                    toast.success("Thêm truyện thành công");
+                    emit("created-success", "second")
+                } else {
+                    toast.success("Lỗi server");
+                }
 
-        } else {
-            toast.error("Thông tin truyện không hợp lệ");
-        }
-    })
-  
+            } else {
+                toast.error("Thông tin truyện không hợp lệ");
+            }
+        })
+    } else {
+        toast.info("Bạn cần đăng nhập để đăng truyện");
+        loginModal.open()
+    }
+
+
 }
 const upload = ref<UploadInstance>()
 
@@ -189,7 +201,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     upload.value!.handleStart(file)
 }
 
-const selectPreset = async(imgUrl) => {
+const selectPreset = async (imgUrl) => {
     selectedImage.value = imgUrl
     fileList.value = [] // reset upload
     ruleForm.cover = null // reset file upload
@@ -198,7 +210,10 @@ const selectPreset = async(imgUrl) => {
     const response = await fetch(imgUrl)
     const blob = await response.blob()
     // tạo file từ blob
-    const file = new File([blob], "preset-image.png", { type: blob.type })
+    const file = Object.assign(
+        new File([blob], "preset-image.png", { type: blob.type }),
+        { uid: genFileId() }
+    ) as UploadRawFile
     ruleForm.cover = file
 }
 </script>
