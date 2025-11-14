@@ -91,13 +91,11 @@ async function getTransaction() {
     else {
         const res = await getTransactions();
         tableData.value = res.data || []
-        console.log(res);
     }
 }
 const handleOpenDialog = (id) => {
     selectedId.value = id;
     dialogVisible.value = true;
-    console.log(selectedId.value);
 
 };
 async function duyetGiaoDich() {
@@ -120,7 +118,6 @@ function formatMoney(value) {
     return Number(value).toLocaleString("vi-VN");
 }
 const onDateChange = (val: [string, string]) => {
-    console.log('Chọn ngày:', val)
 }
 function formatDate(dateStr: string) {
     const date = new Date(dateStr);

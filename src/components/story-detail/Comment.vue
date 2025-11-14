@@ -1,8 +1,9 @@
 <template>
-    <div>
+     <PostComment v-for="value in listComment" :comment_id = "value.comment_id" :like ="value.like" :user="value.username" :user_thumbnail="value.link_thumbnail" :comment="value.content" :date="value.created_at" />
+    <div class="mt-4">
         <InputComment :story_id="Number(props.story_id)"  />
     </div>
-    <PostComment v-for="value in listComment" :comment_id = "value.comment_id" :like ="value.like" :user="value.username" :user_thumbnail="value.link_thumbnail" :comment="value.content" :date="value.created_at" />
+   
 </template>
 
 <script lang="ts" setup>

@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row mt-4">
             <div v-for="stories in categoryList" :key="stories.id" class="box-left__content col-6 py-3">
-                <img style="max-width: 150px; border-radius: 10px;" :src="stories.urlImg">
+                <img style="width: 150px; height: 180px; border-radius: 10px;" :src="stories.urlImg">
                 <div class="left-content">
                     <h4 class="text-color_primary fw-bold">{{ stories.title }}</h4>
                     <p class="left-content__author text-color__tertiary text-md">{{ stories.author }}</p>

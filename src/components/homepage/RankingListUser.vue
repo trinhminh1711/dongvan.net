@@ -16,7 +16,7 @@
                         </div>
             </div>
             <div>
-                <img style="max-width: 40px;" v-if="index == 0" :src="item.link_thumbnail" />
+                <img style="max-width: 40px; height: 60px;" v-if="index == 0" :src="item.link_thumbnail" />
             </div>
         </div>
     </div>

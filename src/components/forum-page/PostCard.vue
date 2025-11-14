@@ -41,7 +41,7 @@
         </div>
         <h3 @click="gotoPost(postId)" class="post-title fw-bold mt-3 hover-link">{{ title }}</h3>
         <div class="d-flex gap-3 align-items-center mt-3">
-            <p class="d-flex gap-1 align-items-center">
+            <p @click="goToProfile(user_id)" class="d-flex gap-1 align-items-center hover-link">
                 <el-icon>
                     <User />
                 </el-icon> {{ username }}
@@ -57,14 +57,14 @@
         <p class="hashtag mt-3"><span class="pe-3 fw-semibold">{{ hashtag }}</span> </p>
 
         <p class="like-share d-flex gap-4 pb-4 pt-2 mt-4">
-            <span>
+            <span class="hover-pointer" @click="likeShare(postId)">
                 <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd"
                         d="M9.99431 3.27985C8.32819 1.332 5.54981 0.808035 3.46227 2.59168C1.37472 4.37532 1.08083 7.35748 2.72019 9.467C4.0832 11.2209 8.20816 14.9201 9.5601 16.1174C9.71136 16.2513 9.78698 16.3183 9.8752 16.3446C9.95219 16.3676 10.0364 16.3676 10.1134 16.3446C10.2016 16.3183 10.2773 16.2513 10.4285 16.1174C11.7805 14.9201 15.9054 11.2209 17.2684 9.467C18.9078 7.35748 18.6498 4.35656 16.5264 2.59168C14.4029 0.826798 11.6604 1.332 9.99431 3.27985Z"
                         stroke="#667085" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 {{ total_likes }}</span>
-            <span><el-icon>
+            <span class="hover-pointer" @click="likeShare(postId)"><el-icon>
                     <ChatRound />
                 </el-icon>{{ total_comments }}</span>
         </p>
@@ -75,10 +75,12 @@
 <script lang="ts" setup>
 import { useRoute } from "vue-router";
 import { useRouter } from 'vue-router'
-
+import { useLoginModal } from '@/stores/useLoginModal'
+import { useAuthStore } from "@/stores/auth";
+const auth= useAuthStore();
 const router = useRouter()
-const route = useRoute();    
-
+const route = useRoute();
+const loginModal = useLoginModal()
 import CreatePostForum from './CreatePostForum.vue';
 import { computed } from 'vue';
 const topicColor = computed(() => {
@@ -91,10 +93,11 @@ const topicColor = computed(() => {
 });
 const props = defineProps({
     STT: Number,
-    postId:Number,
+    postId: Number,
     topic_id: Number,
     title: String,
     username: String,
+    user_id: Number,
     created_at: String,
     total_likes: Number,
     total_comments: Number,
@@ -108,6 +111,21 @@ function gotoPost(postId) {
         name: 'post-detail',   // Tên route bạn đã định nghĩa trong router/index.js
         params: { id: postId }       // Truyền param id
     })
+}
+function goToProfile(params) {
+    router.push({ name: 'user', params: { id: params } })
+}
+function likeShare(postId) {
+    if (auth.userId) {
+        router.push({
+            name: 'post-detail',   // Tên route bạn đã định nghĩa trong router/index.js
+            params: { id: postId }       // Truyền param id
+        })
+    }
+    else
+    {
+        loginModal.open()
+    }
 }
 </script>
 
@@ -178,12 +196,12 @@ function gotoPost(postId) {
 .topic-default:hover {
     background-color: #f5d8d8;
 }
-.element-ouline
-{
-     border: none;
-  border-radius: 20px;
-  padding: 8px 20px;
-  background: #ff6114;
-  color: #fff;
+
+.element-ouline {
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    background: #ff6114;
+    color: #fff;
 }
 </style>

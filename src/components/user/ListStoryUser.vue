@@ -1,13 +1,16 @@
 <template>
     <div class="container">
         <div v-if="categoryList.length" class="row">
-            <div v-for="(stories, index) in categoryList" :key="index" class="box-left__content col-md-6">
-                <div class="book-card col-4">
-                    <img style="width: 150px; height: auto; border-radius: 10px;" class="d-block" :src="stories.urlImg" alt=""></img>
+            <div v-for="(stories, index) in paginatedList" :key="index" class="box-left__content col-md-6 mt-2">
+                <div class="book-card col-5">
+                    <img style="    width: 150px;
+    height: 200px;
+    border-radius: 10px;" class="d-block" :src="stories.urlImg" alt=""></img>
                 </div>
-                <div class="left-content col-8">
+                <div class="left-content col-7">
                     <p class="text-color_primary fw-bold text-lg">{{ stories.title }}</p>
-                    <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.last_chap_number > 0 ? stories.last_chap_number : "Chưa có" }}</span>
+                    <p class="color-red fst-italic"><span class="fw-bold text-md">{{ stories.last_chap_number > 0 ?
+                        stories.last_chap_number : "Chưa có" }}</span>
                         <span class="text-md">
                             chương</span>
                     </p>
@@ -16,6 +19,8 @@
                 </div>
             </div>
         </div>
+        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[6, 10, 20, 50]"
+            :total="total" layout=" prev, pager, next" class="mt-4 d-flex justify-content-center" />
         <div v-if="!categoryList.length">
             <img style="display: block; margin: 0 auto;" src="@/assets/icon/nodata.png" />
             <p style="text-align: center;">Không có dữ liệu</p>
@@ -24,14 +29,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '../../stores/auth';
 import { getListUserReading } from '@/api/stories';
 import { getStory } from '@/api/stories';
 import { useRouter } from "vue-router";
 const router = useRouter();
-const currentPage = 1
-const categoryList = ref([]);
+
+const categoryList = ref([])       // toàn bộ data trả về
+const currentPage = ref(1)         // trang hiện tại
+const pageSize = ref(6)
 const props = defineProps({
     userId: {
         type: [Number, String],
@@ -43,9 +50,9 @@ function handlePageChange(page) {
 }
 async function getListReading() {
     const res = await getStory(props.userId)
-    console.log(res);
     categoryList.value = res
-    console.log(categoryList.value);
+    console.log(res);
+
 }
 
 function readOnBook(storyId) {
@@ -54,6 +61,15 @@ function readOnBook(storyId) {
         params: { id: storyId }
     });
 }
+const paginatedList = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    return categoryList.value.slice(start, start + pageSize.value)
+})
+
+const totalPages = computed(() => {
+    return Math.ceil(categoryList.value.length / pageSize.value)
+})
+const total = computed(() => categoryList.value.length)
 onMounted(async () => {
     await getListReading()
 })

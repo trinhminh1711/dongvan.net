@@ -271,7 +271,7 @@ function goHome() {
     router.push({ name: 'Home' }).then(() => {
         setTimeout(() => {
             document.getElementById('ranking')?.scrollIntoView({ behavior: 'smooth' })
-        }, 1000)
+        }, 300)
     })
 }
 const loadAll = () => {

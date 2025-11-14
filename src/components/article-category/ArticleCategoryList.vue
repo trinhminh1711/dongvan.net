@@ -6,7 +6,7 @@
         </p>
         <div class="row mt-4">
             <div v-for="stories in categoryList" :key="stories.id" class="box-left__content col-6 mt-3">
-                <img style="max-width: 150px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* bóng mờ nhẹ */ border-radius: 8px;"
+                <img style="width: 150px; height: 180px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* bóng mờ nhẹ */ border-radius: 8px;"
                     :src="stories.urlImg" alt="">
                 <div class="left-content px-4">
                     <h4 @click="goToStory(stories.story_id)" class="text-color_primary fw-bold hover_link">{{
@@ -40,10 +40,8 @@ const categoryList = ref(null);
 import { getStoryByCategory } from '@/api/stories'
 async function fetchData() {
     const getData = await getStoryByCategory(route.params.id)
-    console.log(getData.data);
     
     categoryList.value = getData.data
-    console.log( categoryList.value.length);
     
 }
 onMounted(() => {

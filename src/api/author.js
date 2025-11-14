@@ -60,7 +60,6 @@ export const fetchTransactions = async (userId, paramsDate) => {
 
 export const giveSupport = async (fromUserId, toUserId, coins, message) => {
     try {
-        console.log(fromUserId, toUserId, coins, message);
 
         const res = await axiosClient.post(`${API_URL}/give/gift-story`, {
             from_user_id: fromUserId,

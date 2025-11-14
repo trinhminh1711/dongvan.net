@@ -20,7 +20,7 @@
                         </div>
             </div>
             <div>
-                <img style="max-width: 40px;" v-if="index == 0" :src="item.urlImg" />
+                <img style="width: 40px; height: 60px;" v-if="index == 0" :src="item.urlImg" />
             </div>
         </div>
     </div>

@@ -66,7 +66,7 @@
                 </el-table-column>
             </el-table>
             <div style="display: flex; justify-content: center;" class="mt-4 d-flex">
-                <el-pagination background layout="prev, pager, next" :page-size="pageSize" :total="tableData.length"
+                <el-pagination layout="prev, pager, next" :page-size="pageSize" :total="tableData.length"
                     v-model:current-page="currentPage" />
             </div>
 
@@ -197,7 +197,6 @@ async function fetchListStory() {
         return (order[a.status] || 99) - (order[b.status] || 99)
     })
 
-    console.log(tableData.value);
 }
 onMounted(async () => {
     fetchListStory()

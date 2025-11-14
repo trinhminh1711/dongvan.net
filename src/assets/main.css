@@ -140,7 +140,8 @@ a,
 }
 .text-link
 {
-  color: #1877F2;
+  color: #e60000;
+  font-weight: bold;
 }
 .text-link:hover{
   cursor: pointer;
@@ -166,6 +167,10 @@ a,
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.hover-pointer:hover
+{
+  cursor: pointer;
 }
 .btn-no-pointer {
   cursor: default !important;

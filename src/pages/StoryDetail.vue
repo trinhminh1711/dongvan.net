@@ -6,7 +6,7 @@
             </div>
             <!-- Cột ảnh bìa -->
             <div v-if="!loading" class="col-md-4 text-center">
-                <img :src="storyData?.urlImg" fit="cover" style="width: 70%; border-radius: 12px;" />
+                <img :src="storyData?.urlImg" fit="cover" style="width: 70%; border-radius: 12px; height: 400px;" />
             </div>
 
             <!-- Cột nội dung -->
@@ -123,7 +123,7 @@
                             </el-table-column>
                         </el-table>
                         <div class="mt-3 d-flex justify-content-center">
-                            <el-pagination background layout="prev, pager, next" :page-size="pageSize"
+                            <el-pagination layout="prev, pager, next" :page-size="pageSize"
                                 :current-page="currentPage" :total="chapters.length"
                                 @current-change="handlePageChange" />
                         </div>

@@ -1,12 +1,12 @@
 <template>
     <div>
         <PostCard v-for="(post, index) in paginatedPosts" :key="index" :title="post.title" :content="post.content"
-            :username="post.username" :created_at="timeAgo(post.created_at)" :hashtag="post.hashtag"
+            :username="post.username" :user_id="post.user_id" :created_at="timeAgo(post.created_at)" :hashtag="post.hashtag"
             :postId="post.post_id"
             :total_likes="post.total_likes" :total_comments="post.total_comments" :is-active="true"
             :topic_title="post.topic_title" :topic_id="post.topic_id" :STT="index" />
-        <div class="flex justify-center mt-4">
-            <el-pagination background layout="prev, pager, next" :total="postData.length" :page-size="pageSize"
+        <div class="d-flex justify-center mt-4">
+            <el-pagination layout="prev, pager, next" :total="postData.length" :page-size="pageSize"
                 v-model:current-page="currentPage" @current-change="handlePageChange" />
         </div>
     </div>
@@ -27,6 +27,8 @@ const postData = ref([])
 onMounted(async () => {
     const res = await getPost()
     postData.value = res.data
+
+    
 })
 const paginatedPosts = computed(() => {
     const start = (currentPage.value - 1) * pageSize.value;

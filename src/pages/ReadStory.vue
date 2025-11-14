@@ -12,8 +12,8 @@
             <h4 @click="gotoStory(chapterData?.story_id)" class="text-white fw-bold text-md hover-link">{{
                 chapterData?.story_title }}</h4>
             <div class="button-function">
-                <button @click="drawer = true, showOption = true"><img style="max-width: 40px;"
-                        src="@/assets/icon/bookmark-add.png" alt=""></img></button>
+                <button :class="{ 'yellow-filter': isBookmark }" class="hover_link" @click="addBookMark()"><img
+                        style="max-width: 40px;" src="@/assets/icon/bookmark-add.png" alt=""></img></button>
                 <button @click="drawer = true, showOption = true"><img style="max-width: 40px;"
                         src="@/assets/icon/icon-list.png" alt=""></img></button>
                 <button @click="drawer = true, showOption = false"><img style="max-width: 40px;"
@@ -84,13 +84,14 @@
                 </div>
             </div>
         </div>
-        <el-drawer v-model="drawer" direction="rtl" size="400px">
+        <el-drawer v-model="drawer" direction="rtl" size="350px">
             <template #header>
                 <div class="flex items-center justify-between w-full">
                     <!-- <h3 class="text-lg fw-bold">Danh sách</h3> -->
                 </div>
             </template>
-            <MenuBar :storyId="Number(route.params.id)" :chapterId="Number(route.params.chapId)" v-if="showOption" />
+            <MenuBar :user-id="auth.userId" :storyId="Number(route.params.id)" :chapterId="Number(route.params.chapId)"
+                @update:isBookmark="isBookmark = $event" v-show="showOption" />
             <MenuEditUI @set-layout="setLayout" :isTwoColumn="isTwoColumn" @change-font="handleFontChange"
                 @changeTheme="handleTheme" @changeFontSize="handleFontSize" v-if="!showOption" />
         </el-drawer>
@@ -110,21 +111,24 @@
             </template>
         </el-dialog>
         <el-dialog v-if="chapterNumber" v-model="unlockFullChapterDialog" title="Mở khóa combo ưu đãi" width="300">
-            <p class="mt-2">Số chương sẽ mở: <strong style="color: #344054;">{{ chapterNumber.length }} chương <br>
-                    </br> (Từ chương {{ chapterNumber[0].chap_number }} đến chương {{
-                        chapterNumber[chapterNumber.length - 1].chap_number }})</strong></p>
-            <p class="mt-2">Giá ban đầu: <strong style="color: #344054;">{{ 5 * chapterNumber.length }} Tang
-                    diệp</strong></p>
-            <p class="mt-2">Giá đã giảm: <strong style="color: #344054;">{{ chapterNumber.length > 1 ? 4 *
-                chapterNumber.length
-                : 5 *
-                chapterNumber.length }} Tang diệp</strong></p>
-            <p class="mt-2">Số Tang diệp hiện có: <strong style="color: #344054;">{{ cointUser }}</strong></p>
+            <div v-if="chapterNumber.length > 1">
+                <p class="mt-2">Số chương sẽ mở: <strong style="color: #344054;">{{ chapterNumber.length }} chương <br>
+                        </br> (Từ chương {{ chapterNumber[0].chap_number }} đến chương {{
+                            chapterNumber[chapterNumber.length - 1].chap_number }})</strong></p>
+                <p class="mt-2">Giá ban đầu: <strong style="color: #344054;">{{ 5 * chapterNumber.length }} Tang
+                        diệp</strong></p>
+                <p class="mt-2">Giá đã giảm: <strong style="color: #344054;">{{ chapterNumber.length > 1 ? 4 *
+                    chapterNumber.length
+                    : 5 *
+                    chapterNumber.length }} Tang diệp</strong></p>
+                <p class="mt-2">Số Tang diệp hiện có: <strong style="color: #344054;">{{ cointUser }}</strong></p>
+            </div>
+            <p v-else>Chưa đủ số chương để mở combo</p>
             <template #footer>
-                <div class="dialog-footer d-flex">
+                <div class="dialog-footer d-flex justify-content-end">
                     <el-button style="width: 50%; font-size: 12px;" @click="unlockFullChapterDialog = false">Quay
                         lại</el-button>
-                    <el-button @click="unlockFullChapter()"
+                    <el-button v-if="chapterNumber.length > 1" @click="activeUnlockFull()"
                         style="width: 50%; background-color: #FF6114; font-size: 12px; color: #fff; font-weight: 900;">
                         Xác nhận
                     </el-button>
@@ -137,10 +141,11 @@
 <script lang="ts" setup>
 import MenuBar from '@/components/read-story/MenuBar.vue';
 import MenuEditUI from '@/components/read-story/MenuEditUI.vue';
-import { ref, onMounted, watch, onBeforeUnmount, onUnmounted, computed } from "vue";
+import { useLoginModal } from '@/stores/useLoginModal'
+import { ref, onMounted, watch, onBeforeUnmount, onUnmounted, computed, nextTick } from "vue";
 import { useRoute, onBeforeRouteLeave, useRouter } from "vue-router";
 import { getChapterWithId, updateMarkReadChapter } from '@/api/chapter';
-import { updateUserReadingBook, getNumberChapterStory, getNumberChapterNotPurchaseStory, unlockChapters, getStoryFullInfo } from '@/api/stories';
+import { updateUserReadingBook, getNumberChapterStory, getNumberChapterNotPurchaseStory, unlockChapters, getStoryFullInfo, saveReadingProgress, getReadingProgress } from '@/api/stories';
 import { useAuthStore } from "@/stores/auth";
 import { getUserInfo } from '@/api/users';
 import { toast } from "vue3-toastify";
@@ -153,15 +158,18 @@ const router = useRouter()
 const drawer = ref(false);
 const cointUser = ref();
 const chapterData = ref(null)
+const loginModal = useLoginModal()
 const IsPurchased = ref(false)
 const loading = ref(true);
 const chapterNumber = ref();
 const unlockChapterDialog = ref(false)
 const unlockFullChapterDialog = ref(false)
+const listChapterUnlockCombo = ref([])
 const backgroundColor = ref("white");
 const textColor = ref("black");
 const showOption = ref(false)
 const fontFamily = ref("");
+const isBookmark = ref(false);
 const fontSize = ref(18); // px
 const liveTimeReadStory = ref();
 const startTime = ref(null)
@@ -191,23 +199,50 @@ async function fetchChapter() {
 }
 
 async function getChaptersAround() {
-    const res = await getStoryFullInfo(route.params.id)
-    if (res.data.length === 0) {
+    try {
+        const storyId = Number(route.params.id);
+        const current = Number(currentChap.value);
+
+        if (!storyId || !current) {
+            console.warn("Thiếu storyId hoặc currentChap");
+            return;
+        }
+
+        const res = await getStoryFullInfo(storyId);
+
+
+        if (!res?.data || !Array.isArray(res.data) || res.data.length === 0) {
+            prevChap.value = null;
+            nextChap.value = null;
+            console.warn("Không có dữ liệu chương!");
+            return;
+        }
+
+        // Lấy danh sách chương và sắp xếp tăng dần
+        const chapters = res.data.map(ch => Number(ch.chap_number)).sort((a, b) => a - b);
+        const maxChap = chapters[chapters.length - 1];
+        const minChap = chapters[0];
+
+        // Tìm vị trí hiện tại trong danh sách
+        const currentIndex = chapters.indexOf(current);
+
+        // Xác định chương trước và sau
+        prevChap.value = currentIndex > 0 ? chapters[currentIndex - 1] : null;
+        nextChap.value = currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
+
+    } catch (error) {
+        console.error("❌ Lỗi khi lấy danh sách chương:", error);
         prevChap.value = null;
         nextChap.value = null;
-        return;
     }
-    const maxChap = Math.max(...res.data.map(ch => ch.chap_number));
-    const minChap = Math.min(...res.data.map(ch => ch.chap_number));
-    prevChap.value = currentChap.value > minChap ? currentChap.value - 1 : null;
-
-    // next: nếu < max thì tăng 1, nếu là chương cuối thì null
-    nextChap.value = currentChap.value < maxChap ? currentChap.value + 1 : null;
-    console.log(prevChap.value, nextChap.value, currentChap.value);
-
 }
 async function unlockChapter() {
-    unlockChapterDialog.value = true
+    if (auth.userId) {
+        unlockChapterDialog.value = true
+    }
+    else {
+        loginModal.open()
+    }
 
 }
 const scrollPercentLabel = computed(() => scrollPercent.value.toFixed(0));
@@ -223,26 +258,58 @@ function toggleFullScreen() {
 }
 
 async function unlockChap(chapter) {
+    if (auth.userId) {
+        const listChap = [chapter]
+        const res = await unlockChapters(route.params.id, auth.userId, listChap)
+        if (res.status == 201) {
+            toast.success("Mở khóa chương thành công");
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000); // delay 2s tùy thời gian hiển thị toast
 
-    const listChap = [chapter]
-    const res = await unlockChapters(route.params.id, auth.userId, listChap)
-    if (res.status == 201) {
-        toast.success("Mở khóa chương thành công");
-        window.location.reload();
+        }
+        else {
+            toast.error(res.message, {
+                toastId: "unlock-error"
+            });
+        }
     }
     else {
-        toast.error(res.message, {
-            toastId: "unlock-error"
-        });
+        loginModal.open()
+    }
+}
+async function unlockFullChapter() {
+
+    if (auth.userId) {
+        unlockFullChapterDialog.value = true
+        const res = await getNumberChapterNotPurchaseStory(route.params.id, auth.userId)
+
+        if (res.length > 1) {
+            chapterNumber.value = res
+        }
+        else {
+            chapterNumber.value = 1
+        }
+        const newArr = res.map(item => item.chap_number);
+        listChapterUnlockCombo.value = newArr
+    }
+    else {
+        loginModal.open()
     }
 
 }
-async function unlockFullChapter() {
-    unlockFullChapterDialog.value = true
-    const res = await getNumberChapterNotPurchaseStory(route.params.id, auth.userId)
-    const newArr = res.map(item => item.chap_number);
-    const unlockChap = await unlockChapters(route.params.id, auth.userId, newArr)
-    console.log(res);
+async function activeUnlockFull() {
+    const unlockChap = await unlockChapters(route.params.id, auth.userId, listChapterUnlockCombo.value)
+    if (unlockChap.success) {
+        toast.success("Mở khóa thành công Combo")
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000); // delay 2s tùy thời gian hiển thị toast
+
+    }
+    else {
+        toast.error(unlockChap.message)
+    }
 
 }
 function handleFontSize(action) {
@@ -272,7 +339,25 @@ async function handleExit() {
         await updateMarkReadChapter(route.params.id, route.params.chapId, auth.userId)
     }
 }
+async function addBookMark() {
+    if (auth.userId) {
+        isBookmark.value = true
+        const storyId = route.params.id
+        const chapterId = route.params.chapId
+        const res = await saveReadingProgress({
+            user_id: auth.userId,
+            story_id: storyId,
+            chapter_id: chapterId,
+            scroll: window.scrollY,
+        })
+        toast.success("Đã lưu dấu trang");
+    }
+    else {
+        toast.info("Bạn cần đăng nhập");
+        loginModal.open()
+    }
 
+}
 function canCountAsRead(start, required) {
     const duration = (Date.now() - start) / 1000
 
@@ -283,14 +368,17 @@ function goBack() {
     // hoặc: router.go(-1)
 }
 async function gotoChap(id) {
-    await getChaptersAround()
-    router.push({
+    await getChaptersAround();
+    // Điều hướng sang chương mới
+    await router.push({
         name: "chap-detail",
         params: {
             id: route.params.id,
             chapId: id
         }
     });
+
+    // Sau khi router cập nhật, tính lại prev/next
 
 }
 async function gotoStory(id) {
@@ -300,6 +388,7 @@ async function gotoStory(id) {
     });
 
 }
+
 async function updateReadingUser() {
     const storyId = route.params.id;
     const chapterId = route.params.chapId;
@@ -320,19 +409,47 @@ function onSeek() {
     window.scrollTo({ top: scrollTo, behavior: "auto" }); // có thể dùng "smooth"
 }
 watch(
-    () => route.params,
-    () => {
-        fetchChapter();
-        initReadingTracker()
+    () => [route.params.chapId, route.query.scroll],
+    async ([newChap, newScroll], old = []) => {
+        const [oldChap = null, oldScroll = null] = old  // giá trị mặc định
+
+        try {
+            newChap = newChap ?? null
+            newScroll = Number(newScroll ?? 0)
+
+            if (newChap !== oldChap) {
+                currentChap.value = Number(newChap)
+                await fetchChapter()
+                await getChaptersAround()
+                initReadingTracker()
+                console.log("🔁 Chuyển sang chương:", newChap)
+            }
+
+            if (newScroll !== oldScroll && newScroll > 0) {
+                await nextTick()
+                window.scrollTo({ top: newScroll, behavior: 'smooth' })
+                console.log("⏬ Scroll đến vị trí:", newScroll)
+            }
+
+        } catch (err) {
+            console.error("❌ Lỗi trong watcher chapId/scroll:", err)
+        }
     },
-    
     { immediate: true }
-    
-);
+)
+async function scrollToBookmark() {
+    // chờ DOM render xong
+    await nextTick()
+    const scroll = Number(route.query.scroll) || 0
+    if (scroll > 0) {
+        window.scrollTo({ top: scroll, behavior: 'smooth' })
+    }
+}
 onMounted(async () => {
     await updateReadingUser()
     await fetchChapter();
     await getChaptersAround()
+    scrollToBookmark()
     const res = await getUserInfo(auth.userId);
     cointUser.value = res.coin_balance
     window.addEventListener("scroll", updateScroll);
@@ -341,6 +458,10 @@ onUnmounted(() => window.removeEventListener("scroll", updateScroll));
 onBeforeUnmount(() => {
     cleanupReadingTracker()
 })
+nextTick(() => {
+    const scroll = Number(route.query.scroll) || 0;
+    window.scrollTo({ top: scroll, behavior: 'smooth' });
+});
 </script>
 
 <style>
@@ -350,7 +471,7 @@ onBeforeUnmount(() => {
 }
 
 .tab-bar {
-  position: sticky;
+    position: sticky;
     top: 0;
     background-color: #3E3D43;
     display: flex;
@@ -367,7 +488,7 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 100px;
     background-color: #3E3D43;
-
+    z-index: 99;
 }
 
 .bottom-bar__nextslide {
@@ -520,5 +641,9 @@ onBeforeUnmount(() => {
     background: #4f46e5;
     cursor: pointer;
     border: none;
+}
+
+.yellow-filter {
+    filter: sepia(1) saturate(8) hue-rotate(10deg) brightness(0.9);
 }
 </style>

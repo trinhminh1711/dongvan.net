@@ -1,6 +1,6 @@
 <template>
-     <p class=" mb-3 mt-5 fw-bold ms-2">Tham gia thảo luận</p>
-    <div v-loading="loading" class="comment-box px-3 pb-2 pt-3">
+     <p v-if="authStore.userId" class=" mb-3 mt-5 fw-bold ms-2">Tham gia thảo luận</p>
+    <div v-if="authStore.userId" v-loading="loading" class="comment-box px-3 pb-2 pt-3">
         <div class="post-main__info d-flex justify-content-between gap-1">
             <div class="d-flex align-items-start">
                 <img style="width: 50px; height: 50px; border-radius: 50%;" :src="authStore.user?.link_thumbnail" alt="">
@@ -19,11 +19,16 @@
         </div>
 
     </div>
+    <div v-if="!authStore.userId" class="px-3 mt-3 pb-2 ">
+        <h4 @click="loginModal.open()" class="text-link">Login to comment</h4>
+    </div>
 </template>
 
 <script lang="ts" setup>
+import { useLoginModal } from '@/stores/useLoginModal'
 import { useAuthStore } from "@/stores/auth";
 import { addPostComment } from "@/api/forum";
+const loginModal = useLoginModal()
 const authStore = useAuthStore();
 import { ref, onMounted } from 'vue'
 const loading = ref(false)
@@ -34,7 +39,7 @@ const props = defineProps({
 })
 const commentContent = ref('')
 async function postComment() {
-    console.log(props.postId);
+
     
     loading.value = true
     const res = await addPostComment(props.postId, authStore.userId, commentContent.value)

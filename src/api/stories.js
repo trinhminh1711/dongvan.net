@@ -2,6 +2,17 @@ import axiosClient from "./axios";
 
 const API_URL = "/stories";
 
+
+export const checkStoryOwner = async (storyId) => {
+  try {
+    const res = await axiosClient.get(`${API_URL}/check-owner/${storyId}`);
+    return res.data; // { success: true, isOwner: true/false }
+  } catch (err) {
+    console.error("Error checking story owner:", err);
+    return { success: false, isOwner: false };
+  }
+};
+
 export const createStory = async (data) => {
 
     try {
@@ -53,7 +64,7 @@ export const updateStory = async (data, story_id) => {
         const res = await axiosClient.put(`${API_URL}/edit-story/${story_id}`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
-        if (res.status === 201 && res.data?.success) {
+        if (res.status === 200 && res.data?.success) {
             return {
                 success: true,
                 message: "Cập nhật thành công!",
@@ -133,7 +144,6 @@ export const getStoryComment = async (story_id) => {
 
 export const getStoryRandom = async (limit) => {
   try {
-    console.log("abc");
     
     const res = await axiosClient.get(`${API_URL}/random/story`, {
       params: { limit }   // query param ?limit=10
@@ -303,25 +313,83 @@ export const getTopUserSpending = async () => {
     }
 };
 
-
-export const unlockChapters = async (storyId, userId, chapters) => {
+export const addBookMarkStories = async () => {
     try {
-        const res = await axiosClient.post(
-            `${API_URL}/unlock-chapter/user/${userId}/story/${storyId}`,
-            { chapters }
-        );
-        return { success: true, status: res.status, data: res.data };
+        const res = await axiosClient.get(`${API_URL}/check/top-user/spending`);
+        return res.data.data;
     } catch (error) {
-        if (error.response) {
-            return {
-                success: false,
-                status: error.response.status,
-                message: error.response.data.message || "API error",
-            };
-        } else if (error.request) {
-            return { success: false, message: "No response from server" };
-        } else {
-            return { success: false, message: error.message };
-        }
+        console.error("Error fetching chapter count:", error);
+        throw error;
     }
 };
+
+export const unlockChapters = async (storyId, userId, chapters) => {
+  try {
+    // ✅ Cho phép axios nhận mọi status code, không tự throw
+    const res = await axiosClient.post(
+      `${API_URL}/unlock-chapter/user/${userId}/story/${storyId}`,
+      { chapters },
+      { validateStatus: () => true }
+    );
+
+    // ✅ Tự check status
+    if (res.status >= 200 && res.status < 300) {
+      return {
+        success: true,
+        status: res.status,
+        data: res.data,
+        message: res.data?.message || "Mở khóa chương thành công",
+      };
+    } else {
+      return {
+        success: false,
+        status: res.status,
+        message: res.data?.message || "API error",
+        data: res.data,
+      };
+    }
+
+  } catch (error) {
+    console.error("❌ Unlock API error:", error);
+
+    if (error.response) {
+      return {
+        success: false,
+        status: error.response.status,
+        message: error.response.data?.message || "API error",
+        data: error.response.data,
+      };
+    } else if (error.request) {
+      return { success: false, message: "No response from server" };
+    } else {
+      return { success: false, message: error.message };
+    }
+  }
+};
+
+
+export const saveReadingProgress = async ({ user_id, story_id, chapter_id, scroll }) => {
+  try {
+    const res = await axiosClient.post(`${API_URL}/add-bookmark`, {
+      user_id,
+      story_id,
+      chapter_id,
+      scroll,
+    })
+    return res.data
+  } catch (err) {
+    console.error('Lỗi khi lưu tiến độ đọc:', err)
+    throw err
+  }
+}
+
+// 🔹 Lấy tiến độ đọc
+export const getReadingProgress = async (user_id, story_id) => {
+  try {
+    const res = await axiosClient.get(`${API_URL}/bookmark/${user_id}/${story_id}`)
+    return res.data
+  } catch (err) {
+    console.error('Lỗi khi lấy tiến độ đọc:', err)
+    throw err
+  }
+}

@@ -14,7 +14,7 @@
                 <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
         </div>
-        <el-table class="story-table" :data="filterTableData" style="width: 100%" :fit="true">
+        <el-table class="story-table" :data="paginatedData" style="width: 100%" :fit="true">
             <el-table-column type="index" label="STT" width="80" />
             <el-table-column prop="title" width="300">
                 <template #header>
@@ -57,7 +57,7 @@
                         </el-button>
                     </el-tooltip>
                     <el-tooltip class="box-item" effect="dark" content="Chỉnh sửa truyện" placement="top-start">
-                        <el-button @click="handleDelete(scope.$index, scope.row)">
+                        <el-button @click="handleEdit(scope.$index, scope.row)">
                             <img src="@/assets/icon/edit-05.svg" alt="">
                         </el-button>
                     </el-tooltip>
@@ -139,6 +139,7 @@ const auth = useAuthStore();
 const router = useRouter()
 const tableData = ref<Story[]>([])
 const upload = ref<UploadInstance>()
+
 interface Story {
     story_id: Number,
     urlImg: String
@@ -164,7 +165,7 @@ const filterStoryData = ref(options[0].value)
 
 const search = ref('')
 const currentPage = ref(1)
-const pageSize = ref(5)
+const pageSize = ref(10)
 
 
 const handleExceed: UploadProps['onExceed'] = (files) => {
@@ -191,7 +192,11 @@ const filterTableData = computed(() =>
             data.title.toLowerCase().includes(search.value.toLowerCase())
     )
 )
-
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filterTableData.value.slice(start, end)
+})
 async function handleSelectStoryStatus(val) {
     getDataStoryApi(val)
 
@@ -201,7 +206,12 @@ function handleAdd(value) {
 
 }
 
-function handleDelete(index: number, row: Story) {
+function handleEdit(index: number, row: Story) {
+    router.push({
+        name: 'edit-story',
+        params: { id: Number(row.story_id) }
+    })
+
 }
 
 function handleSupport(index: number, row: Story) {

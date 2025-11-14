@@ -40,7 +40,7 @@
         </el-table-column>
       </el-table>
       <div class="mt-4 flex justify-center">
-        <el-pagination background layout="prev, pager, next" :total="tableData.length" :page-size="pageSize"
+        <el-pagination  layout="prev, pager, next" :total="tableData.length" :page-size="pageSize"
           v-model:current-page="currentPage" />
       </div>
     </div>
@@ -102,7 +102,7 @@ const paginatedData = computed(() => {
 async function fetchData() {
   const res = await getAllPostAdmin();
   tableData.value = res.data
-  console.log(tableData.value);
+
 }
 function handleStatusChange(row, newStatus) {
   postSelected.value = row

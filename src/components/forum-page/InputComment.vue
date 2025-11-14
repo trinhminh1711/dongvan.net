@@ -1,6 +1,6 @@
 <template>
-    <p>Tham gia thảo luận</p>
-    <div v-loading="loading" class="comment-box px-3 pb-2 pt-3 mt-3">
+    <p v-if="authStore.userId">Tham gia thảo luận</p>
+    <div v-if="authStore.userId" v-loading="loading" class="comment-box px-3 pb-2 pt-3 mt-3">
         <div class="post-main__info d-flex justify-content-between gap-1">
             <div class="d-flex align-items-start">
                 <img style="    border-radius: 50%;
@@ -22,9 +22,13 @@
         </div>
 
     </div>
+       <div v-if="!authStore.userId" class="pb-2">
+        <h4 @click="loginModal.open()" class="text-link">Login to comment</h4>
+    </div>
 </template>
 
 <script lang="ts" setup>
+
 import { useLoginModal } from '@/stores/useLoginModal'
 const loginModal = useLoginModal()
 import { useAuthStore } from "@/stores/auth";

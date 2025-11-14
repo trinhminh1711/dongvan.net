@@ -6,22 +6,24 @@
         <div class="row">
             <div class="col-3 sidebar-sticky">
                 <h3 class="fw-bold mb-3">Danh mục</h3>
-                <div @click="goToListPost(index + 1)" v-for="(item, index) in items" :key="index"
+                <div @click="goToListPost(item.id ?? items[4].id)" v-for="(item, index) in items" :key="index"
                     class=" d-flex align-items-center menu-category__item gap-2 py-2">
                     <div>
                         <img :src="item.image" alt="Logo">
                     </div>
                     <div>
                         <p class="text-color_primary">{{ item.text }}</p>
-                        <p class="text-color__tertiary">{{ item.number }} bài viết</p>
+                        <p class="text-color__tertiary">
+                             {{ item.number ?? items[4].number }} bài viết
+                        </p>
                     </div>
 
                 </div>
             </div>
             <div class="col-9">
-                    <router-view v-if="!loading" :key="$route.fullPath" v-slot="{ Component }">
-                        <component :is="Component || PostCategory" />
-                    </router-view>
+                <router-view v-if="!loading" :key="$route.fullPath" v-slot="{ Component }">
+                    <component :is="Component || PostCategory" />
+                </router-view>
 
             </div>
         </div>
@@ -35,16 +37,16 @@ import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
-import storyIcon from '@/assets/icon/category-completed1.png'
-import vectorIcon2 from '@/assets/icon/category-completed2.png'
-import vectorIcon3 from '@/assets/icon/category-completed3.png'
-import vectorIcon4 from '@/assets/icon/category-completed4.png'
-import vectorIcon5 from '@/assets/icon/category-completed5.png'
-import vectorIcon6 from '@/assets/icon/category-completed6.png'
-import vectorIcon7 from '@/assets/icon/category-completed7.png'
-import vectorIcon8 from '@/assets/icon/category-completed8.png'
-import vectorIcon9 from '@/assets/icon/category-completed9.png'
-import vectorIcon10 from '@/assets/icon/category-completed10.png'
+import storyIcon from '@/assets/icon/Forum-topic-0111.png'
+import vectorIcon2 from '@/assets/icon/Forum-topic 0-11.png'
+import vectorIcon3 from '@/assets/icon/forum-topic-0-1.png'
+import vectorIcon4 from '@/assets/icon/forum-topic-0.png'
+import vectorIcon5 from '@/assets/icon/forum-topic2.png'
+import vectorIcon6 from '@/assets/icon/forum-topic-3.png'
+import vectorIcon7 from '@/assets/icon/forum-topic-4.png'
+import vectorIcon8 from '@/assets/icon/forum-topic-5.png'
+import vectorIcon9 from '@/assets/icon/forum-topic-7.png'
+import vectorIcon10 from '@/assets/icon/forum-topic-6.png'
 import PostCard from '@/components/forum-page/PostCard.vue'
 import { getNumberPost } from '@/api/forum';
 import ListPost from '@/components/forum-page/ListPost.vue'
@@ -53,7 +55,11 @@ import CreatePostForum from '@/components/forum-page/CreatePostForum.vue'
 import PostCategory from '@/components/forum-page/PostCategory.vue'
 const loading = ref(false);
 const items = [
-    { id: 1, image: storyIcon, text: 'Luận truyện', number: '236460' },
+    { image: storyIcon, text: 'Trinh thám' },
+    { image: vectorIcon2, text: 'Ngôn tình' },
+    { image: vectorIcon3, text: 'Linh dị' },
+    { image: vectorIcon4, text: 'Lịch sử' },
+    { id: 1, image: vectorIcon5, text: 'Luận truyện' },
     { id: 2, image: vectorIcon6, text: 'Đề cử và Review truyện', number: '43492' },
     { id: 3, image: vectorIcon7, text: 'Nhập môn sáng tác', number: '77225' },
     { id: 4, image: vectorIcon8, text: 'Tìm bạn đồng sáng tác', number: '45378' },
@@ -70,12 +76,13 @@ function goToListPost(id) {
 
 async function getNumberPostForum() {
     const res = await getNumberPost();
-        res.data.forEach(d => {
+
+    res.data.forEach(d => {
         const item = items.find(i => i.id === d.topic_id)
         if (item) {
             item.number = d.total_posts
         }
-        })
+    })
 
 }
 onMounted(() => {
@@ -94,13 +101,15 @@ onMounted(() => {
 
 <style>
 .sidebar-sticky {
-  position: sticky;
-  top: 20px; /* khoảng cách với top khi scroll */
-  align-self: flex-start;
-  max-height: calc(100vh - 40px);
-  overflow-y: auto;
-  scrollbar-width: thin;
+    position: sticky;
+    top: 20px;
+    /* khoảng cách với top khi scroll */
+    align-self: flex-start;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
+
 .loader-overlay {
     position: fixed;
     top: 0;

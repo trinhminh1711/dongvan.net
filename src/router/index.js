@@ -27,8 +27,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import EditStory from '@/components/create-story/EditStory.vue'
 import NotFound from '@/pages/NotFound.vue'
 import adminRoutes from "./admin"; // 👈 Import admin routes
-
-
+import { checkStoryOwner } from '@/api/stories'
+import { useAuthStore } from "@/stores/auth";
+import { toast } from 'vue3-toastify';
+import { useLoginModal } from '@/stores/useLoginModal'
 const routes = [
     { path: '/', name: 'Home', component: HomePage },
     { path: '/library-page', name: 'library', component: LibraryPage },
@@ -60,21 +62,40 @@ const routes = [
     { path: '/story-detail/:id/chap/:chapId', name: 'chap-detail', component: ReadStory },
     {
         path: '/create-story', name: 'create-story', component: CreateStory, children:
-        [{
-            path: "list-chap/:id",
-            name: "list-chap",
-            component: ListChap
-        }]
+            [{
+                path: "list-chap/:id",
+                name: "list-chap",
+                component: ListChap
+            }]
     },
     {
-    path: '/edit-story/:id',
+        path: '/edit-story/:id',
         name: 'edit-story',
-        component: CreateStory, // hoặc EditStory nếu bạn tách riêng file
-        props: true
+        component: EditStory, // hoặc EditStory nếu bạn tách riêng file
+        props: true,
+        beforeEnter: async (to, from, next) => {
+            const auth = useAuthStore();
+            console.log(auth.userId);
+            // 1. Nếu chưa login
+            if (!auth.userId) {
+                toast.info("Bạn cần đăng nhập để chỉnh sửa truyện");
+                return next({ name: 'create-story' });
+            }
+
+            // 2. Gọi API check owner
+            const storyId = Number(to.params.id);
+            const res = await checkStoryOwner(storyId);
+
+            if (res.success && res.isOwner) {
+                next(); // được phép vào trang
+            } else {
+                toast.error("Bạn không có quyền chỉnh sửa truyện này");
+                next({ name: 'create-story' }); // redirect về trang khác
+            }
+        }
     },
     { path: '/profile', name: 'profile', component: ProfilePage, beforeEnter: requireAuth },
     { path: '/create-story/new-chap/:storyId', name: 'create-newchap', component: CreateNewTrapForm },
-    { path: '/edit-story/:id', name: 'edit-story', component: EditStory },
     { path: '/forbidden', name: 'forbidden', component: Forbidden },
     {
         path: '/article-page/:id', name: 'article', component: ArticleCategoryList, children: [
@@ -89,5 +110,18 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(), // dùng HTML5 history mode
     routes
+})
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore()
+  const loginModal = useLoginModal()
+
+  if (to.name === 'payment') {
+    if (!auth.userId) {    // chưa đăng nhập
+      loginModal.open()   // mở modal
+      return next(false)  // ngăn không cho chuyển route
+    }
+  }
+
+  next()
 })
 export default router

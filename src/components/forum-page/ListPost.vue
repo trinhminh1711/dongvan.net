@@ -17,8 +17,13 @@
                 <template #default="scope">
                     <div class="post-info py-3">
                         <div class="imgAuthor">
-                            <img style="width: 70px; height: 70px; border-radius: 50%;" :src="scope.row.avatarImg"
-                                alt="">
+                            <el-tooltip popper-class="custom-tooltip" placement="left-start">
+                                <template #content>
+                                    <UserInfoCard :idUserComment="scope.row.user_id" />
+                                </template>
+                                <img style="width: 70px; height: 70px; border-radius: 50%;" :src="scope.row.avatarImg"
+                                    alt="">
+                            </el-tooltip>
                         </div>
                         <div class="info">
                             <p> <span class="text-sm fw-semibold color-blue post-topic"><span class="dot"></span>
@@ -30,7 +35,8 @@
                                 <p class="d-flex gap-1 align-items-center">
                                     <el-icon>
                                         <User />
-                                    </el-icon> {{ scope.row.author }}
+                                    </el-icon> <span class=" hover-link" @click="goToProfile(scope.row.user_id)">{{
+                                        scope.row.author }}</span>
                                 </p>
                                 <p class="d-flex gap-1 align-items-center">
                                     <el-icon>
@@ -48,12 +54,7 @@
                 <template #default="scope">
                     <p class="like-share d-flex gap-4 py-4">
                         <span>
-                            <svg width="20" height="18" viewBox="0 0 20 18" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M9.99431 3.27985C8.32819 1.332 5.54981 0.808035 3.46227 2.59168C1.37472 4.37532 1.08083 7.35748 2.72019 9.467C4.0832 11.2209 8.20816 14.9201 9.5601 16.1174C9.71136 16.2513 9.78698 16.3183 9.8752 16.3446C9.95219 16.3676 10.0364 16.3676 10.1134 16.3446C10.2016 16.3183 10.2773 16.2513 10.4285 16.1174C11.7805 14.9201 15.9054 11.2209 17.2684 9.467C18.9078 7.35748 18.6498 4.35656 16.5264 2.59168C14.4029 0.826798 11.6604 1.332 9.99431 3.27985Z"
-                                    stroke="#667085" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
+<svg data-v-fb47b416="" class="heart-icon-unliked" width="22" height="20" viewBox="0 0 20 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path data-v-fb47b416="" d="M9.99431 3.27985C8.32819 1.332 5.54981 0.808035 3.46227 2.59168C1.37472 4.37532 1.08083 7.35748 2.72019 9.467C4.0832 11.2209 8.20816 14.9201 9.5601 16.1174C9.71136 16.2513 9.78698 16.3183 9.8752 16.3446C9.95219 16.3676 10.0364 16.3676 10.1134 16.3446C10.2016 16.3183 10.2773 16.2513 10.4285 16.1174C11.7805 14.9201 15.9054 11.2209 17.2684 9.467C18.9078 7.35748 18.6498 4.35656 16.5264 2.59168C14.4029 0.826798 11.6604 1.332 9.99431 3.27985Z"></path></svg>
                             {{ scope.row.like }}</span>
                         <span><el-icon>
                                 <ChatRound />
@@ -74,8 +75,9 @@
                             <template #content>
                                 <UserInfoCard :idUserComment="scope.row.closestInteraction.user_id" />
                             </template>
-                            <img v-if="scope.row.closestInteraction.user_id" style="width: 40px; height: 40px; border-radius: 50%;" :src="scope.row.closestInteraction.avatarImg"
-                                alt="">
+                            <img v-if="scope.row.closestInteraction.user_id"
+                                style="width: 40px; height: 40px; border-radius: 50%;"
+                                :src="scope.row.closestInteraction.avatarImg" alt="">
                         </el-tooltip>
                     </div>
                 </template>
@@ -144,6 +146,7 @@ async function getAllPostByTopic(page) {
         postId: post.post_id,
         avatarImg: post.link_thumbnail, // tạm thời fix cứng, hoặc lấy từ user table
         name: post.title,
+        user_id: post.user_id,
         author: post.username,  // chỗ này có thể thay bằng username nếu backend trả về
         time: timeAgo(post.created_at), // cần xử lý từ created_at nếu backend có
         like: post.total_likes, // nếu backend có trường view thì gán trực tiếp
@@ -189,6 +192,9 @@ function goToPost(postId) {
     });
 
 
+}
+function goToProfile(params) {
+    router.push({ name: 'user', params: { id: params } })
 }
 function convertJsonData(data) {
     return JSON.parse(data)

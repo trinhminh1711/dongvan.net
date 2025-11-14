@@ -2,7 +2,7 @@
     <div v-if="dataUser">
         <div style="background-color: #F7F6F2; border-top-left-radius: 8px; border-top-right-radius: 8px; " class="d-flex gap-2 py-2 px-2 align-items-center">
             <div>
-                <img style="width: auto; max-height:100%; max-width:50px" :src="dataUser.link_thumbnail" alt=""></img>
+                <img style=" height:50px; width:40px" :src="dataUser.link_thumbnail" alt=""></img>
             </div>
             <div>
                 <p> <span class="fw-bold text-color_primary">{{ dataUser.username }}</span><span style="color: #667085;"> (ID: 2025{{ dataUser.user_id }})</span></p>

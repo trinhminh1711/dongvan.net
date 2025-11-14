@@ -11,8 +11,10 @@
     <el-tab-pane label="Dấu trang" name="second">
       <ul class="list-menu" style="list-style: none;">
         <li class="my-3" v-for="(value, index) in bookmark" :key="index">
-          <p class="fw-bold">{{ value.text }}</p>
-          <p class="text-sm">{{ value.date }}</p>
+          <p @click="goToBookmark(value)" class="fw-bold hover-link">Bookmark {{ index + 1 }} : {{ value.chapter_title
+            }}
+          </p>
+          <p class="text-sm">Update: {{ value.updated_at.split("T")[0] }}</p>
         </li>
       </ul>
     </el-tab-pane>
@@ -23,16 +25,22 @@
 import { ref } from 'vue'
 import { defineProps } from "vue";
 import { onMounted } from "vue";
-import { getStoryFullInfo } from '@/api/stories';
+import { getStoryFullInfo, getReadingProgress } from '@/api/stories';
 import { useRouter } from "vue-router";
+import { nextTick } from 'vue'
 
 const router = useRouter();
 const props = defineProps({
   type: [Number, String],
   storyId: Number,
   chapterId: Number,
+  userId: String,
 });
+const emit = defineEmits(['update:isBookmark'])
 const storyData = ref(null)
+const bookmark = ref()
+const bookIndex = ref()
+
 async function fetchChapter() {
   storyData.value = await getStoryFullInfo(props.storyId);
 
@@ -43,6 +51,13 @@ async function fetchChapter() {
 
 
 }
+async function getBookMark() {
+  const res = await getReadingProgress(props.userId, props.storyId)
+  bookmark.value = res.data
+   if (bookmark.value) {
+    emit('update:isBookmark', true)
+  }
+}
 function gotoChap(chap_number) {
   router.push({
     name: "chap-detail",
@@ -52,13 +67,34 @@ function gotoChap(chap_number) {
     }
   });
 }
+function goToBookmark(bookmark) {
+  router.push({
+    name: 'chap-detail',
+    params: {
+      id: bookmark.story_id,
+      chapId: bookmark.chapter_id
+    },
+    query: {
+      scroll: bookmark.scroll
+    }
+  }).then(async () => {
+    // chờ DOM render xong
+    await nextTick()
+    window.scrollTo({
+      top: bookmark.scroll,
+      behavior: 'smooth'
+    })
+  })
+}
+
 onMounted(async () => {
   await fetchChapter();
+  await getBookMark()
+
 });
 const activeName = ref('first')
 
-const bookmark = ref([])
-const bookIndex = ref([])
+
 </script>
 <style scoped>
 .list-menu {
